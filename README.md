@@ -50,8 +50,7 @@ Single-follicle RNA-seq (sfRNA-seq) and ATAC-seq (sfATAC-seq) of 181 human hair 
 │           ├── mouse_Gstp1.fa
 │           └── pathway_gene_sets.csv
 │
-├── environment.yml
-└── README.md
+└── environment.yml
 ```
 
 ### Usage
