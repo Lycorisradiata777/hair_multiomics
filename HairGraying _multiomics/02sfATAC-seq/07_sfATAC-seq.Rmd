@@ -1,0 +1,1581 @@
+```{r data_preprocessing, message=FALSE, warning=FALSE}
+# Description: ATAC-seq data loading and preprocessing
+# Workflow: Part 02 - sfATAC-seq downstream analysis
+
+# ==================== ATAC-seq Data Loading and Preprocessing ====================
+library(readr)
+library(Matrix)
+library(edgeR)
+
+# ==================== Configuration ====================
+COUNT_FILE <- "./results/merged_peaks/raw_atac_counts.tsv"  # Output from merge_peaks.sh
+GROUP_FILE <- "./data/atac_group.csv"                        # Sample group information
+OUTPUT_DIR <- "./results"                                     # Output directory
+
+# ==================== Create Output Directories ====================
+dir.create(file.path(OUTPUT_DIR, "tables"), showWarnings = FALSE, recursive = TRUE)
+dir.create(file.path(OUTPUT_DIR, "figures"), showWarnings = FALSE, recursive = TRUE)
+
+# ==================== Load Data ====================
+message("[", Sys.time(), "] Loading count data from: ", COUNT_FILE)
+df <- read_tsv(COUNT_FILE, show_col_types = FALSE)
+
+# Check peak ID column
+if (!("id" %in% colnames(df))) {
+  if (ncol(df) >= 4) {
+    colnames(df)[4] <- "id"
+  } else stop("Input matrix has <4 columns; cannot find peak id.")
+}
+
+# Extract peak IDs and count matrix
+peak_ids <- as.character(df$id)
+count_matrix <- as.matrix(df[, 5:ncol(df), drop = FALSE])
+rownames(count_matrix) <- peak_ids
+mode(count_matrix) <- "integer"
+
+# Get sample names
+samples <- colnames(count_matrix)
+
+# ==================== Load Group Information ====================
+message("[", Sys.time(), "] Loading group information from: ", GROUP_FILE)
+group <- read.csv(GROUP_FILE, stringsAsFactors = FALSE)
+
+# Check if all samples are in group file
+missing_group <- setdiff(samples, group$sample)
+if (length(missing_group) > 0) {
+  stop("Missing samples in group file: ", paste(missing_group, collapse = ", "))
+}
+
+# Ensure sample order matches
+group <- group[match(samples, group$sample), ]
+
+message("Loaded ", length(peak_ids), " peaks and ", length(samples), " samples")
+
+# ==================== TMM Normalization (save cpm_tmm for PCA) ====================
+message("[", Sys.time(), "] Performing TMM normalization...")
+dge <- DGEList(counts = count_matrix)
+dge <- calcNormFactors(dge, method = "TMMwsp")
+cpm_tmm <- cpm(dge, log = FALSE)  # Save for PCA
+
+# ==================== Save Processed Data ====================
+message("[", Sys.time(), "] Saving results...")
+
+# Save count matrix
+write.csv(count_matrix, 
+          file.path(OUTPUT_DIR, "tables", "atac_counts.csv"))
+
+# Save cpm_tmm (for PCA)
+write.csv(cpm_tmm, 
+          file.path(OUTPUT_DIR, "tables", "atac_cpm_tmm.csv"))
+
+# Save group information
+write.csv(group, 
+          file.path(OUTPUT_DIR, "tables", "atac_group.csv"),
+          row.names = FALSE)
+
+# ==================== Save as List Object ====================
+atac_data <- list(
+  counts_raw = count_matrix,
+  group = group,
+  samples = samples,
+  peaks = peak_ids,
+  dge = dge,
+  cpm_tmm = cpm_tmm
+)
+
+message("------------------------------------------------")
+message("[", Sys.time(), "] Preprocessing complete.")
+message("Samples: ", length(samples))
+message("Peaks: ", length(peak_ids))
+message("Count matrix saved to: ", file.path(OUTPUT_DIR, "tables", "atac_counts.csv"))
+```
+
+```{r peak_annotation, message=FALSE, warning=FALSE}
+# Description: ATAC-seq peak annotation using ChIPseeker
+# Workflow: Part 02 - sfATAC-seq downstream analysis
+
+library(GenomicRanges)
+library(GenomeInfoDb)
+library(ChIPseeker)
+library(TxDb.Hsapiens.UCSC.hg38.knownGene)
+library(org.Hs.eg.db)
+library(dplyr)
+
+# ==================== Configuration ====================
+PEAK_FILE <- "./results/merged_peaks/raw_atac_counts.tsv"  # Peak file with genomic coordinates
+OUTPUT_DIR <- "./results/tables"                            # Output directory
+
+# Create output directory
+dir.create(OUTPUT_DIR, showWarnings = FALSE, recursive = TRUE)
+
+# ==================== Load Peak Information ====================
+df <- read_tsv(PEAK_FILE, show_col_types = FALSE)
+
+# ==================== Build GRanges Object ====================
+peak_gr <- GRanges(
+  seqnames = df$chr,
+  ranges = IRanges(start = df$start, end = df$end),
+  strand = "*"
+)
+names(peak_gr) <- df$id
+
+# ==================== Standardize Chromosome Style and Filter ====================
+seqlevelsStyle(peak_gr) <- "UCSC"
+txdb <- TxDb.Hsapiens.UCSC.hg38.knownGene
+
+# Keep only standard chromosomes
+peak_gr <- keepSeqlevels(
+  peak_gr, 
+  intersect(seqlevels(peak_gr), seqlevels(txdb)),
+  pruning.mode = "coarse"
+)
+
+# ==================== Peak Annotation ====================
+peak_anno <- annotatePeak(
+  peak_gr, 
+  TxDb = txdb, 
+  tssRegion = c(-1000, 1000),
+  annoDb = "org.Hs.eg.db"
+)
+
+# Convert to data frame
+annotated_df <- as.data.frame(peak_anno)
+annotated_df$peak_id <- names(peak_gr)
+
+# ==================== Save Annotation Results ====================
+output_file <- file.path(OUTPUT_DIR, "atac_peaks_annotated.csv")
+write.csv(annotated_df, output_file, row.names = FALSE)
+
+# ==================== Return Annotation Results ====================
+atac_peak_annotation <- annotated_df
+```
+
+```{r peak_coefficient_of_variation, message=FALSE, warning=FALSE}
+# Description: Coefficient of Variation (CV) analysis for ATAC-seq peaks
+# Workflow: Part 02 - sfATAC-seq downstream analysis
+
+library(matrixStats)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(ggpubr)
+
+# ==================== Configuration ====================
+OUTPUT_DIR <- "./results"
+topN <- 33287
+threshold_mean <- 1
+eps <- 1e-8
+test_method <- "t.test"
+
+# Create output directories
+dir.create(file.path(OUTPUT_DIR, "figures"), recursive = TRUE, showWarnings = FALSE)
+dir.create(file.path(OUTPUT_DIR, "tables"), recursive = TRUE, showWarnings = FALSE)
+
+# ==================== Data Preparation ====================
+cpm_tmm <- atac_data$cpm_tmm
+group <- atac_data$group
+
+# 1) Use top_peaks from PCA if available, otherwise select by variance
+if (exists("pca_out") && !is.null(pca_out$top_peaks)) {
+  top_peaks <- intersect(pca_out$top_peaks, rownames(cpm_tmm))
+  if (length(top_peaks) == 0) stop("pca_out$top_peaks not found in cpm_tmm")
+} else {
+  rv <- rowVars(cpm_tmm)
+  names(rv) <- rownames(cpm_tmm)
+  topN_use <- min(topN, length(rv))
+  top_peaks <- names(sort(rv, decreasing = TRUE))[1:topN_use]
+}
+
+# 2) Subset cpm and align groups
+cpm_top <- cpm_tmm[top_peaks, , drop = FALSE]
+group_in_mat <- group[group$sample %in% colnames(cpm_top), , drop = FALSE]
+
+black_samples <- group_in_mat$sample[group_in_mat$colour == "Black"]
+gray_samples  <- group_in_mat$sample[group_in_mat$colour == "Gray"]
+
+# 3) Calculate mean, sd, CV%
+mean_black <- rowMeans(cpm_top[, colnames(cpm_top) %in% black_samples, drop = FALSE], na.rm = TRUE)
+sd_black   <- rowSds(cpm_top[, colnames(cpm_top) %in% black_samples, drop = FALSE], na.rm = TRUE)
+cv_black   <- sd_black / (mean_black + eps) * 100
+
+mean_gray <- rowMeans(cpm_top[, colnames(cpm_top) %in% gray_samples, drop = FALSE], na.rm = TRUE)
+sd_gray   <- rowSds(cpm_top[, colnames(cpm_top) %in% gray_samples, drop = FALSE], na.rm = TRUE)
+cv_gray   <- sd_gray / (mean_gray + eps) * 100
+
+# 4) Filter: keep peaks with mean >= threshold in at least one group
+keep_by_mean <- (mean_black >= threshold_mean) | (mean_gray >= threshold_mean)
+sel_peaks <- top_peaks[keep_by_mean]
+
+# 5) Prepare plot data
+cv_df <- data.frame(peak = sel_peaks,
+                    Black = cv_black[sel_peaks],
+                    Gray  = cv_gray[sel_peaks],
+                    stringsAsFactors = FALSE)
+
+df_long <- cv_df %>%
+  pivot_longer(cols = c("Black", "Gray"), names_to = "colour", values_to = "CV") %>%
+  mutate(logCV = log10(CV + eps))
+
+# 6) Save CV results
+write.csv(cv_df, file.path(OUTPUT_DIR, "tables", "atac_cv_results.csv"), row.names = FALSE)
+
+# 7) Generate plot
+y_max <- max(df_long$logCV, na.rm = TRUE)
+y_pos <- y_max + 0.08 * max(1, abs(y_max))
+
+cv_vln <- ggplot(df_long, aes(x = colour, y = logCV, fill = colour, color = colour)) +
+  geom_violin(trim = FALSE, width = 0.9) +
+  geom_boxplot(width = 0.12, outlier.size = 0.5, position = position_dodge(width = 0.9), coef = 1.5) +
+  xlab("Group") + ylab("log10(Coefficient of variation)") +
+  stat_compare_means(method = test_method, label = "p.signif", 
+                     label.y = y_pos, label.x = 1.5) +
+  scale_color_manual(values = c("Black" = "#3f60aa", "Gray" = "#cc340c")) +
+  scale_fill_manual(values = c("Black" = "#3f60aa", "Gray" = "#cc340c")) +
+  theme_bw() +
+  theme(axis.title = element_text(size = 14, face = "bold"),
+        axis.text = element_text(size = 12),
+        legend.position = "none")
+
+# Save figure
+ggsave(file.path(OUTPUT_DIR, "figures", "atac_cv_violin.png"), 
+       cv_vln, width = 6, height = 5, dpi = 300)
+print(cv_vln)
+```
+
+```{r peak_count_statistics, message=FALSE, warning=FALSE}
+# Description: Peak count statistics per sample for ATAC-seq
+# Workflow: Part 02 - sfATAC-seq downstream analysis
+
+library(matrixStats)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(ggpubr)
+
+# ==================== Configuration ====================
+OUTPUT_DIR <- "./results"
+presence_threshold <- 10
+test_method <- "t.test"
+use_pca_top_peaks_if_exists <- TRUE
+
+# Create output directories
+dir.create(file.path(OUTPUT_DIR, "figures"), recursive = TRUE, showWarnings = FALSE)
+dir.create(file.path(OUTPUT_DIR, "tables"), recursive = TRUE, showWarnings = FALSE)
+
+# ==================== Data Preparation ====================
+mat <- atac_data$cpm_tmm
+group <- atac_data$group
+
+# 1) Use PCA top_peaks if available
+if (use_pca_top_peaks_if_exists && exists("pca_out") && !is.null(pca_out$top_peaks)) {
+  top_peaks <- intersect(pca_out$top_peaks, rownames(mat))
+  if (length(top_peaks) > 0) {
+    mat <- mat[top_peaks, , drop = FALSE]
+  }
+}
+
+# 2) Align samples
+samples_mat <- colnames(mat)
+group_in_mat <- group[group$sample %in% samples_mat, , drop = FALSE]
+
+# 3) Calculate present peak count per sample (CPM >= threshold)
+pres_mat <- (mat >= presence_threshold)
+counts_per_sample <- colSums(pres_mat, na.rm = TRUE)
+
+# 4) Prepare plot data
+df_counts <- data.frame(
+  sample = names(counts_per_sample),
+  peak_count = as.integer(counts_per_sample),
+  stringsAsFactors = FALSE
+)
+
+# Match group information
+group_sub <- group[match(df_counts$sample, group$sample), , drop = FALSE]
+df_counts <- cbind(df_counts, group_sub[, !colnames(group_sub) %in% "sample", drop = FALSE])
+
+# 5) Factor levels
+df_counts$colour <- factor(df_counts$colour, levels = c("Black", "Gray"))
+
+# 6) Log transformation
+df_counts$plot_y <- log2(df_counts$peak_count + 1)
+
+# 7) Save statistics
+write.csv(df_counts, 
+          file.path(OUTPUT_DIR, "tables", "atac_peakcount_stats.csv"),
+          row.names = FALSE)
+
+# 8) Generate plot
+p_peakcount <- ggplot(df_counts, aes(x = colour, y = plot_y, fill = colour, color = colour)) +  
+  geom_violin(alpha = 0.7, trim = FALSE, linewidth = 0.6, width = 0.8) +  
+  geom_boxplot(width = 0.15, alpha = 0.3, outlier.shape = NA, linewidth = 0.4) +
+  stat_compare_means(method = test_method, label.x = 1.25, 
+                     label.y = max(df_counts$plot_y) * 1.05, 
+                     size = 3, bracket.size = 0.4) +
+  scale_color_manual(values = c("Black" = "#3f60aa", "Gray" = "#cc340c"), guide = "none") +
+  scale_fill_manual(values = c("Black" = "#3f60aa", "Gray" = "#cc340c"), guide = "none") +
+  labs(x = "", y = "Number of present peaks (log2)") +
+  theme_bw(base_size = 14) +
+  theme(
+    panel.grid.major = element_line(color = "gray95", linewidth = 0.3),
+    panel.grid.minor = element_blank(),
+    panel.border = element_rect(linewidth = 0.8, color = "black"),
+    panel.background = element_rect(fill = "white"),
+    axis.title.y = element_text(size = 15, face = "bold", margin = margin(r = 10)),
+    axis.title.x = element_blank(),
+    axis.text.x = element_text(size = 13, face = "bold", color = "black"),
+    axis.text.y = element_text(size = 12, color = "black"),
+    axis.ticks = element_line(color = "black", linewidth = 0.5),
+    plot.margin = margin(15, 15, 15, 15)
+  )
+
+# 9) Display and save
+print(p_peakcount)
+ggsave(file.path(OUTPUT_DIR, "figures", "atac_peakcount_violin.png"), 
+       plot = p_peakcount, width = 5, height = 4, dpi = 300, bg = "white")
+
+# 10) Return results
+peakcount_res <- list(
+  presence_threshold = presence_threshold,
+  counts_df = df_counts,
+  plot = p_peakcount
+)
+```
+
+```{r frip_analysis, message=FALSE, warning=FALSE}
+# Description: FRiP (Fraction of Reads in Peaks) analysis for ATAC-seq
+# Workflow: Part 02 - sfATAC-seq downstream analysis
+
+library(readr)
+library(dplyr)
+library(ggplot2)
+library(ggpubr)
+
+# ==================== Configuration ====================
+OUTPUT_DIR <- "./results"
+FRIP_FILE <- "./data/frip.tsv"                    # FRiP results file
+GROUP_FILE <- "./data/atac_group.csv"              # Group information file
+test_method <- "t.test"
+cols_map <- c("Black" = "#3f60aa", "Gray" = "#cc340c")
+
+# Create output directories
+dir.create(file.path(OUTPUT_DIR, "figures"), recursive = TRUE, showWarnings = FALSE)
+dir.create(file.path(OUTPUT_DIR, "tables"), recursive = TRUE, showWarnings = FALSE)
+
+# ==================== Load Data ====================
+fr_raw <- read_tsv(FRIP_FILE, show_col_types = FALSE)
+
+# Process FRiP data (columns: sample, total_mapped, in_peaks, FRiP)
+fr <- fr_raw %>%
+  dplyr::select(sample, FRiP) %>%
+  mutate(FRiP = as.numeric(FRiP))
+
+# Load group information
+group <- read.csv(GROUP_FILE)
+
+# Merge with group information
+fr2 <- left_join(fr, group, by = "sample") %>% 
+  filter(!is.na(FRiP), !is.na(colour))
+
+# ==================== Filter Samples ====================
+# Use QC-passed samples from atac_data
+keep_samples <- atac_data$samples
+present_keep <- intersect(keep_samples, fr2$sample)
+df <- fr2 %>% filter(sample %in% present_keep)
+
+# Set factor levels
+df$colour <- factor(df$colour, levels = c("Black", "Gray"))
+
+# ==================== Calculate y-axis position ====================
+y_pos <- max(df$FRiP, na.rm = TRUE) * 1.15
+
+# ==================== Generate Plot ====================
+p_frip <- ggplot(df, aes(x = colour, y = FRiP, fill = colour, color = colour)) +
+  geom_violin(alpha = 0.7, trim = FALSE, linewidth = 0.6, width = 0.8) +
+  geom_boxplot(width = 0.15, alpha = 0.3, outlier.shape = NA, linewidth = 0.4) +
+  stat_compare_means(method = test_method, 
+                     label.x = 1.25, 
+                     label.y = y_pos,
+                     size = 3,
+                     bracket.size = 0.4) +
+  scale_color_manual(values = cols_map, guide = "none") +
+  scale_fill_manual(values = cols_map, guide = "none") +
+  labs(x = "", y = "FRiP") +
+  theme_bw(base_size = 14) +
+  theme(
+    panel.grid.major = element_line(color = "gray95", linewidth = 0.3),
+    panel.grid.minor = element_blank(),
+    panel.border = element_rect(linewidth = 0.8, color = "black"),
+    axis.title.y = element_text(size = 15, face = "bold"),
+    axis.title.x = element_blank(),
+    axis.text.x = element_text(size = 13, face = "bold", color = "black"),
+    axis.text.y = element_text(size = 12, color = "black")
+  )
+
+# ==================== Display and Save ====================
+print(p_frip)
+
+# Save figure
+ggsave(file.path(OUTPUT_DIR, "figures", "atac_frip.png"), 
+       p_frip, width = 5, height = 4, dpi = 300, bg = "white")
+
+# Save data
+write.csv(df, 
+          file.path(OUTPUT_DIR, "tables", "atac_frip.csv"),
+          row.names = FALSE)
+
+# ==================== Return Results ====================
+frip_plot_res <- list(
+  df = df,
+  plot = p_frip
+)
+```
+
+```{r pca_analysis, message=FALSE, warning=FALSE}
+# Description: PCA analysis for ATAC-seq data
+# Workflow: Part 02 - sfATAC-seq downstream analysis
+
+library(Matrix)
+library(matrixStats)
+library(reshape2)
+library(ggpubr)
+library(ggplot2)
+
+# ==================== Configuration ====================
+OUTPUT_DIR <- "./results"
+topN <- nrow(atac_data$cpm_tmm)  # Use all peaks
+
+# Create output directories
+dir.create(file.path(OUTPUT_DIR, "figures"), recursive = TRUE, showWarnings = FALSE)
+dir.create(file.path(OUTPUT_DIR, "tables"), recursive = TRUE, showWarnings = FALSE)
+
+# ==================== Data Preparation ====================
+cpm_matrix <- atac_data$cpm_tmm  # Unlogged CPM matrix
+group_df <- atac_data$group
+samples <- colnames(cpm_matrix)
+
+# ==================== Select Highly Variable Peaks ====================
+rv <- rowVars(cpm_matrix)
+names(rv) <- rownames(cpm_matrix)
+topN_use <- min(topN, length(rv))
+top_peaks <- names(sort(rv, decreasing = TRUE))[seq_len(topN_use)]
+mat_top <- cpm_matrix[top_peaks, , drop = FALSE]
+
+# ==================== PCA Analysis ====================
+counts_t <- t(mat_top)  # rows = samples, columns = peaks
+pca_res <- prcomp(counts_t, center = TRUE, scale. = TRUE)
+pca.variance <- (pca_res$sdev^2) / sum(pca_res$sdev^2)
+nPCs <- length(pca_res$sdev)
+
+# ==================== Build PCA Data Frame ====================
+pca_df <- as.data.frame(pca_res$x[, seq_len(nPCs), drop = FALSE])
+pca_df$sample <- rownames(pca_df)
+pca_df <- cbind(pca_df, group_df[match(pca_df$sample, group_df$sample), 
+                                  setdiff(colnames(group_df), "sample"), drop = FALSE])
+
+# ==================== PC Significance Tests ====================
+pctest <- sapply(seq_len(nPCs), function(k){
+  x <- try(t.test(pca_df[[paste0("PC", k)]] ~ pca_df$colour), silent = TRUE)
+  if (inherits(x, "try-error")) NA_real_ else round(x$p.value, 4)
+})
+pctest <- setNames(as.data.frame(t(pctest)), paste0("PC", seq_len(nPCs)))
+
+# ==================== PCA Scatter Plot (PC1 vs PC7) ====================
+i <- 1; j <- 7
+pca_df$PCx <- pca_df[[paste0("PC", i)]]
+pca_df$PCy <- pca_df[[paste0("PC", j)]]
+
+pcaplot <- ggplot(pca_df, aes(x = PCx, y = PCy, color = colour)) +
+  geom_point(size = 3.5, alpha = 0.85) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "gray70", linewidth = 0.4) +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "gray70", linewidth = 0.4) +
+  stat_ellipse(linetype = "longdash", linewidth = 0.6, level = 0.95, alpha = 0.7) +
+  scale_color_manual(name = "Hair Colour", 
+                     values = c("Black" = "#3f60aa", "Gray" = "#cc340c")) +
+  theme_bw(base_size = 14) +
+  theme(panel.grid = element_blank(),
+        panel.border = element_rect(linewidth = 0.8, color = "black"),
+        legend.position = "right",
+        legend.title = element_text(face = "bold", size = 18),
+        legend.text = element_text(size = 16),
+        axis.title = element_text(face = "bold", size = 15),
+        axis.text = element_text(color = "black", size = 13, face = "bold"),
+        aspect.ratio = 1) +
+  labs(x = paste0("PC", i, " (", signif(pca.variance[i] * 100, 3), "%)"),
+       y = paste0("PC", j, " (", signif(pca.variance[j] * 100, 3), "%)"),
+       title = "")
+
+# Save PCA plot
+ggsave(file.path(OUTPUT_DIR, "figures", "atac_pca_pc1_vs_pc7.png"), 
+       pcaplot, width = 8, height = 6, dpi = 300, bg = "white")
+print(pcaplot)
+
+# ==================== PC1-10 Boxplot ====================
+pc_long <- reshape2::melt(pca_df[, paste0("PC", 1:10)])
+colnames(pc_long) <- c("variable", "value")
+pc_long$colour <- rep(pca_df$colour, times = 10)
+
+pcs_boxplot <- ggboxplot(pc_long, x = 'variable', y = 'value', color = 'colour',
+                         ylab = "Coordinates", xlab = "",
+                         width = 0.6, add = "none") +
+  scale_color_manual(values = c("#3f60aa", "#cc340c")) +
+  stat_compare_means(aes(group = colour), method = "t.test",
+                     symnum.args = list(cutpoints = c(0, 0.001, 0.01, 0.05, 1),
+                                        symbols = c("***", "**", "*", " ")),
+                     label = "p.signif")
+
+# Save boxplot
+ggsave(file.path(OUTPUT_DIR, "figures", "atac_pcs_boxplot.png"), 
+       plot = pcs_boxplot, width = 8, height = 5, dpi = 300)
+print(pcs_boxplot)
+
+# ==================== Save PCA Results ====================
+pca_out <- list(
+  pca_res = pca_res,
+  pca_df = pca_df,
+  pctest = pctest,
+  top_peaks = top_peaks,
+  mat_top = mat_top,
+  counts_t = counts_t,
+  pca.variance = pca.variance,
+  nPCs = nPCs
+)
+
+# Save PC significance results
+write.csv(pctest, 
+          file.path(OUTPUT_DIR, "tables", "atac_pc_significance.csv"),
+          row.names = FALSE)
+```
+
+```{r pc_variance_test, message=FALSE, warning=FALSE}
+# Description: Violin plots with variance tests for ATAC-seq principal components
+# Workflow: Part 02 - sfATAC-seq downstream analysis
+
+library(reshape2)
+library(ggplot2)
+library(dplyr)
+library(ggpubr)
+
+# ---------------- Violin Plot Function ----------------
+plot_pca_violin_with_var_test_atac <- function(pca_df, top_n_pcs = 10) {
+  # Check pca_df
+  if (!("sample" %in% colnames(pca_df))) stop("pca_df must contain sample column")
+  if (!("colour" %in% colnames(pca_df))) stop("pca_df must contain colour column")
+  pc_cols <- paste0("PC", 1:top_n_pcs)
+  missing_pc <- setdiff(pc_cols, colnames(pca_df))
+  if (length(missing_pc) > 0) stop("pca_df missing PC columns: ", paste(missing_pc, collapse = ", "))
+
+  # Step 1: reshape PCA matrix (first top_n_pcs PCs)
+  pca_long <- data.frame(sample = pca_df$sample, pca_df[, pc_cols, drop = FALSE], check.names = FALSE)
+  pcdensity <- reshape2::melt(pca_long, id.vars = "sample", variable.name = "PC", value.name = "value")
+
+  # Step 2: add group info
+  pcdensity$colour <- pca_df$colour[match(pcdensity$sample, pca_df$sample)]
+  pcdensity$colour <- factor(pcdensity$colour, levels = unique(pca_df$colour))
+
+  # Step 3: statistics + direction
+  stat_result <- pcdensity %>%
+    group_by(PC) %>%
+    summarise(
+      t_p = tryCatch(t.test(value ~ colour)$p.value, error = function(e) NA_real_),
+      var_p = tryCatch(var.test(value ~ colour)$p.value, error = function(e) NA_real_),
+      mean_gray = if ("Gray" %in% unique(colour)) mean(value[colour == "Gray"], na.rm = TRUE) else NA_real_,
+      mean_black = if ("Black" %in% unique(colour)) mean(value[colour == "Black"], na.rm = TRUE) else NA_real_,
+      y = max(value, na.rm = TRUE) + (max(value, na.rm = TRUE) - min(value, na.rm = TRUE)) * 0.15
+    ) %>%
+    mutate(
+      t_star = case_when(
+        is.na(t_p) ~ "NA",
+        t_p < 0.001 ~ "***",
+        t_p < 0.01 ~ "**",
+        t_p < 0.05 ~ "*",
+        TRUE ~ "ns"
+      ),
+      var_star = case_when(
+        is.na(var_p) ~ "NA",
+        var_p < 0.001 ~ "***",
+        var_p < 0.01 ~ "**",
+        var_p < 0.05 ~ "*",
+        TRUE ~ "ns"
+      ),
+      direction_label = case_when(
+        abs(mean_gray - mean_black) < 1e-6 ~ "~",
+        mean_gray > mean_black ~ "Gray ↑",
+        mean_gray < mean_black ~ "Black ↑",
+        TRUE ~ NA_character_
+      ),
+      label = paste0(var_star)
+    )
+
+  stat_result$PC <- factor(stat_result$PC, levels = paste0("PC", 1:top_n_pcs))
+
+  # Step 4: generate plot
+  violin_plot <- ggplot(pcdensity, aes(x = colour, y = value, fill = colour)) +
+    geom_violin(trim = FALSE, scale = "width", alpha = 0.5) +
+    geom_boxplot(width = 0.1, outlier.shape = NA) +
+    facet_wrap(~PC, scales = "free_y", ncol = 5) +
+    geom_text(data = stat_result, aes(x = 1.5, y = y, label = label),
+              inherit.aes = FALSE, size = 3.8, lineheight = 1.2) +
+    scale_fill_manual(values = c("Gray" = "#cc340c", "Black" = "#3f60aa")) +
+    labs(x = "", y = "PC Score", fill = "Group") +
+    theme_bw() +
+    theme(
+      axis.text.x = element_text(angle = 45, hjust = 1),
+      legend.position = "top",
+      strip.text = element_text(size = 12)
+    )
+
+  print(violin_plot)
+  
+  # Save figure
+  ggsave(file.path("results/figures", "atac_pca_violin_var_test.png"), 
+         plot = violin_plot, width = 12, height = 8, dpi = 300)
+
+  return(stat_result)
+}
+
+# ---------------- Execute Function and Save Results ----------------
+usePCsToReport <- 10
+var_result_table_atac <- plot_pca_violin_with_var_test_atac(pca_df, top_n_pcs = usePCsToReport)
+
+# Save statistical results
+write.csv(var_result_table_atac, 
+          file.path("results/tables", "atac_pca_var_test_results.csv"), 
+          row.names = FALSE)
+```
+
+```{r permanova_analysis, message=FALSE, warning=FALSE}
+# Description: PERMANOVA analysis on weighted principal components for ATAC-seq
+# Workflow: Part 02 - sfATAC-seq downstream analysis
+
+library(vegan)
+
+# ==================== Configuration ====================
+OUTPUT_DIR <- "./results"
+set.seed(123)
+
+# ==================== Data Preparation ====================
+group_df <- atac_data$group
+group_df$age <- as.numeric(as.character(group_df$age))
+
+# ==================== Extract All PCs and Weight ====================
+all_pcs <- pca_df[, grep("^PC\\d+$", colnames(pca_df)), drop = FALSE]
+n_pcs <- ncol(all_pcs)
+pca_vars <- pca.variance[1:n_pcs]
+pca_weighted <- sweep(all_pcs, 2, sqrt(pca_vars), "*")
+
+# ==================== PERMANOVA Analysis ====================
+permanova_weighted <- adonis2(pca_weighted ~ colour + age + gender + donor,
+                             data = group_df,
+                             permutations = 999,
+                             method = "euclidean",
+                             by = "terms")
+
+# ==================== Save Results ====================
+write.csv(as.data.frame(permanova_weighted), 
+          file.path(OUTPUT_DIR, "tables", "atac_permanova_results.csv"),
+          row.names = TRUE)
+
+# ==================== Return Results ====================
+atac_permanova <- permanova_weighted
+```
+
+```{r loading_peaks_extraction, message=FALSE, warning=FALSE}
+# Description: Extract significant loading peaks for each PC using Z-score threshold
+# Workflow: Part 02 - sfATAC-seq downstream analysis
+
+# -------- Extract PCA Loadings (Based on Z-score Threshold) --------
+rotation <- as.data.frame(pca_out$pca_res$rotation)
+
+# -------- Parameter Settings --------
+outdir <- "results/tables/loading_peaks"
+dir.create(outdir, showWarnings = FALSE, recursive = TRUE)
+
+target_p <- 0.05  # Two-tailed significance level
+z_threshold <- qnorm(1 - target_p / 2)  # Z-score threshold
+
+# -------- Load Annotation Table --------
+annotated_df <- read.csv(
+  file.path("results/tables", "atac_peaks_annotated.csv"),
+  stringsAsFactors = FALSE
+)
+
+# Safety check
+stopifnot("peak_id" %in% colnames(annotated_df))
+
+# -------- Extract Significant Loading Peaks for Each PC --------
+all_topload <- list()
+
+for (i in 1:10) {
+  pc_loading <- rotation[, i]  # Loading vector for current PC
+  
+  # Standardize to Z-score (preserve row names = peak_id)
+  pc_z <- scale(pc_loading)[, 1]
+  names(pc_z) <- rownames(rotation)
+
+  # Find positive and negative significant peaks
+  pos_idx <- which(pc_z > z_threshold)
+  neg_idx <- which(pc_z < -z_threshold)
+
+  # Positive significant
+  positive <- if (length(pos_idx) > 0) {
+    data.frame(
+      peak_id = rownames(rotation)[pos_idx],
+      zscore  = pc_z[pos_idx],
+      loading = pc_loading[pos_idx],
+      group   = "positive",
+      pc      = i,
+      stringsAsFactors = FALSE
+    )
+  } else data.frame()
+
+  # Negative significant
+  negative <- if (length(neg_idx) > 0) {
+    data.frame(
+      peak_id = rownames(rotation)[neg_idx],
+      zscore  = pc_z[neg_idx],
+      loading = pc_loading[neg_idx],
+      group   = "negative",
+      pc      = i,
+      stringsAsFactors = FALSE
+    )
+  } else data.frame()
+
+  # Combine
+  topload <- rbind(positive, negative)
+
+  # Merge with annotations
+  if (nrow(topload) > 0) {
+    annotated <- merge(topload, annotated_df, by = "peak_id", all.x = TRUE)
+
+    # Save
+    output_file <- file.path(outdir, paste0("PC", i, "_TOPpeak.csv"))
+    write.csv(annotated, output_file, row.names = FALSE)
+  }
+
+  # Store in list
+  all_topload[[i]] <- annotated
+}
+
+# -------- Combine All PC Results --------
+final_table <- do.call(rbind, all_topload)
+write.csv(final_table, file.path(outdir, "all_TOPpeak.csv"), row.names = FALSE)
+```
+
+```{r loading_heatmap, message=FALSE, warning=FALSE}
+# Description: Heatmap visualization of significant loading peaks for selected PCs
+# Workflow: Part 02 - sfATAC-seq downstream analysis
+
+library(pheatmap)
+library(dplyr)
+
+# ====== Parameter Settings ======
+output_dir <- "results/figures"
+dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
+
+# ====== Function to Plot Loading Heatmap for a Single PC ======
+plot_pc_loading_heatmap <- function(target_pc) {
+  
+  # Extract loading peaks for this PC (both positive and negative)
+  topload <- all_topload[[target_pc]]
+  if (is.null(topload) || nrow(topload) < 2) {
+    return(NULL)
+  }
+  
+  # Preserve original order and direction
+  ordered_peaks <- topload$peak_id
+  peak_group_label <- topload$group  # "positive" / "negative"
+  
+  # Expression matrix processing (logCPM + selection + scaling)
+  expr_mat <- atac_data$cpm_tmm[ordered_peaks, , drop = FALSE]
+  expr_mat <- expr_mat[match(ordered_peaks, rownames(expr_mat)), ]  
+  expr_mat_scaled <- t(scale(t(as.matrix(expr_mat))))  
+  expr_mat_scaled[is.na(expr_mat_scaled)] <- 0  
+  
+  # Sample group information
+  group_df <- atac_data$group
+  
+  # Get PC scores for sample ordering
+  pc_scores <- pca_out$pca_res$x[, target_pc]
+  names(pc_scores) <- rownames(pca_out$pca_res$x)
+  
+  # Order samples by group + PC score
+  black_samples <- group_df$sample[group_df$colour == "Black"]
+  gray_samples <- group_df$sample[group_df$colour == "Gray"]
+  
+  black_ordered <- black_samples[order(pc_scores[black_samples])]
+  gray_ordered <- gray_samples[order(pc_scores[gray_samples])]
+  
+  # Combine: Black on left, Gray on right
+  final_order <- c(black_ordered, gray_ordered)
+  
+  # Reorder matrix
+  expr_final <- expr_mat_scaled[, final_order, drop = FALSE]
+  
+  # Column annotation
+  col_anno <- data.frame(
+    Colour = group_df$colour[match(final_order, group_df$sample)]
+  )
+  rownames(col_anno) <- final_order
+  
+  # Color settings
+  annotation_colors <- list(
+    Colour = c(Black = "#2166AC", Gray = "#B2182B")
+  )
+  color_palette <- colorRampPalette(c("#2166ac", "white", "#b2182b"))(100)
+  breaks_range  <- seq(-2, 2, length.out = 91)
+  
+  # Generate heatmap
+  pm <- pheatmap(expr_final,
+                 cluster_rows = TRUE,
+                 cluster_cols = FALSE,
+                 show_rownames = FALSE,
+                 show_colnames = FALSE,
+                 annotation_row = NA,
+                 annotation_col = col_anno,
+                 annotation_colors = annotation_colors,
+                 annotation_legend = FALSE,
+                 legend = FALSE,
+                 main = "",
+                 color = color_palette,
+                 breaks = breaks_range,
+                 border_color = NA,
+                 annotation_names_row = FALSE,
+                 annotation_names_col = FALSE,
+                 treeheight_row = 0)
+  
+  # Save
+  outfile <- file.path(output_dir, paste0("atac_PC", target_pc, "_loading_heatmap.png"))
+  png(outfile, width = 2500, height = 1500, res = 300)
+  print(pm)
+  dev.off()
+  
+  return(pm)
+}
+
+# ====== Generate Heatmaps for PC1 and PC7 ======
+for (pc in c(1, 7)) {
+  plot_pc_loading_heatmap(pc)
+}
+```
+
+```{r peak_distribution, message=FALSE, warning=FALSE}
+# Description: Stacked barplot showing genomic distribution of significant loading peaks
+# Workflow: Part 02 - sfATAC-seq downstream analysis
+
+library(ggplot2)
+library(dplyr)
+
+# ====== Load Annotation Table ======
+annotated_df <- read.csv(
+  file.path("results/tables", "atac_peaks_annotated.csv"),
+  stringsAsFactors = FALSE
+)
+
+# ====== Define Distribution Function ======
+get_distribution <- function(peaks, group_name, annotated_df) {
+  df <- subset(annotated_df, peak_id %in% peaks$peak_id)
+  df$annotation <- replace(df$annotation, grepl("Intron", df$annotation), "Intron")
+  df$annotation <- replace(df$annotation, grepl("Exon",   df$annotation), "Exon")
+  df <- df[!is.na(df$annotation), ]
+  dis <- as.data.frame(table(df$annotation), stringsAsFactors = FALSE)
+  dis$group <- group_name
+  names(dis) <- c("Distribution", "Freq", "group")
+  return(dis)
+}
+
+# ====== Define Plot Function ======
+plot_pc_distribution <- function(spc) {
+  
+  # Select loading peaks for this PC
+  select_loading_peak <- all_topload[[spc]]
+  if (is.null(select_loading_peak) || nrow(select_loading_peak) == 0) {
+    return(NULL)
+  }
+  
+  # Get distribution for negative and positive groups
+  negadis <- get_distribution(
+    peaks = subset(select_loading_peak, group == "negative"),
+    group_name = "negative",
+    annotated_df = annotated_df
+  )
+  posidis <- get_distribution(
+    peaks = subset(select_loading_peak, group == "positive"),
+    group_name = "positive",
+    annotated_df = annotated_df
+  )
+  
+  # Combine and calculate proportions
+  pc_peakdis <- bind_rows(posidis, negadis) %>%
+    group_by(group) %>%
+    mutate(Proportion = Freq / sum(Freq)) %>%
+    ungroup()
+  
+  # Define stack order
+  stack_order <- c("3' UTR", "5' UTR", "Distal Intergenic",
+                   "Downstream (<=300bp)", "Exon", "Intron", "Promoter")
+  
+  present_levels <- intersect(stack_order, unique(pc_peakdis$Distribution))
+  pc_peakdis$Distribution <- factor(pc_peakdis$Distribution, levels = present_levels)
+  
+  pc_peakdis <- pc_peakdis %>%
+    group_by(group) %>%
+    mutate(Proportion = Freq / sum(Freq)) %>%
+    ungroup()
+  
+  # X-axis label mapping
+  label_map <- c("negative" = "Black", "positive" = "Gray")
+  
+  # Generate plot
+  peak_barplot <- ggplot(pc_peakdis, aes(x = group, y = Proportion, fill = Distribution)) +   
+    geom_bar(stat = "identity", width = 0.92, color = NA) +
+    labs(x = NULL, y = "Proportion", title = paste0("PC", spc)) +
+    scale_y_continuous(expand = expansion(mult = c(0, 0.06)),
+                       labels = scales::percent_format(accuracy = 1)) +
+    scale_x_discrete(expand = expansion(add = c(0.08, 0.08)),
+                     labels = label_map) +
+    scale_fill_manual(values = c(
+      "3' UTR"               = "#8DD3C7",
+      "5' UTR"               = "#FFFFB3",
+      "Distal Intergenic"    = "#BEBADA",
+      "Downstream (<=300bp)" = "#FB8072",
+      "Exon"                 = "#80B1D3",
+      "Intron"               = "#FDB462",
+      "Promoter"             = "#B3DE69"
+    )[present_levels],
+    breaks = present_levels,
+    na.value = "grey80") +
+    theme(
+      plot.title = element_text(size = 18, face = "bold", hjust = 0, vjust = 1.2),
+      axis.text.x = element_text(size = 14, face = "bold"),
+      axis.text.y = element_text(size = 12),
+      axis.ticks.y = element_blank(),
+      legend.title = element_text(size = 14, face = "bold"),
+      legend.text = element_text(size = 13),
+      panel.background = element_rect(fill = "white"),
+      panel.grid = element_blank(),
+      axis.ticks.x = element_blank(),
+      axis.line = element_blank(),
+      axis.title.y = element_text(size = 14, margin = margin(r = 14)),
+      plot.margin = unit(c(10, 12, 8, 8), "pt")
+    )
+  
+  print(peak_barplot)
+  
+  # Save figure
+  outfile <- file.path("results/figures", paste0("atac_PC", spc, "_peak_distribution.png"))
+  ggsave(outfile, peak_barplot, width = 6, height = 4, dpi = 300)
+  
+  return(peak_barplot)
+}
+
+# ====== Generate Distribution Plots for PC1 and PC7 ======
+for (pc in c(1, 7)) {
+  plot_pc_distribution(pc)
+}
+```
+
+```{r rgreat_input_preparation, message=FALSE, warning=FALSE}
+# Description: Export peaks for rGREAT analysis (BED + CSV format)
+# Workflow: Part 02 - sfATAC-seq downstream analysis
+
+# ========== Export Peaks for Specific PC & Group ==========
+
+# Output directory
+outdir <- "results/tables/rgreat_input"
+dir.create(outdir, recursive = TRUE, showWarnings = FALSE)
+
+# Target PCs and groups
+target_pcs <- c(1, 7)
+target_groups <- c("positive", "negative")
+
+# Load required packages
+library(GenomicRanges)
+library(GenomeInfoDb)
+
+# Helper: safely get peak_id column
+ensure_peak_id <- function(df) {
+  if (!is.data.frame(df)) df <- as.data.frame(df, stringsAsFactors = FALSE)
+  if (!("peak_id" %in% colnames(df))) {
+    if (!is.null(rownames(df))) {
+      df$peak_id <- rownames(df)
+    } else stop("Data frame has no peak_id column and no rownames.")
+  }
+  df
+}
+
+# Helper: merge with annotated_df and build GRanges
+clean_and_build_gr <- function(sub_df, annotated_df) {
+  sub_df <- ensure_peak_id(sub_df)
+  ann <- as.data.frame(annotated_df, stringsAsFactors = FALSE)
+  
+  if (!("peak_id" %in% colnames(ann))) stop("annotated_df must contain peak_id column")
+  if (!all(c("seqnames","start","end") %in% colnames(ann))) {
+    stop("annotated_df must contain seqnames, start, end columns")
+  }
+  
+  # Align with annotated_df
+  idx <- match(as.character(sub_df$peak_id), as.character(ann$peak_id))
+  ann_sub <- ann[idx, , drop = FALSE]
+  merged <- cbind(sub_df, ann_sub[, c("seqnames","start","end"), drop = FALSE])
+
+  # Handle possible list columns
+  extract_first <- function(x) {
+    if (is.list(x)) sapply(x, function(v) if (is.null(v) || length(v)==0) NA else v[[1]]) else x
+  }
+  merged$seqnames <- as.character(extract_first(merged$seqnames))
+  merged$start <- as.numeric(extract_first(merged$start))
+  merged$end <- as.numeric(extract_first(merged$end))
+
+  # Add chr prefix if needed
+  if (!any(grepl("^chr", na.omit(merged$seqnames)))) {
+    merged$seqnames <- paste0("chr", merged$seqnames)
+  }
+
+  # Filter invalid coordinates
+  merged <- merged[!is.na(merged$seqnames) & !is.na(merged$start) & !is.na(merged$end) & 
+                   merged$start < merged$end, , drop = FALSE]
+  
+  if (nrow(merged) == 0) {
+    return(list(df = merged, gr = GRanges()))
+  }
+
+  # Build GRanges
+  gr <- GRanges(seqnames = merged$seqnames,
+                ranges = IRanges(start = merged$start, end = merged$end))
+  names(gr) <- as.character(merged$peak_id)
+
+  # Keep only standard chromosomes
+  std_chrs <- paste0("chr", c(1:22, "X", "Y", "M"))
+  gr <- keepSeqlevels(gr, intersect(seqlevels(gr), std_chrs), pruning.mode = "coarse")
+  gr <- sort(gr)
+
+  # Keep only retained peaks
+  merged_keep <- merged[merged$peak_id %in% names(gr), , drop = FALSE]
+
+  return(list(df = merged_keep, gr = gr))
+}
+
+# Execute export loop
+for (pc in target_pcs) {
+  if (!(pc %in% seq_along(all_topload))) next
+  
+  topdf <- all_topload[[pc]]
+  if (!is.data.frame(topdf)) topdf <- as.data.frame(topdf, stringsAsFactors = FALSE)
+  
+  for (grp in target_groups) {
+    if (!("group" %in% colnames(topdf))) next
+    
+    sub_df <- topdf[topdf$group == grp, , drop = FALSE]
+    if (nrow(sub_df) == 0) next
+    
+    res <- clean_and_build_gr(sub_df, annotated_df)
+    if (length(res$gr) == 0) next
+    
+    # Write BED file
+    bed_df <- data.frame(
+      chr = as.character(seqnames(res$gr)),
+      start = start(res$gr),
+      end = end(res$gr),
+      name = names(res$gr)
+    )
+    
+    bed_fn <- file.path(outdir, paste0("PC", pc, "_", grp, "_query.bed"))
+    write.table(bed_df, bed_fn, quote = FALSE, sep = "\t", 
+                row.names = FALSE, col.names = FALSE)
+    
+    # Write CSV file
+    csv_fn <- file.path(outdir, paste0("PC", pc, "_", grp, "_peaks.csv"))
+    write.csv(res$df, csv_fn, row.names = FALSE)
+  }
+}
+```
+
+```{r background_peaks_preparation, message=FALSE, warning=FALSE}
+# Description: Generate background peaks BED file for rGREAT analysis
+# Workflow: Part 02 - sfATAC-seq downstream analysis
+
+# ========== Generate Background Peaks BED File ==========
+
+# Output directory
+outdir <- "results/tables/rgreat_input"
+dir.create(outdir, recursive = TRUE, showWarnings = FALSE)
+bg_path <- file.path(outdir, "background_all_peaks.bed")
+
+# Check annotated_df
+if (!exists("annotated_df")) stop("annotated_df not found")
+ann <- as.data.frame(annotated_df, stringsAsFactors = FALSE)
+
+# Check required columns
+need_cols <- c("peak_id", "seqnames", "start", "end")
+miss <- setdiff(need_cols, colnames(ann))
+if (length(miss) > 0) stop("annotated_df missing columns: ", paste(miss, collapse = ", "))
+
+# Extract coordinate information
+ann2 <- ann[!is.na(ann$seqnames) & !is.na(ann$start) & !is.na(ann$end), 
+            c("peak_id", "seqnames", "start", "end")]
+ann2$seqnames <- as.character(ann2$seqnames)
+
+# Add chr prefix if needed
+if (!any(grepl("^chr", na.omit(ann2$seqnames)))) {
+  ann2$seqnames <- paste0("chr", ann2$seqnames)
+}
+
+# Convert coordinates to numeric
+ann2$start <- as.numeric(ann2$start)
+ann2$end <- as.numeric(ann2$end)
+
+# Filter invalid coordinates
+ann2 <- ann2[!is.na(ann2$start) & !is.na(ann2$end) & ann2$start < ann2$end, , drop = FALSE]
+
+# Keep only standard chromosomes
+std_chrs <- paste0("chr", c(1:22, "X", "Y", "M"))
+ann2 <- ann2[ann2$seqnames %in% std_chrs, , drop = FALSE]
+
+if (nrow(ann2) == 0) stop("No valid background peaks")
+
+# Generate BED file
+bed_df <- data.frame(
+  chr = ann2$seqnames,
+  start = ann2$start,
+  end = ann2$end,
+  name = ann2$peak_id,
+  stringsAsFactors = FALSE
+)
+
+# Write to file
+write.table(bed_df, bg_path, quote = FALSE, sep = "\t", 
+            row.names = FALSE, col.names = FALSE)
+```
+
+```{r great_enrichment_analysis, message=FALSE, warning=FALSE}
+# Description: Multi-database GREAT enrichment analysis for ATAC-seq peaks
+# Workflow: Part 02 - sfATAC-seq downstream analysis
+
+# ------------------ Multi-database GREAT Analysis ------------------
+library(GenomicRanges)
+library(rGREAT)
+library(GenomeInfoDb)
+library(dplyr)
+
+# ========== User Settings ==========
+outdir <- "results/tables/rgreat_input"
+save_dir <- file.path(outdir, "GREAT_results_multidb")
+dir.create(save_dir, recursive = TRUE, showWarnings = FALSE)
+
+beds <- list.files(outdir, pattern = "PC(1|7)_(positive|negative)_query.bed$", full.names = TRUE)
+if (length(beds) == 0) stop("No matching BED files found")
+
+species <- "hg38"
+std_chrs <- paste0("chr", c(1:22, "X", "Y", "M"))
+pval_thresh <- 0.05
+
+# ========== Main Loop ==========
+for (bedf in beds) {
+  sample_base <- sub("_query$", "", tools::file_path_sans_ext(basename(bedf)))
+  
+  # Read BED
+  bed <- read.table(bedf, stringsAsFactors = FALSE)
+  qgr <- GRanges(seqnames = bed[[1]], ranges = IRanges(start = bed[[2]], end = bed[[3]]))
+  qgr <- keepSeqlevels(qgr, intersect(seqlevels(qgr), std_chrs), pruning.mode = "coarse")
+  qgr <- sort(qgr)
+  
+  if (length(qgr) == 0) next
+
+  # Submit GREAT job
+  job <- submitGreatJob(
+    qgr, 
+    species = species,
+    includeCuratedRegDoms = TRUE,
+    rule = "basalPlusExt",
+    adv_upstream = 5.0,
+    adv_downstream = 1.0,
+    adv_span = 1000.0
+  )
+
+  # Get all database results
+  tb <- getEnrichmentTables(job, download_by = "tsv")
+  if (is.null(tb)) next
+
+  # Process each database
+  for (db_name in names(tb)) {
+    df <- as.data.frame(tb[[db_name]], stringsAsFactors = FALSE)
+    if (nrow(df) == 0) next
+    
+    df$Database <- db_name
+    
+    # Select p-value column
+    pcol_candidates <- c("HyperBonfP", "HyperFdrQ", "BinomBonfP", "BinomFdrQ", "HyperP", "BinomP")
+    pcol_use <- intersect(pcol_candidates, colnames(df))[1]
+    
+    if (!is.na(pcol_use)) {
+      df_filtered <- df %>%
+        filter(!is.na(!!sym(pcol_use)), !!sym(pcol_use) <= pval_thresh)
+      
+      if (nrow(df_filtered) > 0) {
+        db_safe <- gsub("[ /:]", "_", db_name)
+        outfile <- file.path(save_dir, paste0(sample_base, "_", db_safe, "_filtered.csv"))
+        write.csv(df_filtered, outfile, row.names = FALSE)
+      }
+    }
+  }
+  
+  # Combine all databases
+  all_dfs <- list()
+  for (db_name in names(tb)) {
+    df <- as.data.frame(tb[[db_name]], stringsAsFactors = FALSE)
+    if (nrow(df) > 0) {
+      df$Database <- db_name
+      all_dfs[[db_name]] <- df
+    }
+  }
+  
+  if (length(all_dfs) > 0) {
+    combined_df <- bind_rows(all_dfs)
+    combined_file <- file.path(save_dir, paste0(sample_base, "_ALL_DATABASES.csv"))
+    write.csv(combined_df, combined_file, row.names = FALSE)
+  }
+  
+  Sys.sleep(2)
+}
+```
+
+```{r rgreat_visualization, message=FALSE, warning=FALSE}
+# Description: Visualization of rGREAT enrichment results
+# Workflow: Part 02 - sfATAC-seq downstream analysis
+
+# ========== rGREAT Results Visualization ==========
+library(ggplot2)
+library(dplyr)
+library(stringr)
+
+# ========== Parameter Settings ==========
+outdir <- "results/figures"
+dir.create(outdir, showWarnings = FALSE, recursive = TRUE)
+
+# GREAT results path
+great_dir <- "results/tables/rgreat_input/GREAT_results_multidb"
+
+# Define four BP files to process
+bp_files <- c(
+  "PC1_negative_GO_Biological_Process_filtered.csv",
+  "PC1_positive_GO_Biological_Process_filtered.csv", 
+  "PC7_negative_GO_Biological_Process_filtered.csv",
+  "PC7_positive_GO_Biological_Process_filtered.csv"
+)
+
+file_paths <- file.path(great_dir, bp_files)
+
+# ========== Process Single File ==========
+process_bp_file <- function(file_path, sample_name) {
+  if (!file.exists(file_path)) return(NULL)
+  
+  df <- read.csv(file_path)
+  
+  df_clean <- df %>%
+    select(Desc, BinomP, ObsGenes, TotalGenes) %>%
+    mutate(
+      neg_log_p = -log10(BinomP),
+      GeneRatio = ObsGenes / TotalGenes,
+      Desc_short = str_trunc(Desc, width = 40, side = "right"),
+      Sample = sample_name
+    ) %>%
+    arrange(BinomP) %>%
+    head(20) %>%
+    mutate(Desc_short = factor(Desc_short, levels = rev(Desc_short)))
+  
+  return(df_clean)
+}
+
+# ========== Process All Files ==========
+sample_names <- c("PC1 Negative", "PC1 Positive", "PC7 Negative", "PC7 Positive")
+
+bp_list <- list()
+for (i in seq_along(file_paths)) {
+  res <- process_bp_file(file_paths[i], sample_names[i])
+  if (!is.null(res)) bp_list[[i]] <- res
+}
+
+bp_all <- bind_rows(bp_list)
+
+if (nrow(bp_all) == 0) stop("No enrichment results available")
+
+# ========== Generate Plot ==========
+colors <- c(
+  "PC1 Negative" = "#1f77b4",
+  "PC1 Positive" = "#ff7f0e",
+  "PC7 Negative" = "#2ca02c",
+  "PC7 Positive" = "#d62728"
+)
+
+p <- ggplot(bp_all, aes(x = neg_log_p, y = Desc_short, fill = Sample)) +
+  geom_col(position = position_dodge(width = 0.8), width = 0.7) +
+  facet_wrap(~Sample, scales = "free_y", ncol = 2) +
+  scale_fill_manual(values = colors, guide = "none") +
+  labs(x = "-log10(p-value)", y = NULL) +
+  theme_bw(base_size = 12) +
+  theme(
+    strip.text = element_text(size = 12, face = "bold"),
+    strip.background = element_rect(fill = "gray95"),
+    axis.text.y = element_text(size = 12, face = "bold"),
+    axis.text.x = element_text(size = 10),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor = element_blank(),
+    plot.margin = margin(10, 10, 10, 10)
+  )
+
+print(p)
+
+# Save
+ggsave(file.path(outdir, "atac_GO_BP_enrichment.png"), 
+       p, width = 12, height = 10, dpi = 300)
+```
+
+```{r motif_visualization, message=FALSE, warning=FALSE}
+# Description: Visualization of HOMER motif enrichment results
+# Workflow: Part 02 - sfATAC-seq downstream analysis
+
+# ========== HOMER Motif Results Visualization ==========
+library(ggplot2)
+library(dplyr)
+library(stringr)
+library(purrr)
+
+# ========== Parameter Settings ==========
+outdir <- "results/figures"
+dir.create(outdir, showWarnings = FALSE, recursive = TRUE)
+
+# Define four folders and corresponding sample names
+motif_dirs <- c(
+  "PC1_negative_homer",
+  "PC1_positive_homer", 
+  "PC7_negative_homer",
+  "PC7_positive_homer"
+)
+
+sample_names <- c("PC1 Negative", "PC1 Positive", "PC7 Negative", "PC7 Positive")
+
+base_path <- "results/motif_analysis"
+
+# ========== Read and Process Each Motif File ==========
+process_motif_file <- function(dir_path, sample_name) {
+  file_path <- file.path(dir_path, "knownResults.txt")
+  
+  if (!file.exists(file_path)) {
+    return(NULL)
+  }
+  
+  df <- read.delim(file_path, check.names = FALSE, stringsAsFactors = FALSE)
+  
+  df_clean <- df %>%
+    mutate(
+      temp_name = str_extract(.[[1]], "^[^/]+"),
+      Motif_short = str_remove_all(temp_name, "\\([^)]*\\)"),
+      Motif_short = str_trim(Motif_short),
+      Motif_short = str_trunc(Motif_short, width = 20, side = "right"),
+      P_val = as.numeric(.[[3]]),
+      neg_log_p = -log10(P_val),
+      Sample = sample_name
+    ) %>%
+    filter(!is.na(P_val)) %>%
+    arrange(P_val) %>%
+    head(20) %>%
+    mutate(Motif_short = factor(Motif_short, levels = rev(unique(Motif_short))))
+  
+  return(df_clean)
+}
+
+# Process four folders
+motif_list <- list()
+for (i in seq_along(motif_dirs)) {
+  dir_path <- file.path(base_path, motif_dirs[i])
+  motif_list[[i]] <- process_motif_file(dir_path, sample_names[i])
+}
+
+# Filter out NULL or empty data frames
+motif_list <- motif_list[!sapply(motif_list, function(x) is.null(x) || nrow(x) == 0)]
+
+if (length(motif_list) > 0) {
+  motif_all <- bind_rows(motif_list)
+  
+  # Define colors
+  colors <- c(
+    "PC1 Negative" = "#1f77b4",
+    "PC1 Positive" = "#ff7f0e", 
+    "PC7 Negative" = "#2ca02c",
+    "PC7 Positive" = "#d62728"
+  )
+  
+  # Generate bar plot
+  p <- ggplot(motif_all, aes(x = neg_log_p, y = Motif_short, fill = Sample)) +
+    geom_col(position = position_dodge(width = 0.8), width = 0.7) +
+    facet_wrap(~Sample, scales = "free_y", ncol = 2) +
+    scale_fill_manual(values = colors, guide = "none") +
+    labs(x = "-log10(p-value)", y = NULL) +
+    theme_bw(base_size = 12) +
+    theme(
+      strip.text = element_text(size = 12, face = "bold"),
+      strip.background = element_rect(fill = "gray95"),
+      axis.text.y = element_text(size = 11, face = "bold"),
+      axis.text.x = element_text(size = 10),
+      axis.title.x = element_text(size = 12, face = "bold"),
+      panel.grid.major.y = element_blank(),
+      panel.grid.minor = element_blank(),
+      plot.margin = margin(10, 10, 10, 10)
+    )
+  
+  print(p)
+  
+  # Save
+  ggsave(file.path(outdir, "atac_motif_enrichment.png"), 
+         p, width = 14, height = 10, dpi = 300)
+}
+```
+
+```{r promoter_matrix, message=FALSE, warning=FALSE}
+# Description: Aggregate ATAC-seq promoter peaks into gene-level matrix
+# Workflow: Part 02 - sfATAC-seq downstream analysis
+
+# ========== Aggregate ATAC-seq Promoter Peaks to Gene Matrix ==========
+library(dplyr)
+library(edgeR)
+
+# ========== Function Definition ==========
+make_promoter_matrix <- function(
+  annotated_path = "results/tables/atac_peaks_annotated.csv",
+  out_dir = "results/tables/integration",
+  out_promoter_csv = file.path(out_dir, "atac_promoter_genes.csv"),
+  out_group_csv = file.path(out_dir, "atac_group.csv"),
+  agg_method = c("mean", "median", "sum", "weighted"),
+  weighted_by = c("width", "none"),
+  filter_min_rowMeanCPM = 0,
+  do_log = FALSE,
+  save_raw_gene_counts = TRUE
+) {
+  agg_method <- match.arg(agg_method)
+  weighted_by <- match.arg(weighted_by)
+  
+  # Load annotations
+  if (!file.exists(annotated_path)) stop("annotated_path not found: ", annotated_path)
+  annotated_df <- read.csv(annotated_path, stringsAsFactors = FALSE)
+  if (!("peak_id" %in% colnames(annotated_df) && "SYMBOL" %in% colnames(annotated_df))) {
+    stop("annotated_df must contain peak_id and SYMBOL columns")
+  }
+  
+  # Extract promoter regions
+  peak2gene <- annotated_df %>%
+    filter(grepl("Promoter", annotation, ignore.case = TRUE)) %>%
+    dplyr::select(peak_id, SYMBOL) %>%
+    filter(!is.na(SYMBOL), SYMBOL != "")
+  
+  if (nrow(peak2gene) == 0) stop("No promoter peaks found")
+  
+  # Get counts matrix
+  if (!exists("atac_data")) stop("atac_data not found")
+  counts_all <- atac_data$counts_raw
+  
+  # Keep only promoter peaks
+  present_peaks <- intersect(peak2gene$peak_id, rownames(counts_all))
+  if (length(present_peaks) == 0) stop("No promoter peaks in counts matrix")
+  
+  peak2gene <- peak2gene %>% filter(peak_id %in% present_peaks)
+  promoter_counts <- counts_all[peak2gene$peak_id, , drop = FALSE]
+  
+  # Peak-level CPM normalization
+  dge_peak <- DGEList(counts = promoter_counts)
+  dge_peak <- calcNormFactors(dge_peak, method = "TMMwsp")
+  peak_cpm <- cpm(dge_peak, log = FALSE)
+  
+  # Calculate peak widths (for weighted average)
+  peak_widths <- NULL
+  if (weighted_by == "width") {
+    if ("width" %in% colnames(annotated_df)) {
+      widths <- setNames(annotated_df$width, annotated_df$peak_id)
+      peak_widths <- widths[peak2gene$peak_id]
+    } else if (all(c("start", "end") %in% colnames(annotated_df))) {
+      widths <- annotated_df$end - annotated_df$start + 1
+      names(widths) <- annotated_df$peak_id
+      peak_widths <- widths[peak2gene$peak_id]
+    }
+  }
+  
+  # Group by gene
+  gene_groups <- peak2gene$SYMBOL[match(rownames(peak_cpm), peak2gene$peak_id)]
+  unique_genes <- unique(gene_groups)
+  
+  # Aggregation function
+  agg_fun <- switch(agg_method,
+    mean = function(rows) colMeans(rows),
+    median = function(rows) apply(rows, 2, median),
+    sum = function(rows) colSums(rows),
+    weighted = function(rows) {
+      if (weighted_by == "width" && !is.null(peak_widths)) {
+        w <- peak_widths[rownames(rows)]
+        w[is.na(w)] <- 1
+        w <- w / sum(w)
+        colSums(rows * w)
+      } else {
+        colMeans(rows)
+      }
+    }
+  )
+  
+  # Build gene matrix
+  gene_mat <- t(vapply(unique_genes, function(g) {
+    pids <- rownames(peak_cpm)[gene_groups == g]
+    rows <- peak_cpm[pids, , drop = FALSE]
+    as.numeric(agg_fun(rows))
+  }, numeric(ncol(peak_cpm))))
+  
+  rownames(gene_mat) <- unique_genes
+  colnames(gene_mat) <- colnames(peak_cpm)
+  
+  # Gene metadata
+  n_peaks <- vapply(unique_genes, function(g) sum(gene_groups == g), integer(1))
+  gene_meta <- data.frame(
+    gene = unique_genes,
+    n_peaks = n_peaks,
+    stringsAsFactors = FALSE
+  )
+  
+  # Filter low-expression genes
+  if (filter_min_rowMeanCPM > 0) {
+    row_means <- rowMeans(gene_mat)
+    keep <- row_means >= filter_min_rowMeanCPM
+    gene_mat <- gene_mat[keep, , drop = FALSE]
+    gene_meta <- gene_meta[keep, , drop = FALSE]
+  }
+  
+  # Optional log transformation
+  final_mat <- gene_mat
+  if (do_log) final_mat <- log2(final_mat + 1)
+  
+  # Group information
+  group_out <- atac_data$group
+  
+  # Save files
+  dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
+  write.csv(group_out, out_group_csv, row.names = FALSE)
+  write.csv(as.data.frame(final_mat), out_promoter_csv, row.names = TRUE)
+  
+  if (save_raw_gene_counts) {
+    gene_raw <- rowsum(promoter_counts, group = gene_groups)
+    raw_file <- file.path(out_dir, "atac_promoter_raw_counts.csv")
+    write.csv(as.data.frame(gene_raw), raw_file, row.names = TRUE)
+  }
+  
+  return(list(
+    gene_mat = as.data.frame(final_mat),
+    gene_meta = gene_meta,
+    group = group_out
+  ))
+}
+
+# ========== Execute ==========
+res <- make_promoter_matrix(
+  agg_method = "weighted",
+  weighted_by = "width",
+  filter_min_rowMeanCPM = 0,
+  do_log = TRUE,
+  save_raw_gene_counts = TRUE
+)
+```

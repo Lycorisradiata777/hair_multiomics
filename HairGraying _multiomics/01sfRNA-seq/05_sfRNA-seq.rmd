@@ -1,0 +1,1840 @@
+```{r tpm_normalization, message=FALSE, warning=FALSE}
+# Description: TPM normalization for sfRNA-seq counts
+# Workflow: Part 01 - sfRNA-seq downstream analysis
+
+library(edgeR)
+
+# ========== 1. Configuration ==========
+COUNT_FILE <- "./results/counts/rawcounts.txt"      # Output from count_sfrna.sh
+GROUP_FILE <- "./data/rna_group.csv"                  # Sample group information
+OUTPUT_DIR <- "./results"                             # Output directory
+
+MIN_COUNT <- 1  # Minimum count threshold for gene filtering
+
+# ========== 2. Initialize Output Directories ==========
+dir.create(file.path(OUTPUT_DIR, "tables"), recursive = TRUE, showWarnings = FALSE)
+dir.create(file.path(OUTPUT_DIR, "figures"), recursive = TRUE, showWarnings = FALSE)
+
+# ========== 3. Load Data ==========
+counts_raw <- read.delim(COUNT_FILE, 
+                         header = TRUE, 
+                         sep = "\t", 
+                         row.names = 1,
+                         check.names = FALSE,
+                         stringsAsFactors = FALSE)
+
+# featureCounts format: first column is Length
+gene_lengths <- counts_raw[, 1]  # Length column
+count_matrix <- counts_raw[, -1, drop = FALSE]  # Remove Length column, keep samples
+
+group <- read.csv(GROUP_FILE, header = TRUE)
+
+# ========== 4. Gene Filtering ==========
+keep <- filterByExpr(count_matrix, 
+                     group = group$colour,
+                     min.count = MIN_COUNT)
+
+count_matrix_filtered <- count_matrix[keep, ]
+gene_lengths_filtered <- gene_lengths[keep]
+
+# ========== 5. TPM Calculation ==========
+calculate_tpm <- function(counts, lengths) {
+  # counts: count matrix (genes in rows, samples in columns)
+  # lengths: gene lengths in bp
+  rpk <- counts / (lengths / 1000)
+  scale_factor <- colSums(rpk) / 1e6
+  tpm <- t(t(rpk) / scale_factor)
+  return(tpm)
+}
+
+tpm_matrix <- calculate_tpm(count_matrix_filtered, gene_lengths_filtered)
+tpm_df <- as.data.frame(tpm_matrix)
+
+# ========== 6. Save Results ==========
+tpm_file <- file.path(OUTPUT_DIR, "tables", "tpm_rna.csv")
+counts_file <- file.path(OUTPUT_DIR, "tables", "filtered_counts.csv")
+
+write.csv(tpm_df, tpm_file, row.names = TRUE)
+write.csv(count_matrix_filtered, counts_file, row.names = TRUE)
+```
+
+```{r gene_expression_statistics, message=FALSE, warning=FALSE}
+# Description: Gene expression statistics and visualization
+# Workflow: Part 01 - sfRNA-seq downstream analysis
+
+library(ggpubr)
+library(ggplot2)
+
+# ========== Gene Count Violin Plot ==========
+# Count genes with TPM > 1 as expressed
+gene_number <- as.data.frame(colSums(tpm > 1))
+gene_number$colour <- group$colour
+names(gene_number) <- c('value', 'colour')
+gene_number$value <- log2(gene_number$value)
+
+# Generate violin plot
+gene_num_vln <- ggplot(gene_number, aes(x = colour, y = value, fill = colour, color = colour)) +  
+  geom_violin() +  
+  labs(title = "", x = "", y = "The number of genes(Log2)") +
+  stat_compare_means(method = 't.test', label.x = 1) +
+  scale_color_manual(values = c("#3f60aa", "#cc340c")) +
+  scale_fill_manual(values = c("#3f60aa", "#cc340c")) +
+  ylim(11.5, 15.5) +
+  theme(text = element_text(family = "Times New Roman", size = 14, face = "bold")) +
+  theme_bw()
+
+print(gene_num_vln)
+
+# Save figure
+ggsave(file.path("results/figures", "gene_number_violin.png"), 
+       plot = gene_num_vln, width = 5, height = 4, dpi = 300)
+```
+
+```{r reads_count_statistics, message=FALSE, warning=FALSE}
+# Description: Reads count statistics and visualization
+# Workflow: Part 01 - sfRNA-seq downstream analysis
+
+library(ggpubr)
+library(ggplot2)
+
+# ========== Reads Count Violin Plot ==========
+# Load filtered counts
+cnts <- read.csv("results/tables/filtered_counts.csv", header = TRUE, row.names = 1)
+cnts_matrix <- cnts[, -1, drop = FALSE]  # Remove gene length column
+
+# Calculate total reads per sample
+reads_number <- as.data.frame(colSums(cnts_matrix))
+names(reads_number) <- c('value')
+
+# Load and align group information
+group <- read.csv("data/rna_group.csv", header = TRUE)
+group <- group[match(colnames(cnts_matrix), group$sample), ]
+
+# Add group information
+reads_number$colour <- group$colour
+reads_number$value <- log(reads_number$value)
+
+# Generate violin plot
+reads_num_vln <- ggplot(reads_number, aes(x = colour, y = value, fill = colour, color = colour)) +  
+  geom_violin() +  
+  labs(title = "", x = "", y = "The number of reads(Log2)") +
+  stat_compare_means(method = 't.test', label.x = 1) +
+  scale_color_manual(values = c("#3f60aa", "#cc340c")) +
+  scale_fill_manual(values = c("#3f60aa", "#cc340c")) +
+  ylim(8.5, 16.5) +
+  theme(text = element_text(family = "Times New Roman", size = 14, face = "bold")) +
+  theme_bw()
+
+print(reads_num_vln)
+
+# Save figure
+ggsave(file.path("results/figures", "reads_number_violin.png"), 
+       plot = reads_num_vln, width = 5, height = 4, dpi = 300)
+```
+
+```{r coefficient_of_variation, message=FALSE, warning=FALSE}
+# Description: Coefficient of Variation (CV) analysis between groups
+# Workflow: Part 01 - sfRNA-seq downstream analysis
+
+library(tidyr)
+library(ggpubr)
+library(ggplot2)
+
+# ========== Coefficient of Variation Statistics ==========
+# Split data by group based on sample indices
+# Note: Assuming first 26 samples are black group, next 97 samples are gray group
+blacktpm <- tpm[, 1:26]      # Black group samples
+graytpm <- tpm[, 27:123]      # Gray group samples
+
+# Calculate CV for black group
+sd_black <- apply(blacktpm, 1, sd, na.rm = TRUE)
+mean_black <- apply(blacktpm, 1, mean, na.rm = TRUE)
+cv_black <- as.data.frame(sd_black / mean_black * 100)
+
+# Calculate CV for gray group
+sd_gray <- apply(graytpm, 1, sd, na.rm = TRUE)
+mean_gray <- apply(graytpm, 1, mean, na.rm = TRUE)
+cv_gray <- as.data.frame(sd_gray / mean_gray * 100)
+
+# Combine and reshape data
+cv_df <- cbind(cv_black, cv_gray)
+names(cv_df) <- c('black', 'gray')
+
+df_long <- cv_df %>%
+  pivot_longer(
+    cols = everything(),
+    names_to = "colour",
+    values_to = "Expression"
+  )
+df_long$Expression <- log(df_long$Expression)
+
+# Generate violin plot with boxplot overlay
+cv_vln <- ggplot(df_long, aes(x = colour, y = Expression, fill = colour)) +
+  geom_violin(trim = FALSE, alpha = 0.7, linewidth = 0.6, width = 0.8) +
+  geom_boxplot(width = 0.15, alpha = 0.3, outlier.shape = NA, 
+               position = position_dodge(width = 0.9), linewidth = 0.4) +
+  stat_compare_means(method = 't.test', label.x = 1.25, 
+                    label.y = max(df_long$Expression, na.rm = TRUE) * 1.05,
+                    size = 4.5, bracket.size = 0.4) +
+  scale_fill_manual(values = c("#3f60aa", "#e6553a"), guide = "none") +
+  scale_color_manual(values = c("#3f60aa", "#e6553a"), guide = "none") +
+  labs(x = "", y = "Coefficient of Variation") +
+  theme_bw(base_size = 14) +
+  theme(
+    panel.grid.major = element_line(color = "gray95", linewidth = 0.3),
+    panel.grid.minor = element_blank(),
+    panel.border = element_rect(linewidth = 0.8, color = "black"),
+    panel.background = element_rect(fill = "white"),
+    axis.title.y = element_text(size = 15, face = "bold", margin = margin(r = 10)),
+    axis.title.x = element_blank(),
+    axis.text.x = element_text(size = 13, face = "bold", color = "black"),
+    axis.text.y = element_text(size = 12, color = "black"),
+    axis.ticks = element_line(color = "black", linewidth = 0.5),
+    plot.margin = margin(15, 15, 15, 15)
+  )
+
+print(cv_vln)
+
+# Save figure
+ggsave(file.path("results/figures", "cv_violin.png"), 
+       plot = cv_vln, width = 5, height = 4, dpi = 300)
+```
+
+```{r differential_expression_analysis, message=FALSE, warning=FALSE}
+# Description: Differential expression analysis using edgeR
+# Workflow: Part 01 - sfRNA-seq downstream analysis
+
+## ===================== Load Libraries =====================
+suppressPackageStartupMessages({
+  library(edgeR)
+  library(ggplot2)
+  library(dplyr)
+})
+
+## ===================== Data Preparation =====================
+# Load group information
+group <- read.csv("data/rna_group.csv", header = TRUE)
+group$colour <- factor(group$colour)
+
+# Load filtered counts
+cnts <- read.csv("results/tables/filtered_counts.csv", 
+                 header = TRUE, 
+                 row.names = 1)
+# Extract count matrix (remove gene length column)
+cnts_matrix <- cnts[, -1, drop = FALSE]
+
+# Create DGE object
+dge <- DGEList(counts = cnts_matrix, group = group$colour)
+
+## ===================== Filter Low-Expressed Genes =====================
+keep <- filterByExpr(dge, group = group$colour, min.count = 1)
+dge <- dge[keep, , keep.lib.sizes = FALSE]
+
+## ===================== Normalization and Design Matrix =====================
+dge <- calcNormFactors(dge)
+design <- model.matrix(~ group$colour)
+
+## ===================== Differential Expression Analysis =====================
+dge <- estimateDisp(dge, design)
+fit <- glmFit(dge, design)
+lrt <- glmLRT(fit, coef = 2)   # coef=2 indicates second level vs first level
+
+deg_result <- topTags(lrt, n = Inf)$table
+deg_result$gene <- rownames(deg_result)
+
+## ===================== Threshold Classification =====================
+logFC_cutoff <- 2
+FDR_cutoff   <- 0.05
+
+group_levels <- levels(group$colour)
+contrast <- paste(group_levels[2], "vs", group_levels[1])
+
+deg_result <- deg_result %>%
+  mutate(threshold = case_when(
+    logFC >= logFC_cutoff & FDR < FDR_cutoff ~ paste0(group_levels[2], "_high"),
+    logFC <= -logFC_cutoff & FDR < FDR_cutoff ~ paste0(group_levels[1], "_high"),
+    TRUE ~ "Not Sig"
+  ))
+
+num_group1_up <- sum(deg_result$threshold == paste0(group_levels[1], "_high"))
+num_group2_up <- sum(deg_result$threshold == paste0(group_levels[2], "_high"))
+
+## ===================== Volcano Plot =====================
+# Define color mapping
+color_map <- setNames(
+  c("#2166AC", "#B2182B", "gray80"),
+  c(paste0(group_levels[1], "_high"),
+    paste0(group_levels[2], "_high"),
+    "Not Sig")
+)
+
+p <- ggplot(deg_result, aes(x = logFC, y = -log10(FDR), color = threshold)) +
+  geom_point(alpha = 0.8, size = 1.2) +
+  scale_color_manual(values = color_map) +
+  geom_vline(xintercept = c(-logFC_cutoff, logFC_cutoff),
+             linetype = "dashed", color = "gray50") +
+  geom_hline(yintercept = -log10(FDR_cutoff),
+             linetype = "dashed", color = "gray50") +
+  theme_bw() +
+  labs(
+    title = paste0("Volcano Plot of DEGs (edgeR, ", contrast, ")\n",
+                   group_levels[1], "_high: ", num_group1_up,
+                   ", ", group_levels[2], "_high: ", num_group2_up),
+    x = paste0("log2 Fold Change (", contrast, ")"),
+    y = "-log10(FDR)",
+    color = "DEG Direction"
+  )
+
+print(p)
+ggsave(file.path("results/figures", "deg_volcano.png"), p)
+
+# Save significant DEG results
+dge_sig_result <- subset(deg_result, 
+                         deg_result$threshold == paste0(group_levels[1], "_high") | 
+                         deg_result$threshold == paste0(group_levels[2], "_high"))
+
+write.csv(dge_sig_result, 
+          file.path("results/tables", "deg_sig.csv"), 
+          row.names = FALSE)
+```
+
+```{r principal_component_analysis, message=FALSE, warning=FALSE}
+# Description: PCA analysis for sfRNA-seq samples
+# Workflow: Part 01 - sfRNA-seq downstream analysis
+
+library(ggplot2)
+
+# ========== Data Preparation ==========
+tpm <- read.csv("results/tables/tpm_rna.csv", row.names = 1)
+group <- read.csv("data/rna_group.csv", header = TRUE)
+
+# PCA analysis
+data <- log10(tpm[apply(tpm, 1, var) != 0, ] + 1)
+pca <- prcomp(t(data), scale. = TRUE)
+pca.data <- data.frame(pca$x)
+pca.variance <- pca$sdev^2 / sum(pca$sdev^2)
+
+# ========== PCA Plot Function ==========
+plot_pca <- function(i, j) {
+  pcaplot <- ggplot(pca.data, aes(x = pca.data[, i], y = pca.data[, j], color = group$colour)) +
+    geom_point(size = 3.5, alpha = 0.85) +
+    geom_hline(yintercept = 0, linetype = "dashed", color = "gray70", linewidth = 0.4) +
+    geom_vline(xintercept = 0, linetype = "dashed", color = "gray70", linewidth = 0.4) +
+    stat_ellipse(linetype = "longdash", linewidth = 0.6, level = 0.95, alpha = 0.7) +
+    scale_color_manual(name = "Hair Colour", values = c("#3f60aa", "#e6553a")) +
+    theme_bw(base_size = 14) +
+    theme(panel.grid = element_blank(),
+          panel.border = element_rect(linewidth = 0.8, color = "black"),
+          legend.position = "right",
+          legend.title = element_text(face = "bold", size = 18),
+          legend.text = element_text(size = 16),
+          axis.title = element_text(face = "bold", size = 13),
+          axis.text = element_text(color = "black", size = 13),
+          aspect.ratio = 1) +
+    labs(x = paste0("PC", i, " (", signif(pca.variance[i] * 100, 3), "%)"),
+         y = paste0("PC", j, " (", signif(pca.variance[j] * 100, 3), "%)"))
+  
+  ggsave(file.path("results/figures", paste0("pca_pc", i, "_pc", j, ".png")), 
+         pcaplot, width = 8, height = 6, dpi = 300, bg = "white")
+  print(pcaplot)
+}
+
+# ========== Generate PCA Plots ==========
+plot_pca(1, 2)  # PC1 vs PC2
+plot_pca(3, 7)  # PC3 vs PC7
+```
+
+```{r pca_by_donor, message=FALSE, warning=FALSE}
+# Description: PCA analysis colored by donor
+# Workflow: Part 01 - sfRNA-seq downstream analysis
+
+# ========== PCA by Donor ==========
+
+i <- 1; j <- 2
+
+pcaplot_donor <- ggplot(pca.data, aes(x = pca.data[, i], y = pca.data[, j], 
+                                       color = group$donor)) +
+  geom_point(size = 3.5, alpha = 0.85) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "gray70", linewidth = 0.4) +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "gray70", linewidth = 0.4) +
+  stat_ellipse(linetype = "longdash", linewidth = 0.6, level = 0.95, alpha = 0.7) +
+  scale_color_manual(
+    name = "Donor",
+    values = c("#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd",
+               "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf",
+               "#a6cee3", "#b15928")
+  ) +
+  theme_bw(base_size = 14) +
+  theme(
+    panel.grid = element_blank(),
+    panel.border = element_rect(linewidth = 0.8, color = "black"),
+    legend.position = "right",
+    legend.title = element_text(face = "bold", size = 18),
+    legend.text = element_text(size = 14),
+    axis.title = element_text(face = "bold", size = 15),
+    axis.text = element_text(color = "black", size = 13, face = "bold"),
+    aspect.ratio = 1
+  ) +
+  labs(
+    x = paste0("PC", i, " (", signif(pca.variance[i] * 100, 3), "%)"),
+    y = paste0("PC", j, " (", signif(pca.variance[j] * 100, 3), "%)")
+  )
+
+print(pcaplot_donor)
+ggsave(file.path("results/figures", "pca_donor.png"), 
+       pcaplot_donor, width = 8, height = 6, dpi = 300, bg = "white")
+```
+
+```{r pca_by_gender, message=FALSE, warning=FALSE}
+# Description: PCA analysis colored by gender
+# Workflow: Part 01 - sfRNA-seq downstream analysis
+
+# ========== PCA by Gender ==========
+i <- 1; j <- 2
+
+pcaplot_gender <- ggplot(pca.data, aes(x = pca.data[, i], y = pca.data[, j], 
+                                        color = group$gender)) +
+  geom_point(size = 3.5, alpha = 0.85) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "gray70", linewidth = 0.4) +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "gray70", linewidth = 0.4) +
+  stat_ellipse(linetype = "longdash", linewidth = 0.6, level = 0.95, alpha = 0.7) +
+  scale_color_manual(
+    name = "Gender",
+    values = c("#1b9e77", "#d95f02"),
+    labels = c("Female", "Male")
+  ) +
+  theme_bw(base_size = 14) +
+  theme(
+    panel.grid = element_blank(),
+    panel.border = element_rect(linewidth = 0.8, color = "black"),
+    legend.position = "right",
+    legend.title = element_text(face = "bold", size = 18),
+    legend.text = element_text(size = 16),
+    axis.title = element_text(face = "bold", size = 15),
+    axis.text = element_text(color = "black", size = 13, face = "bold"),
+    aspect.ratio = 1
+  ) +
+  labs(
+    x = paste0("PC", i, " (", signif(pca.variance[i] * 100, 3), "%)"),
+    y = paste0("PC", j, " (", signif(pca.variance[j] * 100, 3), "%)")
+  )
+
+print(pcaplot_gender)
+ggsave(file.path("results/figures", "pca_gender.png"), 
+       pcaplot_gender, width = 8, height = 6, dpi = 300, bg = "white")
+```
+
+```{r pca_density_distribution, message=FALSE, warning=FALSE}
+# Description: Density distribution of principal components
+# Workflow: Part 01 - sfRNA-seq downstream analysis
+
+library(patchwork)
+
+# ========== Density Distribution of Principal Components ==========
+# Ensure sample order matches pca.data
+group <- group[match(rownames(pca.data), group$sample), ]
+
+# Combine data
+pca_plotdata <- cbind(pca.data[, 1:10], colour = group$colour)
+
+# ========== Generate 10 Density Plots ==========
+plot_list <- list()
+
+for (i in 1:10) {
+  pc_name <- paste0("PC", i)
+  
+  p <- ggplot(pca_plotdata, aes(x = .data[[pc_name]], fill = colour)) +
+    geom_density(alpha = 0.5) +
+    scale_fill_manual(values = c("black" = "#3f60aa", "gray" = "#cc340c")) +
+    theme_bw(base_size = 10) +
+    theme(
+      legend.position = "none",
+      plot.title = element_text(hjust = 0.5, face = "bold", size = 11),
+      axis.title = element_text(face = "bold", size = 9),
+      axis.text = element_text(size = 8)
+    ) +
+    labs(title = pc_name, x = "", y = "Density")
+  
+  # Add legend to the last plot
+  if (i == 10) {
+    p <- p + theme(legend.position = "bottom",
+                   legend.title = element_blank(),
+                   legend.text = element_text(size = 9))
+  }
+  
+  plot_list[[i]] <- p
+}
+
+# ========== Arrange in 2 rows x 5 columns ==========
+combined_plot <- wrap_plots(plot_list, nrow = 2, ncol = 5) +
+  plot_annotation(
+    title = "Density distribution of principal components 1-10",
+    theme = theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 16))
+  )
+
+# ========== Save ==========
+ggsave(file.path("results/figures", "pca_density.png"), 
+       combined_plot, width = 15, height = 8, dpi = 300)
+print(combined_plot)
+```
+
+```{r permanova_analysis, message=FALSE, warning=FALSE}
+# Description: PERMANOVA analysis on weighted principal components
+# Workflow: Part 01 - sfRNA-seq downstream analysis
+
+library(vegan)
+set.seed(123)
+
+# ========== Weighted Principal Components PERMANOVA ==========
+# Convert age to numeric
+group$age <- as.numeric(as.character(group$age))
+
+# Weight PCs by their variance contribution
+pca_weighted <- sweep(pca.data, 2, sqrt(pca.variance), "*")
+
+# Perform PERMANOVA
+permanova_weighted <- adonis2(pca_weighted ~ colour + age + gender + donor,
+                             data = group,
+                             permutations = 999,
+                             method = "euclidean",
+                             by = "terms")
+
+# Save PERMANOVA results
+write.csv(as.data.frame(permanova_weighted), 
+          file.path("results/tables", "permanova_results.csv"), 
+          row.names = TRUE)
+```
+
+```{r variance_test, message=FALSE, warning=FALSE}
+# Description: PCA violin plots with variance homogeneity test
+# Workflow: Part 01 - sfRNA-seq downstream analysis
+
+# ========== PCA Violin Plot with Variance Test ==========
+plot_pca_violin_with_var_test <- function(pca.data, group, top_n_pcs = 10) {
+  library(ggplot2)
+  library(reshape2)
+  library(dplyr)
+
+  # Step 1: reshape PCA matrix
+  pca_long <- data.frame(sample = rownames(pca.data), pca.data[, 1:top_n_pcs])
+  pcdensity <- reshape2::melt(pca_long, id.vars = "sample", variable.name = "PC", value.name = "value")
+
+  # Step 2: add group info
+  pcdensity$colour <- group$colour[match(pcdensity$sample, group$sample)]
+  pcdensity$colour <- as.factor(pcdensity$colour)
+
+  # Step 3: statistics + direction
+  stat_result <- pcdensity %>%
+    group_by(PC) %>%
+    summarise(
+      t_p = tryCatch(t.test(value ~ colour)$p.value, error = function(e) NA),
+      var_p = tryCatch(var.test(value ~ colour)$p.value, error = function(e) NA),
+      mean_gray = mean(value[colour == "gray"], na.rm = TRUE),
+      mean_black = mean(value[colour == "black"], na.rm = TRUE),
+      y = max(value, na.rm = TRUE) - (max(value, na.rm = TRUE) - min(value, na.rm = TRUE)) * 0.05
+    ) %>%
+    mutate(
+      t_star = case_when(
+        is.na(t_p) ~ "NA",
+        t_p < 0.001 ~ "***",
+        t_p < 0.01 ~ "**",
+        t_p < 0.05 ~ "*",
+        TRUE ~ "ns"
+      ),
+      var_star = case_when(
+        is.na(var_p) ~ "NA",
+        var_p < 0.001 ~ "***",
+        var_p < 0.01 ~ "**",
+        var_p < 0.05 ~ "*",
+        TRUE ~ "ns"
+      ),
+      direction_label = case_when(
+        abs(mean_gray - mean_black) < 1e-6 ~ "~",
+        mean_gray > mean_black ~ "gray ↑",
+        mean_gray < mean_black ~ "black ↑",
+        TRUE ~ NA_character_
+      ),
+      label = paste0(var_star)
+    )
+
+  stat_result$PC <- factor(stat_result$PC, levels = paste0("PC", 1:top_n_pcs))
+
+  # Step 4: generate plot
+  violin_plot <- ggplot(pcdensity, aes(x = colour, y = value, fill = colour)) +
+    geom_violin(trim = FALSE, scale = "width", alpha = 0.5) +
+    geom_boxplot(width = 0.1, outlier.shape = NA) +
+    facet_wrap(~PC, scales = "free_y", ncol = 5) +
+    geom_text(data = stat_result,
+              aes(x = 1.5, y = y, label = label),
+              inherit.aes = FALSE, size = 3.8, lineheight = 1.2) +
+    scale_fill_manual(values = c("gray" = "#cc340c", "black" = "#3f60aa")) +
+    labs(x = "", y = "PC Score", fill = "Group") +
+    theme_bw() +
+    theme(
+      axis.text.x = element_text(angle = 45, hjust = 1),
+      legend.position = "top",
+      strip.text = element_text(size = 12)
+    )
+
+  print(violin_plot)
+  ggsave(file.path("results/figures", "pca_violin_var_test.png"), 
+         plot = violin_plot, width = 8, height = 5, dpi = 300)
+  return(stat_result)
+}
+
+var_result_table <- plot_pca_violin_with_var_test(pca.data, group, top_n_pcs = 10)
+
+# Save statistical results
+write.csv(var_result_table, 
+          file.path("results/tables", "pca_var_test_results.csv"), 
+          row.names = FALSE)
+```
+
+```{r pc_coordinates_boxplot, message=FALSE, warning=FALSE}
+# Description: Boxplot of principal component coordinates with t-test significance
+# Workflow: Part 01 - sfRNA-seq downstream analysis
+
+library(ggpubr)
+library(reshape2)
+library(dplyr)
+
+# ===== 1. Reshape to long format =====
+pcdensity <- reshape2::melt(pca.data[, 1:10])  # variable = PC name, value = score
+pcdensity$colour <- group$colour
+
+# ===== 2. T-test for each PC =====
+ttest_result <- pcdensity %>%
+  group_by(variable) %>%
+  summarise(
+    p = tryCatch({
+      g1 <- value[colour == levels(as.factor(colour))[1]]
+      g2 <- value[colour == levels(as.factor(colour))[2]]
+      t.test(g1, g2)$p.value
+    }, error = function(e) NA)
+  ) %>%
+  mutate(
+    p = round(p, 4),
+    signif = case_when(
+      is.na(p) ~ "NA",
+      p < 0.001 ~ "***",
+      p < 0.01 ~ "**",
+      p < 0.05 ~ "*",
+      TRUE ~ " "
+    ),
+    y.position = tapply(
+      pcdensity$value,
+      pcdensity$variable,
+      function(x) max(x, na.rm = TRUE) + 0.15 * diff(range(x, na.rm = TRUE))
+    ) %>% unname(),
+    group1 = NA,
+    group2 = NA
+  )
+
+# ===== 3. Generate boxplot with significance =====
+pcs_boxplot <- ggboxplot(
+  pcdensity, x = 'variable', y = 'value', color = 'colour',
+  ylab = "Coordinates", xlab = "", width = 0.6, add = "none"
+) +
+  scale_color_manual(values = c("#3f60aa", "#cc340c")) +
+  stat_pvalue_manual(
+    ttest_result[, c("variable", "y.position", "signif", "group1", "group2")],
+    x = "variable", label = "signif", y.position = "y.position",
+    tip.length = 0.01, size = 4
+  )
+
+ggsave(file.path("results/figures", "pcs_boxplot.png"), 
+       plot = pcs_boxplot, width = 8, height = 5, dpi = 300)
+print(pcs_boxplot)
+
+# Save t-test results
+write.csv(ttest_result, 
+          file.path("results/tables", "pca_ttest_results.csv"), 
+          row.names = FALSE)
+```
+
+```{r zscore_loading_extraction, message=FALSE, warning=FALSE}
+# Description: Extract significant loading genes for each PC using Z-score threshold
+# Workflow: Part 01 - sfRNA-seq downstream analysis
+
+# -------- Parameter Settings --------
+dir.create(file.path("results/tables", "loading_genes"), showWarnings = FALSE, recursive = TRUE)
+
+rotation <- pca$rotation
+target_p <- 0.05  # Two-tailed significance level
+z_threshold <- qnorm(1 - target_p / 2)  # Convert to Z-score threshold
+
+# -------- Extract significant loading genes for each PC --------
+all_topload <- list()
+
+for (i in 1:10) {
+  pc_loading <- rotation[, i]  # Loading vector for current PC
+  
+  # Standardize while preserving row names
+  pc_z <- scale(pc_loading)[, 1]
+  names(pc_z) <- rownames(rotation)
+
+  # Positive: Z > threshold
+  pos_idx <- which(pc_z > z_threshold)
+  positive <- data.frame(
+    gene = rownames(rotation)[pos_idx],
+    zscore = pc_z[pos_idx],
+    loading = pc_loading[pos_idx],
+    group = "positive",
+    pc = i
+  )
+
+  # Negative: Z < -threshold
+  neg_idx <- which(pc_z < -z_threshold)
+  negative <- data.frame(
+    gene = rownames(rotation)[neg_idx],
+    zscore = pc_z[neg_idx],
+    loading = pc_loading[neg_idx],
+    group = "negative",
+    pc = i
+  )
+
+  # Combine
+  topload <- rbind(positive, negative)
+
+  # Save
+  output_file <- file.path("results/tables", "loading_genes", paste0("PC", i, "_top_genes.csv"))
+  if (nrow(topload) > 0) {
+    write.csv(topload, output_file, row.names = FALSE)
+  }
+
+  all_topload[[i]] <- topload
+}
+
+# -------- Combine all PC results --------
+final_table <- do.call(rbind, all_topload)
+write.csv(final_table, file.path("results/tables", "loading_genes", "all_PCs_top_genes.csv"), row.names = FALSE)
+
+# -------- Print summary statistics --------
+cat("\nSignificant gene counts (Z threshold =", round(z_threshold, 4), ")\n")
+for (i in 1:10) {
+  df <- all_topload[[i]]
+  pos_count <- sum(df$group == "positive")
+  neg_count <- sum(df$group == "negative")
+  cat("PC", i, "→ Positive:", pos_count, "Negative:", neg_count, "\n")
+}
+```
+
+```{r loading_enrichment_visualization, message=FALSE, warning=FALSE}
+# Description: Visualization of enrichment results for positive and negative loadings
+# Workflow: Part 01 - sfRNA-seq downstream analysis
+
+library(forcats)
+library(ggplot2)
+
+# ======== Enrichment Visualization (Positive Loadings) ========
+
+# Load data
+p_enrich <- read.csv("data/positive_loading_enrichment.csv")
+colnames(p_enrich)[3] <- "-Log.P.value"
+
+# Set term order
+term_sort <- rev(unique(p_enrich$term))
+p_enrich$term <- factor(p_enrich$term, levels = term_sort)
+
+# Generate plot (y-axis text in black)
+P_enrich_plot <- ggplot(p_enrich, aes(PC, term)) +
+  geom_point(aes(color = PC, size = `-Log.P.value`)) +
+  theme_bw() +
+  theme(axis.text.y = element_text(colour = "black", size = 11)) +
+  ylab('') +
+  xlab('') +
+  scale_size_continuous(trans = 'log2', range = c(4, 10)) +
+  guides(
+    color = guide_colorbar(order = 1),
+    fill = guide_legend(order = 1)
+  )
+
+# Save
+ggsave(file.path("results/figures", "enrichment_positive.png"), 
+       plot = P_enrich_plot, width = 7, height = 5, dpi = 300)
+
+# ======== Enrichment Visualization (Negative Loadings) ========
+
+# Load data
+n_enrich <- read.csv("data/negative_loading_enrichment.csv")
+colnames(n_enrich)[3] <- "-Log.P.value"
+
+# Set term order
+term_sort <- rev(unique(n_enrich$term))
+n_enrich$term <- factor(n_enrich$term, levels = term_sort)
+
+# Generate plot (y-axis text in black)
+N_enrich_plot <- ggplot(n_enrich, aes(PC, term)) +
+  geom_point(aes(color = PC, size = `-Log.P.value`)) +
+  theme_bw() +
+  theme(axis.text.y = element_text(colour = "black", size = 11)) +
+  ylab('') +
+  xlab('') +
+  scale_size_continuous(range = c(3, 8)) +
+  guides(
+    color = guide_colorbar(order = 1),
+    fill = guide_legend(order = 1)
+  )
+
+# Save
+ggsave(file.path("results/figures", "enrichment_negative.png"), 
+       plot = N_enrich_plot, width = 7, height = 5, dpi = 300)
+```
+
+```{r multi_pc_heatmaps, message=FALSE, warning=FALSE}
+# Description: Heatmaps for PC-associated genes (positive and negative loadings)
+# Workflow: Part 01 - sfRNA-seq downstream analysis
+
+library(pheatmap)
+library(dplyr)
+
+# ====== Heatmap 1: Genes associated with gray hair (positive loadings) ======
+selected_pcs_positive <- c(1,3,7)
+selected_pcs_negative <- c()
+
+# Build gene list
+ordered_genes <- c()
+gene_group_label <- c()
+
+for (i in selected_pcs_positive) {
+  selected_genes <- all_topload[[i]]$gene[all_topload[[i]]$group == "positive"]
+  ordered_genes <- c(ordered_genes, selected_genes)
+  gene_group_label <- c(gene_group_label, rep(paste0("PC", i), length(selected_genes)))
+}
+for (i in selected_pcs_negative) {
+  selected_genes <- all_topload[[i]]$gene[all_topload[[i]]$group == "negative"]
+  ordered_genes <- c(ordered_genes, selected_genes)
+  gene_group_label <- c(gene_group_label, rep(paste0("PC", i), length(selected_genes)))
+}
+
+df_gene <- data.frame(Gene = ordered_genes, Group = gene_group_label)
+df_gene <- df_gene[!duplicated(df_gene$Gene), ]
+ordered_genes <- df_gene$Gene
+gene_group_label <- df_gene$Group
+
+# Expression matrix processing
+logtpm <- log(tpm + 1)
+expr_mat <- logtpm[rownames(logtpm) %in% ordered_genes, ]
+expr_mat <- expr_mat[match(ordered_genes, rownames(expr_mat)), ]
+expr_mat_scaled <- t(scale(t(as.matrix(expr_mat))))
+expr_mat_scaled[is.na(expr_mat_scaled)] <- 0
+
+# Row annotation
+annotation_row <- data.frame(Loading = gene_group_label)
+rownames(annotation_row) <- ordered_genes
+
+col_anno_clustered <- data.frame(
+  Colour = group$colour[match(colnames(expr_mat_scaled), group$sample)]
+)
+rownames(col_anno_clustered) <- colnames(expr_mat_scaled)
+
+# Split samples
+expr_gray <- expr_mat_scaled[, col_anno_clustered$Colour == "gray", drop = FALSE]
+expr_black <- expr_mat_scaled[, col_anno_clustered$Colour == "black", drop = FALSE]
+
+# Cluster gray samples
+pm_gray <- pheatmap(expr_gray,
+                    cluster_rows = FALSE,
+                    cluster_cols = TRUE,
+                    show_rownames = FALSE,
+                    show_colnames = FALSE,
+                    clustering_method = "ward.D",
+                    silent = TRUE)
+
+gray_ordered <- colnames(expr_gray)[pm_gray$tree_col$order]
+final_order <- c(colnames(expr_black), gray_ordered)
+
+expr_final <- expr_mat_scaled[, final_order]
+col_anno_final <- col_anno_clustered[final_order, , drop = FALSE]
+
+# Color settings
+annotation_colors <- list(
+  Colour = c(black = "#2166AC", gray = "#B2182B")
+)
+color_palette <- colorRampPalette(c("#2166ac", "white", "#b2182b"))(100)
+breaks_range <- seq(-2, 2, length.out = 91)
+
+# Generate plot
+pm_positive <- pheatmap(expr_final,
+                        cluster_rows = FALSE,
+                        cluster_cols = FALSE,
+                        show_rownames = FALSE,
+                        show_colnames = FALSE,
+                        annotation_row = annotation_row,
+                        annotation_col = col_anno_final,
+                        annotation_colors = annotation_colors,
+                        annotation_legend = FALSE,
+                        legend = TRUE,
+                        main = "",
+                        color = color_palette,
+                        breaks = breaks_range,
+                        border_color = NA,
+                        annotation_names_row = FALSE,
+                        annotation_names_col = FALSE)
+
+# Save
+png(file.path("results/figures", "heatmap_positive_PC1_3_7.png"), 
+    width = 2500, height = 1500, res = 300)
+print(pm_positive)
+dev.off()
+
+# ====== Heatmap 2: Genes associated with black hair (negative loadings) ======
+selected_pcs_positive <- c()
+selected_pcs_negative <- c(1,3,7)
+
+# Build gene list
+ordered_genes <- c()
+gene_group_label <- c()
+
+for (i in selected_pcs_positive) {
+  selected_genes <- all_topload[[i]]$gene[all_topload[[i]]$group == "positive"]
+  ordered_genes <- c(ordered_genes, selected_genes)
+  gene_group_label <- c(gene_group_label, rep(paste0("PC", i), length(selected_genes)))
+}
+for (i in selected_pcs_negative) {
+  selected_genes <- all_topload[[i]]$gene[all_topload[[i]]$group == "negative"]
+  ordered_genes <- c(ordered_genes, selected_genes)
+  gene_group_label <- c(gene_group_label, rep(paste0("PC", i), length(selected_genes)))
+}
+
+df_gene <- data.frame(Gene = ordered_genes, Group = gene_group_label)
+df_gene <- df_gene[!duplicated(df_gene$Gene), ]
+ordered_genes <- df_gene$Gene
+gene_group_label <- df_gene$Group
+
+# Expression matrix processing
+expr_mat <- logtpm[rownames(logtpm) %in% ordered_genes, ]
+expr_mat <- expr_mat[match(ordered_genes, rownames(expr_mat)), ]
+expr_mat_scaled <- t(scale(t(as.matrix(expr_mat))))
+expr_mat_scaled[is.na(expr_mat_scaled)] <- 0
+
+# Row annotation
+annotation_row <- data.frame(Loading = gene_group_label)
+rownames(annotation_row) <- ordered_genes
+
+expr_gray <- expr_mat_scaled[, col_anno_clustered$Colour == "gray", drop = FALSE]
+expr_black <- expr_mat_scaled[, col_anno_clustered$Colour == "black", drop = FALSE]
+
+# Cluster gray samples
+pm_gray <- pheatmap(expr_gray,
+                    cluster_rows = FALSE,
+                    cluster_cols = TRUE,
+                    show_rownames = FALSE,
+                    show_colnames = FALSE,
+                    clustering_method = "ward.D",
+                    silent = TRUE)
+
+gray_ordered <- colnames(expr_gray)[pm_gray$tree_col$order]
+final_order <- c(colnames(expr_black), gray_ordered)
+
+expr_final <- expr_mat_scaled[, final_order]
+col_anno_final <- col_anno_clustered[final_order, , drop = FALSE]
+
+# Generate plot
+pm_negative <- pheatmap(expr_final,
+                        cluster_rows = FALSE,
+                        cluster_cols = FALSE,
+                        show_rownames = FALSE,
+                        show_colnames = FALSE,
+                        annotation_row = annotation_row,
+                        annotation_col = col_anno_final,
+                        annotation_colors = annotation_colors,
+                        annotation_legend = FALSE,
+                        legend = TRUE,
+                        main = "",
+                        color = color_palette,
+                        breaks = breaks_range,
+                        border_color = NA,
+                        annotation_names_row = FALSE,
+                        annotation_names_col = FALSE)
+
+# Save
+png(file.path("results/figures", "heatmap_negative_PC1_3_7.png"), 
+    width = 2500, height = 1500, res = 300)
+print(pm_negative)
+dev.off()
+```
+
+```{r umap_louvain_clustering, message=FALSE, warning=FALSE}
+# Description: UMAP dimensionality reduction and Louvain clustering on gray hair samples
+# Workflow: Part 01 - sfRNA-seq downstream analysis
+
+# ===== UMAP + Louvain Clustering (Gray Hair Samples Only) =====
+library(uwot)
+library(igraph)
+library(FNN)
+library(ggplot2)
+library(dplyr)
+
+# ====== Parameter Settings ======
+selected_pcs <- c(1, 3, 7)  # PCs associated with gray hair
+point_size <- 3
+set.seed(42)
+
+# ====== Split TPM Data ======
+blacktpm <- tpm[, 1:26]
+graytpm  <- tpm[, 27:123]
+logtpm   <- log(tpm + 1)
+
+# ====== 1. Gene Selection Based on PC Positive Loadings ======
+ordered_genes <- c()
+gene_group_label <- c()
+
+for (i in selected_pcs) {
+  selected_genes <- all_topload[[i]]$gene[all_topload[[i]]$group == "positive"]
+  ordered_genes <- c(ordered_genes, selected_genes)
+  gene_group_label <- c(gene_group_label, rep(paste0("PC", i, "_positive"), length(selected_genes)))
+}
+
+# Remove duplicates
+df_gene <- data.frame(Gene = ordered_genes, Group = gene_group_label) %>% 
+  distinct(Gene, .keep_all = TRUE)
+ordered_genes <- df_gene$Gene
+
+# ====== 2. Build Expression Matrix (Gray Samples Only) ======
+expr_gray <- t(logtpm[ordered_genes, colnames(graytpm)])  # rows = samples, columns = genes
+
+# ====== 3. UMAP Dimensionality Reduction ======
+umap_coords <- umap(expr_gray, 
+                    n_neighbors = 10, 
+                    min_dist = 0.3, 
+                    metric = "cosine", 
+                    scale = TRUE)
+rownames(umap_coords) <- rownames(expr_gray)
+
+# ====== 4. Louvain Clustering ======
+nn <- get.knn(umap_coords, k = min(15, nrow(umap_coords) - 1))
+edges <- do.call(rbind, lapply(1:nrow(nn$nn.index), function(i) {
+  cbind(from = i, to = nn$nn.index[i, ])
+}))
+g <- graph_from_edgelist(edges, directed = FALSE) %>% simplify()
+cl <- cluster_louvain(g)
+clusters <- cl$membership
+names(clusters) <- rownames(umap_coords)
+
+# ====== 5. Construct Data Frame ======
+umap_df <- data.frame(
+  Sample  = rownames(umap_coords),
+  UMAP1   = umap_coords[, 1],
+  UMAP2   = umap_coords[, 2],
+  Cluster = paste0("Cluster_", clusters)
+)
+
+# ====== 6. Rename Clusters: Cluster_1 -> Gray1, Cluster_2 -> Gray2, ... ======
+lv <- levels(factor(umap_df$Cluster))
+# Sort by numeric order
+lv_sorted <- lv[order(as.integer(sub(".*_(\\d+)$", "\\1", lv)))]
+
+# Create mapping
+map_gray <- setNames(paste0("Gray", seq_along(lv_sorted)), lv_sorted)
+
+# Apply renaming
+umap_df$Cluster <- map_gray[umap_df$Cluster]
+umap_df$Cluster <- factor(umap_df$Cluster, levels = paste0("Gray", seq_along(lv_sorted)))
+
+# ====== 7. Set Colors ======
+gray_cols <- c("#E41A1C", "#377EB8", "#4DAF4A", "#984EA3", "#FF7F00", "#A65628")
+cluster_palette <- setNames(gray_cols[1:length(lv_sorted)], paste0("Gray", seq_along(lv_sorted)))
+
+# ====== 8. Generate Plot ======
+p <- ggplot(umap_df, aes(x = UMAP1, y = UMAP2, color = Cluster)) +
+  geom_point(size = point_size, alpha = 0.9) +
+  scale_color_manual(values = cluster_palette) +
+  theme_bw(base_size = 14) +
+  theme(
+    axis.title = element_text(face = "bold", size = 15),
+    axis.text = element_text(face = "bold", size = 12),
+    legend.title = element_text(face = "bold", size = 16),
+    legend.text = element_text(face = "bold", size = 14)
+  ) +
+  labs(title = "",
+       x = "UMAP1", y = "UMAP2", color = "Cluster")
+print(p)
+
+# ====== 9. Save Results ======
+ggsave(file.path("results/figures", "umap_gray_only_PC1_3_7.png"), 
+       plot = p, width = 10, height = 8, dpi = 300)
+
+# Save clustering results
+write.csv(umap_df, 
+          file.path("results/tables", "umap_clustering_results.csv"), 
+          row.names = FALSE)
+```
+
+```{r cluster_heatmap, message=FALSE, warning=FALSE}
+# Description: Heatmap visualization of clusters including Black samples
+# Workflow: Part 01 - sfRNA-seq downstream analysis
+
+# ===== Heatmap with Black Samples Included =====
+suppressPackageStartupMessages({
+  library(pheatmap)
+  library(RColorBrewer)
+  library(grid)
+  library(Cairo)
+})
+
+# Use deduplicated genes from UMAP section
+ordered_genes <- df_gene$Gene
+gene_group_label <- df_gene$Group
+
+# === 1. Add Black samples to expression matrix ===
+black_samples <- colnames(tpm)[1:26]
+all_samples <- c(black_samples, umap_df$Sample)  # Combine Black and Gray samples
+
+# Build expression matrix (including all samples)
+expr_mat <- logtpm[ordered_genes, all_samples, drop = FALSE]
+expr_mat <- expr_mat[match(ordered_genes, rownames(expr_mat)), , drop = FALSE]
+expr_mat_scaled <- t(scale(t(as.matrix(expr_mat))))
+
+# === 2. Row annotation ===
+gene_labels <- gsub("_(positive|negative)$", "", gene_group_label)
+gene_labels[is.na(gene_labels)] <- "Unknown"
+
+# Genes are already deduplicated
+annotation_row <- data.frame(Loading = gene_labels, row.names = ordered_genes)
+annotation_row <- annotation_row[rownames(expr_mat_scaled), , drop = FALSE]
+
+# === 3. Column annotation: Create Cluster info for all samples ===
+all_clusters <- c(rep("Black", length(black_samples)), as.character(umap_df$Cluster))
+
+annotation_col <- data.frame(
+  Cluster = factor(all_clusters, levels = c("Black", levels(umap_df$Cluster))),
+  row.names = all_samples
+)
+
+# === 4. Annotation colors ===
+loading_levels <- unique(annotation_row$Loading)
+loading_colors <- setNames(colorRampPalette(brewer.pal(12, "Paired"))(length(loading_levels)), loading_levels)
+
+# Extend cluster_palette to include Black
+extended_cluster_palette <- c(Black = "#000000", cluster_palette)
+annotation_colors <- list(
+  Loading = loading_colors,
+  Cluster = extended_cluster_palette
+)
+
+# === 5. Sample ordering + gaps ===
+annotation_col$Cluster <- factor(annotation_col$Cluster, levels = names(extended_cluster_palette))
+ordered_samples <- all_samples[order(annotation_col$Cluster)]
+expr_mat_scaled <- expr_mat_scaled[, ordered_samples, drop = FALSE]
+annotation_col <- annotation_col[ordered_samples, , drop = FALSE]
+
+group_sizes <- table(annotation_col$Cluster)
+gaps_col <- if (length(group_sizes) > 1) cumsum(group_sizes)[-length(group_sizes)] else NULL
+
+# === 6. Generate and save ===
+outfile <- file.path("results/figures", "heatmap_UMAP_Louvain_clusters_PC1-3-7.png")
+dir.create(dirname(outfile), showWarnings = FALSE, recursive = TRUE)
+
+CairoPNG(outfile, width = 2500, height = 1500, res = 300)
+
+hm <- pheatmap(
+  expr_mat_scaled,
+  cluster_rows = FALSE,
+  cluster_cols = FALSE,
+  show_rownames = FALSE,
+  show_colnames = FALSE,
+  annotation_row = annotation_row,
+  annotation_col = annotation_col,
+  annotation_colors = annotation_colors,
+  gaps_col = gaps_col,
+  main = " ",
+  color = colorRampPalette(c("#2166ac", "white", "#b2182b"))(100),
+  breaks = seq(-2, 2, length.out = 91),
+  use_raster = TRUE,
+  raster_device = "cairo",
+  silent = TRUE,
+  legend = FALSE,
+  annotation_legend = FALSE,
+  annotation_names_row = FALSE,
+  annotation_names_col = FALSE
+)
+
+grid::grid.draw(hm$gtable)
+dev.off()
+message("Heatmap saved (including Black samples): ", outfile)
+
+# Display
+grid::grid.newpage()
+grid::grid.draw(hm$gtable)
+```
+
+```{r cluster_marker_genes, message=FALSE, warning=FALSE}
+# Description: Differential expression analysis for gray hair subclusters using edgeR
+# Workflow: Part 01 - sfRNA-seq downstream analysis
+
+# ===== Gray Subcluster Marker Gene Analysis (edgeR) =====
+suppressPackageStartupMessages({
+  library(edgeR)
+  library(ggplot2)
+  library(dplyr)
+})
+
+# Required objects:
+#   cnts            : raw integer count matrix (gene x sample), first column may be gene length
+#   annotation_col  : data.frame with sample names as rownames, containing column "Cluster"
+
+# -------- 0. Check and prepare input --------
+stopifnot(is.matrix(cnts) || is.data.frame(cnts))
+cnts <- as.matrix(cnts)
+if (!is.integer(cnts)) storage.mode(cnts) <- "integer"
+
+# Remove gene length column if present
+if (colnames(cnts)[1] == "Length") {
+  cnts_matrix <- cnts[, -1, drop = FALSE]
+} else {
+  cnts_matrix <- cnts
+}
+
+stopifnot("Cluster" %in% colnames(annotation_col))
+stopifnot(all(colnames(cnts_matrix) %in% rownames(annotation_col)))
+
+# Align groups (column names = samples)
+group <- factor(annotation_col[colnames(cnts_matrix), "Cluster"],
+                levels = sort(unique(annotation_col$Cluster)))
+
+# -------- 1. edgeR Basic Processing --------
+dge <- DGEList(counts = cnts_matrix, group = group)
+
+# Filter low-expressed genes
+keep <- filterByExpr(dge, design = model.matrix(~0 + group))
+dge <- dge[keep, , keep.lib.sizes = FALSE]
+
+# TMM normalization
+dge <- calcNormFactors(dge)
+
+# Design matrix
+design <- model.matrix(~ 0 + group)
+colnames(design) <- levels(group)
+
+# Estimate dispersion
+dge <- estimateDisp(dge, design)
+
+# Single fit, multiple contrasts
+fit <- glmFit(dge, design)
+
+# -------- Helper function: collect contrast results with cluster label --------
+collect_contrast <- function(fit, cont_col, cont_matrix, cluster_label) {
+  lrt <- glmLRT(fit, contrast = cont_matrix[, cont_col])
+  tt  <- topTags(lrt, n = Inf)$table
+  tt$gene <- rownames(tt)
+  tt$cluster <- cluster_label
+  rownames(tt) <- NULL
+  tt
+}
+
+# -------- Helper function: add regulation status and significance --------
+add_regulation <- function(df) {
+  df %>%
+    mutate(
+      regulation = case_when(
+        FDR < 0.05 & logFC >=  2 ~ "Up",
+        FDR < 0.05 & logFC <= -2 ~ "Down",
+        TRUE ~ "NotSig"
+      ),
+      signif = regulation != "NotSig"
+    )
+}
+
+# ===================== Each Gray vs Black =====================
+targets <- levels(group)
+if (!("Black" %in% targets)) stop("Black group not found in annotation_col$Cluster.")
+
+gray_levels <- setdiff(targets, "Black")
+if (length(gray_levels) == 0) stop("No other groups to compare with Black.")
+
+contr_gray_vs_black <- setNames(
+  paste0(gray_levels, " - Black"),
+  gray_levels
+)
+cont_mat_A <- makeContrasts(contrasts = contr_gray_vs_black, levels = design)
+
+res_list_A <- lapply(colnames(cont_mat_A), function(co) {
+  cluster_label <- sub(" - Black$", "", co)
+  collect_contrast(fit, co, cont_mat_A, cluster_label = cluster_label)
+})
+res_df_A <- do.call(rbind, res_list_A) %>% add_regulation()
+sig_df_A <- res_df_A %>% filter(signif)
+sig_df_A <- as.data.frame(sig_df_A)
+
+# Save results
+write.csv(sig_df_A, 
+          file.path("results/tables", "DEGs_gray_subtypes_vs_black.csv"), 
+          row.names = FALSE)
+
+# Bar plot: Gray vs Black
+# Keep only Gray clusters
+gray_clusters <- unique(sig_df_A$cluster[!grepl("Black", sig_df_A$cluster)])
+sig_df_A_gray <- sig_df_A[sig_df_A$cluster %in% gray_clusters, ]
+
+# Extract Up and Down genes
+up_down <- sig_df_A_gray[sig_df_A_gray$regulation %in% c("Up", "Down"), ]
+
+if (nrow(up_down) > 0) {
+  # Manual counting
+  counts_list <- table(up_down$cluster, up_down$regulation)
+  counts_A <- as.data.frame(counts_list)
+  colnames(counts_A) <- c("cluster", "regulation", "n")
+  
+  # Downregulated as negative
+  counts_A$n <- ifelse(counts_A$regulation == "Down", -counts_A$n, counts_A$n)
+  
+  pA <- ggplot(counts_A, aes(x = cluster, y = n, fill = regulation)) +
+    geom_col(width = 0.6) +
+    scale_fill_manual(values = c("Up" = "#D73027", "Down" = "#4575B4")) +
+    geom_hline(yintercept = 0, color = "black") +
+    labs(title = "Gray subtypes vs Black: Number of DEGs",
+         x = "Cluster", y = "Number of DEGs") +
+    theme_bw(base_size = 14)
+  
+  ggsave(file.path("results/figures", "barplot_DEGs_gray_vs_black.png"), 
+         pA, width = 7, height = 4, dpi = 300)
+  print(pA)
+}
+
+# ===================== One-vs-Rest =====================
+ovr_contrasts <- vapply(targets, function(g) {
+  others <- setdiff(targets, g)
+  paste0(g, " - (", paste(others, collapse = " + "), ")/", length(others))
+}, FUN.VALUE = character(1))
+
+cont_mat_B <- makeContrasts(contrasts = ovr_contrasts, levels = design)
+stopifnot(length(colnames(cont_mat_B)) == length(targets))
+
+res_list_B <- lapply(seq_along(targets), function(i) {
+  co <- colnames(cont_mat_B)[i]
+  g  <- targets[i]
+  collect_contrast(fit, co, cont_mat_B, cluster_label = g)
+})
+res_df_B <- do.call(rbind, res_list_B) %>% add_regulation()
+sig_df_B <- res_df_B %>% filter(signif)
+sig_df_B <- as.data.frame(sig_df_B)
+
+# Save results
+write.csv(sig_df_B, 
+          file.path("results/tables", "DEGs_one_vs_rest.csv"), 
+          row.names = FALSE)
+
+# Bar plot: One-vs-Rest
+up_down_B <- sig_df_B[sig_df_B$regulation %in% c("Up", "Down"), ]
+
+if (nrow(up_down_B) > 0) {
+  counts_list_B <- table(up_down_B$cluster, up_down_B$regulation)
+  counts_B <- as.data.frame(counts_list_B)
+  colnames(counts_B) <- c("cluster", "regulation", "n")
+  
+  counts_B$n <- ifelse(counts_B$regulation == "Down", -counts_B$n, counts_B$n)
+  
+  pB <- ggplot(counts_B, aes(x = cluster, y = n, fill = regulation)) +
+    geom_col(width = 0.6) +
+    scale_fill_manual(values = c("Up" = "#D73027", "Down" = "#4575B4")) +
+    geom_hline(yintercept = 0, color = "black") +
+    labs(title = "One-vs-Rest: DEGs per cluster",
+         x = "Cluster", y = "Number of DEGs") +
+    theme_bw(base_size = 14)
+  
+  ggsave(file.path("results/figures", "barplot_DEGs_one_vs_rest.png"), 
+         pB, width = 7, height = 4, dpi = 300)
+  print(pB)
+}
+
+# ===================== Extract Up/Down Gene Lists =====================
+get_gene_table <- function(sig_df, direction = c("Up", "Down"), clusters = NULL) {
+  direction <- match.arg(direction)
+  if (is.null(clusters)) clusters <- sort(unique(sig_df$cluster))
+  
+  if (direction == "Up") {
+    df <- sig_df[sig_df$regulation == "Up", ]
+    df <- df[order(df$FDR, -df$logFC), ]
+  } else {
+    df <- sig_df[sig_df$regulation == "Down", ]
+    df <- df[order(df$FDR, df$logFC), ]
+  }
+  
+  if (nrow(df) == 0) {
+    cols <- setNames(rep(list(character(0)), length(clusters)), clusters)
+    return(as.data.frame(cols, stringsAsFactors = FALSE, check.names = FALSE))
+  }
+  
+  # Gene lists per cluster
+  gene_lists <- list()
+  for (cl in clusters) {
+    genes <- unique(df$gene[df$cluster == cl])
+    gene_lists[[cl]] <- genes
+  }
+  
+  # Pad to equal length
+  max_len <- max(sapply(gene_lists, length))
+  result <- data.frame(matrix("", nrow = max_len, ncol = length(clusters)))
+  colnames(result) <- clusters
+  
+  for (cl in clusters) {
+    genes <- gene_lists[[cl]]
+    if (length(genes) > 0) {
+      result[1:length(genes), cl] <- genes
+    }
+  }
+  
+  return(result)
+}
+
+# Gray vs Black up/down gene lists
+if (nrow(sig_df_A) > 0) {
+  clusters_A <- sort(unique(sig_df_A$cluster))
+  up_genes_A_df   <- get_gene_table(sig_df_A, direction = "Up",   clusters = clusters_A)
+  down_genes_A_df <- get_gene_table(sig_df_A, direction = "Down", clusters = clusters_A)
+  
+  write.csv(up_genes_A_df,   
+            file.path("results/tables", "gene_lists_gray_vs_black_up.csv"), 
+            row.names = FALSE)
+  write.csv(down_genes_A_df, 
+            file.path("results/tables", "gene_lists_gray_vs_black_down.csv"), 
+            row.names = FALSE)
+}
+
+# One-vs-Rest up/down gene lists
+if (nrow(sig_df_B) > 0) {
+  clusters_B <- sort(unique(sig_df_B$cluster))
+  up_genes_B_df   <- get_gene_table(sig_df_B, direction = "Up",   clusters = clusters_B)
+  down_genes_B_df <- get_gene_table(sig_df_B, direction = "Down", clusters = clusters_B)
+  
+  write.csv(up_genes_B_df,   
+            file.path("results/tables", "gene_lists_one_vs_rest_up.csv"), 
+            row.names = FALSE)
+  write.csv(down_genes_B_df, 
+            file.path("results/tables", "gene_lists_one_vs_rest_down.csv"), 
+            row.names = FALSE)
+}
+```
+
+```{r cluster_enrichment_dotplot, message=FALSE, warning=FALSE}
+# Description: Enrichment analysis dot plot for gray hair subclusters
+# Workflow: Part 01 - sfRNA-seq downstream analysis
+
+# ===== Enrichment Dot Plot for Gray Subclusters =====
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+
+# ========= Load Data =========
+df_wide <- read.csv("data/gray_cluster_batch_enrichment.csv", 
+                     check.names = FALSE, stringsAsFactors = FALSE)
+
+# ========= Reshape to Long Format =========
+df_long <- df_wide %>%
+  pivot_longer(
+    cols = starts_with("_LogP_"),
+    names_to = "Cluster",
+    names_prefix = "_LogP_",
+    values_to = "LogP"
+  ) %>%
+  mutate(
+    Cluster = factor(Cluster, levels = c("Gray1", "Gray2", "Gray3", "Gray4")),
+    LogP = as.numeric(LogP),
+    score = -LogP,
+    Description = factor(Description, levels = rev(unique(Description)))
+  ) %>%
+  filter(score > 0)
+
+# ========= Top 10 per Cluster =========
+top_n <- 10
+df_top <- df_long %>%
+  group_by(Cluster) %>%
+  arrange(desc(score), .by_group = TRUE) %>%
+  slice_head(n = top_n) %>%
+  ungroup() %>%
+  mutate(Description = factor(Description, levels = rev(unique(Description))))
+
+# ========= Color Scheme =========
+cluster_colors <- c(
+  "Gray1" = "#E41A1C",
+  "Gray2" = "#377EB8",
+  "Gray3" = "#4DAF4A",
+  "Gray4" = "#984EA3"
+)
+
+# ========= Dot Plot =========
+p <- ggplot(df_top, aes(x = Cluster, y = Description)) +
+  geom_point(aes(size = score, fill = Cluster), 
+             shape = 21, color = "black", stroke = 0.3, alpha = 0.85) +
+  scale_fill_manual(values = cluster_colors, guide = "none") +
+  scale_size_continuous(
+    name = expression(bold(-log[10](p))),
+    range = c(10, 20),
+    breaks = c(2, 5, 10, 20, 50)
+  ) +
+  scale_x_discrete(labels = c("Gray1", "Gray2", "Gray3", "Gray4")) +
+  theme_minimal(base_size = 12) +
+  theme(
+    axis.text.y = element_text(size = 14, color = "black", face = "bold"),
+    axis.text.x = element_text(size = 12, color = "black", face = "bold", 
+                               angle = 0, hjust = 0.5),
+    axis.title = element_blank(),
+    legend.position = "right",
+    legend.title = element_text(size = 12, face = "bold"),
+    legend.text = element_text(size = 10),
+    legend.key.size = unit(0.8, "cm"),
+    panel.grid.major = element_line(color = "gray90", linewidth = 0.3),
+    panel.grid.minor = element_blank(),
+    panel.border = element_rect(fill = NA, color = "gray50", linewidth = 0.5),
+    plot.background = element_rect(fill = "white", color = NA),
+    plot.margin = margin(10, 10, 10, 10)
+  ) +
+  labs(title = "", x = NULL, y = NULL)
+
+print(p)
+
+# ========= Save =========
+ggsave(file.path("results/figures", "enrichment_bubble_gray_clusters.png"), 
+       p, width = 10, height = 8, dpi = 300, bg = "white")
+```
+
+```{r ssgsea_analysis, message=FALSE, warning=FALSE}
+# Description: ssGSEA analysis for pathway enrichment in gray hair subclusters
+# Workflow: Part 01 - sfRNA-seq downstream analysis
+
+# ===== ssGSEA Analysis - Heatmap for Significant Pathway Selection =====
+library(ggplot2)
+library(dplyr)
+library(pheatmap)
+
+# ===========================================
+# Load Gene Set CSV File
+# ===========================================
+
+gene_sets_df <- read.csv("data/pathway_gene_sets.csv", 
+                         stringsAsFactors = FALSE)
+
+# Convert to list format for ssGSEA
+gene_sets <- list()
+pathway_names_map <- list()
+
+for (pathway_code in unique(gene_sets_df$Pathway_Code)) {
+  # Extract all genes for this pathway
+  pathway_genes <- gene_sets_df$Gene[gene_sets_df$Pathway_Code == pathway_code]
+  gene_sets[[pathway_code]] <- paste(pathway_genes, collapse = ",")
+  
+  # Save full pathway name
+  pathway_full <- unique(gene_sets_df$Pathway_Name[gene_sets_df$Pathway_Code == pathway_code])
+  pathway_names_map[[pathway_code]] <- pathway_full[1]
+}
+
+# ===========================================
+# Data Preparation
+# ===========================================
+
+# Use TPM data
+expr_matrix <- as.matrix(log(tpm + 1))  # log(TPM+1) transformation
+
+# Sample grouping information
+samples <- rownames(annotation_col)
+clusters <- annotation_col$Cluster
+
+metadata_df <- data.frame(
+  sample_id = samples,
+  condition = factor(clusters, levels = c("Black", "Gray1", "Gray2", "Gray3", "Gray4"))
+)
+
+# ===========================================
+# ssGSEA Function
+# ===========================================
+
+ssgsea_score <- function(expr_matrix, gene_list) {
+  available_genes <- intersect(gene_list, rownames(expr_matrix))
+  if (length(available_genes) < 3) return(NULL)
+  
+  scores <- sapply(colnames(expr_matrix), function(sample) {
+    expr_values <- expr_matrix[, sample]
+    expr_rank <- rank(-expr_values, ties.method = "average")
+    weights <- 1/expr_rank
+    in_set <- rownames(expr_matrix) %in% available_genes
+    weighted_sum <- sum(expr_values[in_set] * weights[in_set])
+    total_weight <- sum(weights[in_set])
+    if (total_weight > 0) weighted_sum / total_weight else 0
+  })
+  return(scores)
+}
+
+# ===========================================
+# Color Definition (consistent with UMAP)
+# ===========================================
+
+cluster_colors <- c(
+  "Black" = "#000000",
+  "Gray1" = "#E41A1C",
+  "Gray2" = "#377EB8", 
+  "Gray3" = "#4DAF4A",
+  "Gray4" = "#984EA3"
+)
+
+# ===========================================
+# Statistical Test Function (retain t-test p-values only)
+# ===========================================
+
+perform_statistical_tests <- function(scores_df) {
+  conditions <- levels(scores_df$condition)
+  n_conditions <- length(conditions)
+  
+  if (n_conditions < 2) return(data.frame())
+  
+  stats_results <- data.frame()
+  
+  for (i in 1:(n_conditions-1)) {
+    for (j in (i+1):n_conditions) {
+      group1 <- conditions[i]
+      group2 <- conditions[j]
+      
+      data1 <- scores_df$Pathway_Score[scores_df$condition == group1]
+      data2 <- scores_df$Pathway_Score[scores_df$condition == group2]
+      
+      t_test <- tryCatch({
+        t.test(data1, data2)
+      }, error = function(e) {
+        list(p.value = NA)
+      })
+      
+      stats_row <- data.frame(
+        Group1 = group1,
+        Group2 = group2,
+        Comparison = paste(group1, "vs", group2),
+        T_p_value = ifelse(!is.null(t_test$p.value), t_test$p.value, NA)
+      )
+      
+      stats_results <- rbind(stats_results, stats_row)
+    }
+  }
+  
+  return(stats_results)
+}
+
+# ===========================================
+# Batch Analysis of All Pathways (save results for heatmap only)
+# ===========================================
+
+all_results <- list()
+all_statistics <- data.frame()
+
+for (selected_set in names(gene_sets)) {
+  gene_input <- gene_sets[[selected_set]]  
+  pathway_name <- ifelse(selected_set %in% names(pathway_names_map),
+                         pathway_names_map[[selected_set]], selected_set)
+  
+  genes <- trimws(unlist(strsplit(gene_input, ",")))
+  available_genes <- genes[genes %in% rownames(expr_matrix)]
+  
+  if (length(available_genes) < 3) next
+  
+  geneset_scores <- ssgsea_score(expr_matrix, available_genes)
+  if (is.null(geneset_scores)) next
+  
+  result_df <- data.frame(
+    sample = names(geneset_scores),
+    Pathway_Score = geneset_scores,
+    condition = metadata_df$condition[match(names(geneset_scores), metadata_df$sample_id)]
+  )
+  
+  result_df$condition <- factor(result_df$condition, levels = c("Black", "Gray1", "Gray2", "Gray3", "Gray4"))
+  
+  group_means <- result_df %>%
+    group_by(condition) %>%
+    summarise(mean_score = mean(Pathway_Score, na.rm = TRUE), .groups = 'drop')
+  
+  stats_results <- perform_statistical_tests(result_df)
+  
+  if (nrow(stats_results) > 0) {
+    stats_results$Pathway <- selected_set
+    stats_results$Pathway_Name <- pathway_name
+    stats_results$Available_Genes <- length(available_genes)
+    stats_results$Total_Genes <- length(genes)
+    stats_results$Gene_Coverage <- round(length(available_genes) / length(genes) * 100, 1)
+    stats_results$Min_P_Value <- min(stats_results$T_p_value, na.rm = TRUE)
+    
+    all_statistics <- rbind(all_statistics, stats_results)
+  }
+  
+  all_results[[selected_set]] <- list(
+    scores = result_df,
+    group_means = group_means,
+    available_genes = available_genes,
+    statistics = stats_results
+  )
+}
+
+# ===========================================
+# Filter Significant Pathways (p < 0.05)
+# ===========================================
+
+significant_pathways <- c()
+
+for (pathway_name in names(all_results)) {
+  stats_df <- all_results[[pathway_name]]$statistics
+  
+  if (nrow(stats_df) > 0) {
+    has_sig <- any(stats_df$T_p_value < 0.05, na.rm = TRUE)
+    if (has_sig) {
+      significant_pathways <- c(significant_pathways, pathway_name)
+    }
+  }
+}
+
+if (length(significant_pathways) == 0) {
+  for (pathway_name in names(all_results)) {
+    stats_df <- all_results[[pathway_name]]$statistics
+    if (nrow(stats_df) > 0 && any(stats_df$T_p_value < 0.1, na.rm = TRUE)) {
+      significant_pathways <- c(significant_pathways, pathway_name)
+    }
+  }
+}
+
+if (length(significant_pathways) == 0) {
+  significant_pathways <- names(all_results)
+}
+
+# ===========================================
+# Prepare Heatmap Data
+# ===========================================
+
+cluster_levels <- c("Black", "Gray1", "Gray2", "Gray3", "Gray4")
+
+heatmap_data <- matrix(NA, 
+                       nrow = length(significant_pathways), 
+                       ncol = length(cluster_levels),
+                       dimnames = list(significant_pathways, cluster_levels))
+
+for (pathway in significant_pathways) {
+  scores_df <- all_results[[pathway]]$scores
+  
+  cluster_means <- scores_df %>%
+    group_by(condition) %>%
+    summarise(mean_score = mean(Pathway_Score, na.rm = TRUE), .groups = 'drop')
+  
+  for (cluster in cluster_levels) {
+    if (cluster %in% cluster_means$condition) {
+      heatmap_data[pathway, cluster] <- cluster_means$mean_score[cluster_means$condition == cluster]
+    }
+  }
+}
+
+heatmap_data <- heatmap_data[rowSums(!is.na(heatmap_data)) > 0, , drop = FALSE]
+heatmap_data_scaled <- t(scale(t(heatmap_data)))
+heatmap_data_scaled[is.na(heatmap_data_scaled)] <- 0
+
+# ===========================================
+# Prepare Row Annotations
+# ===========================================
+
+annotation_row <- data.frame(
+  row.names = rownames(heatmap_data_scaled)
+)
+
+min_p_values <- sapply(rownames(heatmap_data_scaled), function(pathway) {
+  stats_df <- all_results[[pathway]]$statistics
+  if (nrow(stats_df) > 0) {
+    return(min(stats_df$T_p_value, na.rm = TRUE))
+  }
+  return(NA)
+})
+
+annotation_row$NegLog10_P <- -log10(min_p_values + 1e-10)
+annotation_row$Significance <- cut(min_p_values,
+                                   breaks = c(0, 0.001, 0.01, 0.05, 0.1, 1),
+                                   labels = c("p<0.001", "p<0.01", "p<0.05", "p<0.1", "NS"),
+                                   include.lowest = TRUE)
+
+annotation_row$Significance <- factor(annotation_row$Significance, 
+                                      levels = c("p<0.001", "p<0.01", "p<0.05", "p<0.1", "NS"))
+
+# ===========================================
+# Prepare Column Annotations
+# ===========================================
+
+annotation_col <- data.frame(
+  Cluster = factor(colnames(heatmap_data_scaled), levels = cluster_levels),
+  row.names = colnames(heatmap_data_scaled)
+)
+
+significance_colors <- c(
+  "p<0.001" = "#d73027",
+  "p<0.01" = "#fc8d59", 
+  "p<0.05" = "#fee08b",
+  "p<0.1" = "#d9ef8b",
+  "NS" = "#ffffff"
+)
+
+annotation_colors <- list(
+  Cluster = cluster_colors,
+  Significance = significance_colors
+)
+
+# ===========================================
+# Generate Heatmap
+# ===========================================
+
+heatmap_colors <- colorRampPalette(c("blue", "white", "red"))(100)
+
+if (exists("pathway_names_map")) {
+  row_labels <- sapply(rownames(heatmap_data_scaled), function(x) {
+    if(x %in% names(pathway_names_map)) pathway_names_map[[x]] else x
+  })
+} else {
+  row_labels <- rownames(heatmap_data_scaled)
+}
+
+row_anno_for_plot <- data.frame(
+  Significance = annotation_row$Significance,
+  row.names = rownames(annotation_row)
+)
+
+pheatmap_result <- pheatmap(
+  heatmap_data_scaled,
+  scale = "none",
+  cluster_rows = TRUE,    
+  cluster_cols = FALSE,   
+  show_rownames = TRUE,   
+  show_colnames = TRUE,   
+  labels_row = row_labels,
+  annotation_col = annotation_col,
+  annotation_colors = annotation_colors,
+  border_color = NA,
+  cellwidth = 45,
+  cellheight = ifelse(nrow(heatmap_data_scaled) > 30, 10, 12),
+  fontsize_row = ifelse(nrow(heatmap_data_scaled) > 30, 8, 9),
+  fontsize_col = 11,
+  angle_col = 45,
+  treeheight_row = 0,
+  treeheight_col = 0,
+  color = heatmap_colors,
+  breaks = seq(-2, 2, length.out = 101),
+  main = "Significant Pathways by Cluster",
+  gaps_col = 1:(ncol(heatmap_data_scaled)-1),
+  silent = FALSE
+)
+
+# Save heatmap
+output_dir <- "results/figures"
+if (!dir.exists(output_dir)) {
+  dir.create(output_dir, recursive = TRUE)
+}
+
+png(file.path(output_dir, "ssGSEA_significant_pathways.png"), 
+    width = 3000, height = 2500, res = 300)
+print(pheatmap_result)
+dev.off()
+
+# ===========================================
+# Save Results to Variable
+# ===========================================
+
+ssgsea_results <- list(
+  all_results = all_results,
+  statistics = all_statistics,
+  significant_pathways = significant_pathways,
+  heatmap_data = heatmap_data_scaled,
+  pheatmap_object = pheatmap_result
+)
+
+# Save statistics to CSV
+write.csv(all_statistics, 
+          file.path("results/tables", "ssGSEA_statistics.csv"), 
+          row.names = FALSE)
+```

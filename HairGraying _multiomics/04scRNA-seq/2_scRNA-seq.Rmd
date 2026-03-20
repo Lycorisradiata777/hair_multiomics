@@ -1,0 +1,1555 @@
+```{r qc_filtering, message=FALSE, warning=FALSE}
+# Description: scRNA-seq data preprocessing and quality control filtering
+# Workflow: Part 04 - scRNA-seq validation
+
+library(Seurat)
+library(dplyr)
+library(ggplot2)
+
+# Define quick clustering function
+easy_clustering <- function(object, nfeatures = 3000, pcs = 50, dims = 1:30, resolution = 2){
+  object <- FindVariableFeatures(object, nfeatures = nfeatures)
+  object <- ScaleData(object, features = VariableFeatures(object))
+  object <- RunPCA(object, features = VariableFeatures(object), npcs = pcs)
+  object <- ScaleData(object, features = VariableFeatures(object)[1])
+  object <- FindNeighbors(object, dims = dims)
+  object <- FindClusters(object, resolution = resolution)
+  object <- RunUMAP(object, dims = dims)
+  return(object)
+}
+
+# ========== Load Data ==========
+data.path <- c(
+  "scRNA-seq/results/cellranger/Y1_outs/raw_feature_bc_matrix/",
+  "scRNA-seq/results/cellranger/Y2_outs/raw_feature_bc_matrix/",
+  "scRNA-seq/results/cellranger/O1_outs/raw_feature_bc_matrix/",
+  "scRNA-seq/results/cellranger/O2_outs/raw_feature_bc_matrix/"
+)
+
+object.list <- list()
+for (i in 1:length(data.path)) {
+  object.list[[i]] <- CreateSeuratObject(counts = Read10X(data.dir = data.path[i]), 
+                                          min.cells = 1, min.features = 100)
+  object.list[[i]]$stim <- c("Y1", "Y2", "O1", "O2")[i]
+  object.list[[i]]$stage <- c("Anagen", "Telogen", "Anagen", "Telogen")[i]
+  object.list[[i]]$age <- c("3 months", "2 months", "12 months", "18 months")[i]
+}
+
+merged <- merge(x = object.list[[1]], y = object.list[2:4], merge.data = TRUE)
+merged[["percent.mt"]] <- PercentageFeatureSet(merged, pattern = "^mt-")
+merged[["percent.rp"]] <- PercentageFeatureSet(merged, pattern = "^Rp[ls][1-9]")
+merged <- NormalizeData(merged)
+merged <- easy_clustering(object = merged)
+
+# ========== Automatic QC Filtering ==========
+# First filter: based on nFeature_RNA < 600
+cluster_stats <- merged@meta.data %>%
+  group_by(seurat_clusters) %>%
+  summarise(median_nFeature = median(nFeature_RNA), .groups = "drop") %>%
+  arrange(median_nFeature)
+low_feature_clusters <- cluster_stats %>%
+  filter(median_nFeature < 600) %>%
+  pull(seurat_clusters) %>% as.character()
+if (length(low_feature_clusters) > 0) {
+  merged <- subset(merged, idents = setdiff(levels(merged), low_feature_clusters))
+  merged <- easy_clustering(merged)
+}
+
+# Second filter: based on nCount_RNA < 1500
+cluster_stats <- merged@meta.data %>%
+  group_by(seurat_clusters) %>%
+  summarise(median_nCount = median(nCount_RNA), .groups = "drop") %>%
+  arrange(median_nCount)
+low_count_clusters <- cluster_stats %>%
+  filter(median_nCount < 1500) %>%
+  pull(seurat_clusters) %>% as.character()
+if (length(low_count_clusters) > 0) {
+  merged <- subset(merged, idents = setdiff(levels(merged), low_count_clusters))
+  merged <- easy_clustering(merged)
+}
+
+# ========== Manual Filtering ==========
+# Marker-based annotations (reference only, actual cluster numbers may vary)
+# Fgf18: quiescence
+# Endo: 12(VEC), 34(LEC)
+# Muscle: 7, 36, 22
+# satellite: 28
+# Fibroblast: 16
+# melanocyte: 1
+# schwann cell: 39
+# epithelial: 2,5,8,9,11,13,14,15,17,18,20,23,24,25,26,29,30,31,32,33,35,37,38,40,41,42,45,48
+# dermal papilla cell: 0,3,4,6,10,19,27,50
+# Doublets: 45,46,47,49,51
+# immune:21,43,44,52
+
+# Remove doublets and immune cells (update cluster numbers based on your results)
+doublet_immune_clusters <- c(21, 43, 44, 52, 45, 46, 47, 49, 51)
+merged <- subset(merged, idents = setdiff(levels(merged), doublet_immune_clusters))
+
+# Extract hair follicle-related cells (update cluster numbers based on your results)
+hair_clusters <- c(2,6,7,9,11,21,27,3,5,16,19,24,25,30,8,13,14,15,17,20,22,33,36,39,40,42,46,49,45,26,29,32,35,47,4,12,34,18,44)
+merged_hair <- subset(merged, idents = hair_clusters)
+
+# ========== Hair Follicle Cell Processing ==========
+merged_hair <- easy_clustering(merged_hair)
+```
+
+```{r cell_annotation, message=FALSE, warning=FALSE}
+# Description: Cell type annotation for hair follicle cells
+# Workflow: Part 04 - scRNA-seq validation
+
+# ========== Cell Type Annotation ==========
+# Map clusters to 5 major cell types based on marker genes
+library(dplyr)
+
+# Add majorCellType column using mutate
+merged_hair <- merged_hair %>%
+  mutate(majorCellType = case_when(
+    seurat_clusters %in% c(0, 1, 2, 3, 4, 8, 12, 20, 22, 25, 26, 31) ~ "DP cell", #Fgf7
+    seurat_clusters %in% c(5, 15, 18, 19, 23, 30) ~ "Activated HFSC",             #Sox9,Gata3,Krt14
+    seurat_clusters %in% c(6, 21) ~ "Quiescent HFSC",                             #Sox9,Fgf18
+    seurat_clusters %in% c(11, 14) ~ "Melanocyte",                                #Dct
+    seurat_clusters %in% c(7, 9, 10, 13, 16, 17, 24, 27, 28, 29) ~ "Matrix cell", #Msx2
+    TRUE ~ "Other"
+  ))
+
+# Set majorCellType as factor with fixed order
+merged_hair$majorCellType <- factor(merged_hair$majorCellType,
+                                    levels = c("Matrix cell", "DP cell", "Activated HFSC",
+                                               "Quiescent HFSC", "Melanocyte"))
+
+# ========== Set stim Factor Levels ==========
+Idents(merged_hair) <- "stim"
+merged_hair$stim <- factor(Idents(merged_hair), levels = c("Young_anagen", "Old_anagen", "Young_telogen", "Old_telogen"))
+
+# ========== Visualization ==========
+library(ggplot2)
+library(patchwork)
+
+# Create output directory
+outdir <- "results/figures/All"
+dir.create(outdir, recursive = TRUE, showWarnings = FALSE)
+
+# Color settings (5 cell types, matching factor order)
+ratiocol <- c('#5BC0EB', '#ffbc42', '#d81159', '#6a60a9', '#218380')
+names(ratiocol) <- levels(merged_hair$majorCellType)
+
+# UMAP plot colored by majorCellType
+umapplot <- DimPlot(merged_hair, label = TRUE, repel = TRUE,
+                    group.by = "majorCellType", cols = ratiocol,
+                    label.size = 6, label.color = "black")
+print(umapplot)
+ggsave(file.path(outdir, "umapplot5.png"), plot = umapplot,
+       width = 10, height = 6, dpi = 300)
+
+# Combined FeaturePlot: marker genes (4 genes)
+feature5clusters <- (
+  FeaturePlot(merged_hair, features = "Fgf7", cols = c("#bebebe", "#ffbc42")) +
+  FeaturePlot(merged_hair, features = "Msx2", cols = c("#bebebe", "#5BC0EB")) +
+  FeaturePlot(merged_hair, features = "Dct", cols = c("#bebebe", "#218380")) +
+  FeaturePlot(merged_hair, features = "Sox9", cols = c("#bebebe", "#d81159"))
+) + plot_layout(ncol = 2, nrow = 2)
+print(feature5clusters)
+ggsave(file.path(outdir, "feature5clusters.png"), plot = feature5clusters,
+       width = 12, height = 12, dpi = 300)
+
+# Combined FeaturePlot: additional 3 genes
+featuresg <- (
+  FeaturePlot(merged_hair, features = "Fgf18", cols = c("#bebebe", "#ffbc42")) +
+  FeaturePlot(merged_hair, features = "Gata3", cols = c("#bebebe", "#d81159")) +
+  FeaturePlot(merged_hair, features = "Krt14", cols = c("#bebebe", "#218380"))
+) + plot_layout(ncol = 3, nrow = 1)
+print(featuresg)
+ggsave(file.path(outdir, "featuresg.png"), plot = featuresg,
+       width = 18, height = 6, dpi = 300)
+```
+
+```{r melanocyte_extraction}
+# Description: Extract and analyze melanocyte subpopulation
+# Workflow: Part 04 - scRNA-seq validation
+
+# ==================== Melanocyte Subpopulation Analysis ====================
+# Extract melanocytes from annotated merged_hair object for subclustering analysis
+
+library(Seurat)
+library(ggplot2)
+library(dplyr)
+
+# Set output directory
+OUTPUT_DIR <- "results"
+dir.create(file.path(OUTPUT_DIR, "figures", "melanocyte"), recursive = TRUE, showWarnings = FALSE)
+
+# ========== Extract Melanocytes ==========
+melanocyte <- subset(x = merged_hair, subset = majorCellType == "Melanocyte")
+```
+
+```{r mela_clustering}
+# Description: Clustering analysis for melanocyte subpopulation
+# Workflow: Part 04 - scRNA-seq validation
+
+# ========== Define Melanocyte Clustering Function ==========
+mela_clustering <- function(object, nfeatures = 3000, dims = 1:30, pcs = 50, resolution = 0.6){
+  object <- NormalizeData(object)
+  object <- FindVariableFeatures(object, selection.method = "vst", nfeatures = nfeatures)
+  object <- ScaleData(object, features = rownames(object))
+  object <- RunPCA(object, features = VariableFeatures(object), npcs = pcs)
+  object <- FindNeighbors(object, dims = dims)
+  object <- FindClusters(object, resolution = resolution)
+  object <- RunUMAP(object, dims = dims)
+  return(object)
+}
+
+# ========== Melanocyte Reclustering ==========
+melanocyte <- mela_clustering(melanocyte)
+melanocyte <- RenameIdents(melanocyte, 
+                          '0' = 'M0',
+                          '1' = 'M1',
+                          '2' = 'M2',
+                          '3' = 'M3')
+melanocyte[["cellType"]] <- Idents(melanocyte)
+```
+
+```{r qc_metrics}
+# Description: Quality control metrics for melanocyte subpopulation
+# Workflow: Part 04 - scRNA-seq validation
+
+# Calculate mitochondrial gene percentage (if not already calculated)
+melanocyte[["percent.mt"]] <- PercentageFeatureSet(melanocyte, pattern = "^mt-")
+
+# Combined QC metrics violin plot
+qc_combined <- VlnPlot(melanocyte, 
+                       features = c("nFeature_RNA", "nCount_RNA", "percent.mt", "percent.rp"),
+                       pt.size = 0, 
+                       ncol = 2) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+print(qc_combined)
+
+# Save combined plot
+ggsave(file.path(OUTPUT_DIR, "figures", "melanocyte", "qc_metrics_combined.png"),
+       plot = qc_combined, width = 10, height = 8, dpi = 300)
+```
+
+```{r umap_visualization}
+# Description: UMAP visualization for melanocyte subpopulations
+# Workflow: Part 04 - scRNA-seq validation
+
+# ========== Visualization ==========
+# Define colors
+mycol <- c('#218380','#d81159','#ffbc42','#6a60a9')
+
+# Custom UMAP plot with arrows and labels
+# Extract UMAP coordinates
+umap_df <- as.data.frame(Embeddings(melanocyte, "umap"))
+colnames(umap_df) <- c("UMAP1", "UMAP2")
+umap_df$celltype <- melanocyte$cellType
+
+# Calculate median position for each cell type as label position
+label_df <- umap_df %>%
+  group_by(celltype) %>%
+  summarise(
+    x = median(UMAP1),
+    y = median(UMAP2),
+    .groups = "drop"
+  )
+
+# Calculate coordinate ranges
+x_min <- min(umap_df$UMAP1)
+x_max <- max(umap_df$UMAP1)
+y_min <- min(umap_df$UMAP2)
+y_max <- max(umap_df$UMAP2)
+
+x_range <- x_max - x_min
+y_range <- y_max - y_min
+dx <- x_range * 0.15
+dy <- y_range * 0.15
+
+# Generate plot
+p1 <- ggplot() +
+  geom_point(data = umap_df, aes(UMAP1, UMAP2, color = celltype), size = 2) +
+  # Bottom-left arrows
+  annotate("segment", x = x_min, xend = x_min + dx, y = y_min, yend = y_min,
+           arrow = arrow(length = unit(0.25, "cm")), linewidth = 0.8) +
+  annotate("segment", x = x_min, xend = x_min, y = y_min, yend = y_min + dy,
+           arrow = arrow(length = unit(0.25, "cm")), linewidth = 0.8) +
+  # Arrow labels
+  annotate("text", x = x_min + dx/2, y = y_min - y_range*0.05, label = "UMAP1", size = 4) +
+  annotate("text", x = x_min - x_range*0.05, y = y_min + dy/2, label = "UMAP2", angle = 90, size = 4) +
+  scale_color_manual(values = mycol) +
+  theme_void() +
+  theme(legend.position = "none")
+
+print(p1)
+ggsave(file.path(OUTPUT_DIR, "figures", "melanocyte", "umap_total.png"),
+       plot = p1, width = 8, height = 6, dpi = 300)
+
+# Split UMAP by sample (custom version)
+umap_df <- as.data.frame(Embeddings(melanocyte, "umap"))
+colnames(umap_df) <- c("UMAP1", "UMAP2")
+umap_df$celltype <- melanocyte$cellType
+umap_df$stim <- melanocyte$stim
+
+# Calculate coordinate ranges
+x_min <- min(umap_df$UMAP1)
+x_max <- max(umap_df$UMAP1)
+y_min <- min(umap_df$UMAP2)
+y_max <- max(umap_df$UMAP2)
+
+x_range <- x_max - x_min
+y_range <- y_max - y_min
+dx <- x_range * 0.15
+dy <- y_range * 0.15
+
+# Generate split plot
+p2 <- ggplot(umap_df, aes(UMAP1, UMAP2)) +
+  geom_point(aes(color = celltype), size = 2) +
+  # Bottom-left arrows
+  annotate("segment", x = x_min, xend = x_min + dx, y = y_min, yend = y_min,
+           arrow = arrow(length = unit(0.25, "cm")), linewidth = 0.8) +
+  annotate("segment", x = x_min, xend = x_min, y = y_min, yend = y_min + dy,
+           arrow = arrow(length = unit(0.25, "cm")), linewidth = 0.8) +
+  # Arrow labels
+  annotate("text", x = x_min + dx/2, y = y_min - y_range*0.05, label = "UMAP1", size = 9) +
+  annotate("text", x = x_min - x_range*0.05, y = y_min + dy/2, label = "UMAP2", angle = 90, size = 9) +
+  facet_wrap(~ stim, nrow = 2, ncol = 2) +
+  scale_color_manual(values = mycol) +
+  theme_void() +
+  theme(
+    strip.text = element_text(size = 30, face = "bold"),
+    legend.title = element_text(size = 30, face = "bold"),
+    legend.text = element_text(size = 30, face = "bold"),
+    legend.position = "right",
+    strip.clip = "off"
+  ) +
+  guides(color = guide_legend(override.aes = list(size = 6)))
+
+print(p2)
+ggsave(file.path(OUTPUT_DIR, "figures", "melanocyte", "umap_split.png"),
+       plot = p2, width = 18, height = 12, dpi = 300)
+```
+
+```{r proportion_plot}
+# Description: Cell proportion analysis for melanocyte subpopulations
+# Workflow: Part 04 - scRNA-seq validation
+
+# ========== Cell Proportion Analysis ==========
+# Calculate proportions of different cell clusters across samples (row-normalized)
+Cellratio <- prop.table(
+  table(Idents(melanocyte), melanocyte$stim),
+  margin = 1
+)
+Cellratio <- as.data.frame(Cellratio)
+colnames(Cellratio) <- c("Cluster", "Condition", "Freq")
+
+# Set condition factor levels
+Cellratio$Condition <- factor(
+  Cellratio$Condition,
+  levels = c("Old_anagen", "Old_telogen", "Young_anagen", "Young_telogen")
+)
+
+# Define colors
+ratiocol <- c('#d81159','#6a60a9','#ffbc42','#218380')
+
+# Generate proportion plot
+p_ratio <- ggplot(
+  Cellratio,
+  aes(x = Cluster, y = Freq, fill = Condition)
+) +
+  geom_bar(
+    stat = "identity",
+    width = 0.92,
+    color = "black",
+    linewidth = 0.25
+  ) +
+  scale_y_continuous(
+    labels = scales::percent_format(accuracy = 1),
+    expand = c(0, 0)
+  ) +
+  scale_fill_manual(values = ratiocol) +
+  labs(
+    x = NULL,
+    y = "Cell proportion (%)",
+    fill = "Condition"
+  ) +
+  theme_classic(base_size = 14) +
+  theme(
+    axis.text.x = element_text(
+      size = 12,
+      angle = 30,
+      hjust = 1,
+      vjust = 1,
+      color = "black"
+    ),
+    axis.text.y = element_text(size = 12, color = "black"),
+    axis.title.y = element_text(size = 14, face = "bold"),
+    legend.title = element_text(size = 14, face = "bold"),
+    legend.text  = element_text(size = 13),
+    legend.key.height = unit(0.6, "cm"),
+    panel.grid = element_blank()
+  )
+
+print(p_ratio)
+
+# Save
+ggsave(file.path(OUTPUT_DIR, "figures", "melanocyte", "cell_proportion.png"),
+       plot = p_ratio, width = 8, height = 5, dpi = 300)
+```
+
+```{r volcano_plot}
+# Description: Differential expression analysis and volcano plot for melanocyte subpopulations
+# Workflow: Part 04 - scRNA-seq validation
+
+# ========== Differential Expression Analysis ==========
+library(dplyr)
+library(ggplot2)
+library(ggrepel)
+library(tibble)
+
+# Create subset containing M1 and M2 cells
+melanocyte_subset <- subset(melanocyte, idents = c("M1", "M2"))
+
+# Set new identity combining cell type and condition
+melanocyte_subset$celltype_stim <- paste0(melanocyte_subset$cellType, "_", melanocyte_subset$stim)
+Idents(melanocyte_subset) <- "celltype_stim"
+
+# Check available ident combinations
+print(table(Idents(melanocyte_subset)))
+
+# Adjust comparison groups based on actual ident names
+# Example: M1_Old_anagen vs M2_Young_anagen - modify according to your data
+ident.1 <- "M1_Old_anagen"
+ident.2 <- "M2_Young_anagen"
+
+# Extract differentially expressed genes
+m2_young_vs_m1_old <- FindMarkers(melanocyte_subset,
+                                 ident.1 = ident.1,
+                                 ident.2 = ident.2,
+                                 logfc.threshold = 0,
+                                 min.pct = 0.1)
+
+# Filter significant DEGs
+m2_young_vs_m1_old_sig <- m2_young_vs_m1_old %>% 
+  filter(p_val_adj < 0.05 & abs(avg_log2FC) > 0.25)
+
+print(head(m2_young_vs_m1_old_sig, 20))
+
+# ========== Volcano Plot ==========
+# Prepare volcano plot data
+lfc_cutoff <- 0.25
+p_cutoff   <- 0.05
+
+m2_young_vs_m1_old_volcano <- rownames_to_column(m2_young_vs_m1_old, "gene")
+m2_young_vs_m1_old_volcano <- m2_young_vs_m1_old_volcano %>%
+  mutate(
+    group = case_when(
+      p_val_adj < p_cutoff & avg_log2FC >  lfc_cutoff  ~ "Up_in_M1_Old",
+      p_val_adj < p_cutoff & avg_log2FC < -lfc_cutoff  ~ "Up_in_M2_Young",
+      TRUE ~ "Not_Sig"
+    ),
+    label = ifelse(p_val_adj < 0.01 & abs(avg_log2FC) > 0.6, gene, "")
+  )
+
+# Count genes in each group
+n_m1_old   <- sum(m2_young_vs_m1_old_volcano$group == "Up_in_M1_Old")
+n_m2_young <- sum(m2_young_vs_m1_old_volcano$group == "Up_in_M2_Young")
+n_total <- n_m1_old + n_m2_young
+
+subtitle_text <- paste0(
+  "Up_in_M1_Old: ", n_m1_old, " | ",
+  "Up_in_M2_Young: ", n_m2_young, " | ",
+  "Total DEGs: ", n_total
+)
+
+# Set colors
+pal <- c("Up_in_M1_Old" = "#d81159", "Up_in_M2_Young" = "#218380", "Not_Sig" = "grey80")
+
+# Generate volcano plot
+volcano_plot <- ggplot(m2_young_vs_m1_old_volcano, aes(x = avg_log2FC, y = -log10(p_val_adj), color = group)) +
+  geom_point(alpha = 0.8, size = 3) +
+  geom_text_repel(
+    aes(label = label),
+    size = 4,
+    max.overlaps = 20,
+    color = "black",
+    box.padding = 0.5,
+    point.padding = 0.3
+  ) +
+  scale_color_manual(values = pal) +
+  geom_vline(xintercept = c(-lfc_cutoff, lfc_cutoff), linetype = 2, color = "grey60") +
+  geom_hline(yintercept = -log10(p_cutoff), linetype = 2, color = "grey60") +
+  theme_bw(base_size = 14) +
+  labs(
+    title = "M1_Old vs M2_Young",
+    subtitle = subtitle_text,
+    x = "log2 Fold Change",
+    y = "-log10(adj. p-value)",
+    color = "Group"
+  ) +
+  theme(
+    plot.title = element_text(hjust = 0.5, face = "bold", size = 16),
+    plot.subtitle = element_text(hjust = 0.5, face = "italic", size = 12),
+    axis.text.x = element_text(size = 12, color = "black"),
+    axis.text.y = element_text(size = 12, color = "black"),
+    axis.title = element_text(size = 14, face = "bold"),
+    legend.title = element_text(size = 14, face = "bold"),
+    legend.text = element_text(size = 12),
+    legend.position = "right"
+  )
+
+print(volcano_plot)
+
+# Save volcano plot
+ggsave(
+  file.path(OUTPUT_DIR, "figures", "melanocyte", "M1_Old_vs_M2_Young_volcano.png"),
+  plot = volcano_plot, width = 8, height = 6, dpi = 300
+)
+```
+
+```{r enrichment_bubble}
+# Description: Enrichment analysis bubble plot for melanocyte subpopulations
+# Workflow: Part 04 - scRNA-seq validation
+
+# ========== Enrichment Bubble Plot ==========
+library(readr)
+library(ggplot2)
+library(dplyr)
+
+# Read enrichment results
+enrich_data <- read_csv("results/tables/melanocyte/M1_old_vs_M2_young_enrichment.csv")
+
+# Prepare bubble plot data
+bubble_data <- enrich_data %>%
+  dplyr::select(Description, LogP, Cluster) %>%
+  arrange(Cluster, desc(LogP)) %>%
+  mutate(Description = factor(Description, levels = rev(unique(Description))))
+
+# Generate bubble plot
+bubble_plot <- ggplot(bubble_data, aes(x = Cluster, y = Description)) +
+  geom_point(aes(size = LogP, color = Cluster), alpha = 0.8) +
+  scale_color_manual(values = c("M1_old" = "#d81159", "M2_young" = "#218380"),
+                     name = "Cluster") +
+  scale_size_continuous(name = "-log10(p-value)", range = c(7, 12)) +
+  labs(title = "M1_Old vs M2_Young Enrichment", x = "Cluster", y = "") +
+  theme_bw(base_size = 14) +
+  theme(
+    axis.text.y = element_text(color = "black", size = 13),
+    axis.text.x = element_text(color = "black", size = 14, face = "bold"),
+    axis.title = element_text(size = 16, face = "bold"),
+    plot.title = element_text(hjust = 0.5, face = "bold", size = 18),
+    panel.grid.major = element_line(color = "grey90"),
+    panel.grid.minor = element_line(color = "grey95"),
+    legend.position = "right",
+    legend.title = element_text(size = 14, face = "bold"),
+    legend.text = element_text(size = 12),
+    legend.key.size = unit(1.2, "cm")
+  ) +
+  guides(
+    color = guide_legend(override.aes = list(size = 6)),
+    size = guide_legend(override.aes = list(shape = 16))
+  )
+
+print(bubble_plot)
+
+# Save bubble plot
+ggsave(file.path(OUTPUT_DIR, "figures", "melanocyte", "enrichment_bubble.png"), 
+       plot = bubble_plot, width = 11.3, height = 12, dpi = 300)
+```
+
+```{r tf_activity_analysis}
+# Description: Transcription factor activity analysis using dorothea/viper
+# Workflow: Part 04 - scRNA-seq validation
+
+# ========== Transcription Factor Activity Analysis ==========
+library(Seurat)
+library(dorothea)
+library(dplyr)
+library(viper)
+library(ggplot2)
+
+# Load mouse transcription factor regulons from dorothea
+data(dorothea_mm, package = "dorothea")
+tf_regulons <- dorothea_mm
+
+# Select high confidence A/B regulons
+tf_regulons_high <- tf_regulons %>%
+  dplyr::filter(confidence %in% c("A", "B"))
+
+# Subset M1 and M2 cells
+Idents(melanocyte) <- "cellType"
+melanocyte_subset <- subset(melanocyte, idents = c("M1", "M2"))
+
+# Create combined identity with cell type and condition
+melanocyte_subset$celltype_stim <- paste0(melanocyte_subset$cellType, "_", melanocyte_subset$stim)
+Idents(melanocyte_subset) <- "celltype_stim"
+
+# Ensure RNA assay is default
+DefaultAssay(melanocyte_subset) <- "RNA"
+
+# Run VIPER for TF activity inference
+melanocyte_subset <- run_viper(
+  melanocyte_subset,
+  regulon = tf_regulons_high,
+  options = list(
+    method      = "scale",
+    minsize     = 3,
+    eset.filter = FALSE,
+    cores       = 1,
+    verbose     = FALSE
+  )
+)
+
+# Identify TF activity assay
+assay_candidates <- Assays(melanocyte_subset)
+assay_name <- assay_candidates[grepl("dorothea|viper", assay_candidates)][1]
+DefaultAssay(melanocyte_subset) <- assay_name
+Idents(melanocyte_subset) <- "celltype_stim"
+
+# Differential TF activity analysis
+tf_deg <- FindMarkers(
+  object = melanocyte_subset,
+  ident.1 = "M1_Old_anagen",
+  ident.2 = "M2_Young_anagen",
+  logfc.threshold = 0,
+  min.pct = 0.1
+)
+
+tf_deg <- tibble::rownames_to_column(tf_deg, "TF")
+
+# Filter significant TFs
+tf_DE <- tf_deg %>%
+  dplyr::filter(p_val_adj < 0.05 & abs(avg_log2FC) > 0.1)
+
+# Save results
+dir.create(file.path(OUTPUT_DIR, "tables", "melanocyte"), recursive = TRUE, showWarnings = FALSE)
+write.csv(tf_DE, file.path(OUTPUT_DIR, "tables", "melanocyte", "TF_M1_Old_vs_M2_Young.csv"), row.names = FALSE)
+
+# Plot significant TFs
+sig_tfs <- tf_deg %>%
+  dplyr::filter(p_val_adj < 0.05 & abs(avg_log2FC) > 0.1) %>%
+  arrange(desc(abs(avg_log2FC)))
+
+if(nrow(sig_tfs) > 0) {
+  # Create bar plot for TF activity differences
+  tf_plot <- ggplot(sig_tfs, aes(x = reorder(TF, avg_log2FC), y = avg_log2FC, 
+                                fill = avg_log2FC > 0)) +
+    geom_bar(stat = "identity") +
+    scale_fill_manual(values = c("FALSE" = "#218380", "TRUE" = "#d81159"), 
+                      labels = c("Higher in M2_Young", "Higher in M1_Old")) +
+    coord_flip() +
+    theme_bw(base_size = 14) +
+    labs(
+      title = "Differential TF Activity: M1_Old_anagen vs M2_Young_anagen",
+      x = "Transcription Factors",
+      y = "log2 Fold Change",
+      fill = "Activity Direction"
+    ) +
+    theme(
+      plot.title = element_text(hjust = 0.5, face = "bold", size = 16),
+      axis.text.y = element_text(size = 12),
+      axis.text.x = element_text(size = 12),
+      axis.title = element_text(size = 14, face = "bold"),
+      legend.position = "bottom",
+      legend.title = element_text(size = 12, face = "bold"),
+      legend.text = element_text(size = 11)
+    )
+  
+  print(tf_plot)
+  
+  # Save figure
+  ggsave(file.path(OUTPUT_DIR, "figures", "melanocyte", "tf_activity_barplot.png"),
+         plot = tf_plot, width = 10, height = 8, dpi = 300)
+}
+```
+
+```{r regulatory_network_visualization}
+# Description: TF-target gene regulatory network construction and visualization
+# Workflow: Part 04 - scRNA-seq validation
+
+# ========== TF-Target Regulatory Network Construction ==========
+library(dplyr)
+
+# Extract significant TF names
+significant_tf_names <- sig_tfs$TF
+
+# Extract TF-target relationships from DoRothEA database
+tf_target_relationships <- tf_regulons_high %>%
+  filter(tf %in% significant_tf_names)
+
+# Get all differentially expressed genes
+de_genes <- rownames(m2_young_vs_m1_old_sig)
+
+# Find overlap: DE genes regulated by significant TFs
+regulated_de_genes <- tf_target_relationships %>%
+  filter(target %in% de_genes)
+
+# Summarize target genes per TF
+tf_summary <- regulated_de_genes %>%
+  group_by(tf, confidence) %>%
+  summarise(
+    n_targets = n(),
+    target_genes = paste(target, collapse = ", "),
+    .groups = 'drop'
+  ) %>%
+  arrange(desc(n_targets))
+
+# Save results
+dir.create(file.path(OUTPUT_DIR, "tables", "melanocyte"), recursive = TRUE, showWarnings = FALSE)
+write.csv(tf_summary, 
+          file.path(OUTPUT_DIR, "tables", "melanocyte", "tf_target_summary.csv"), 
+          row.names = FALSE)
+write.csv(regulated_de_genes, 
+          file.path(OUTPUT_DIR, "tables", "melanocyte", "regulated_de_genes.csv"), 
+          row.names = FALSE)
+
+# ========== TF-Target Regulatory Network Visualization ==========
+library(igraph)
+library(ggraph)
+
+# Prepare network data
+network_edges <- regulated_de_genes %>%
+  dplyr::select(tf, target) %>%
+  distinct()
+
+# Identify genes upregulated in M1_Old and M2_Young
+de_genes_m1_old <- m2_young_vs_m1_old_sig %>% 
+  filter(avg_log2FC > 0) %>%  # Upregulated in M1_Old
+  rownames()
+
+de_genes_m2_young <- m2_young_vs_m1_old_sig %>% 
+  filter(avg_log2FC < 0) %>%  # Upregulated in M2_Young
+  rownames()
+
+# Create graph object
+g <- graph_from_data_frame(network_edges, directed = TRUE)
+
+# Set node attributes
+V(g)$type <- ifelse(V(g)$name %in% significant_tf_names, "TF", "Target")
+
+# Set node color groups
+V(g)$group <- ifelse(
+  V(g)$name %in% significant_tf_names, "TF",
+  ifelse(
+    V(g)$name %in% de_genes_m1_old, "Up_in_M1_Old",
+    ifelse(
+      V(g)$name %in% de_genes_m2_young, "Up_in_M2_Young", "Other"
+    )
+  )
+)
+
+# Generate network plot
+set.seed(123)
+p_network <- ggraph(g, layout = "fr") +
+  geom_edge_link(
+    alpha = 0.6, 
+    arrow = arrow(length = unit(2, 'mm')), 
+    end_cap = circle(3, 'mm'),
+    color = "grey50"
+  ) +
+  geom_node_point(
+    aes(color = group, size = type), 
+    alpha = 0.8
+  ) +
+  geom_node_text(
+    aes(label = name),
+    repel = TRUE, 
+    size = 2.5,
+    max.overlaps = 100,
+    segment.color = "grey70",
+    segment.size = 0.2
+  ) +
+  scale_color_manual(
+    name = "Gene Group",
+    values = c(
+      "TF" = "#8B4513",           # Brown for TFs
+      "Up_in_M1_Old" = "#D81159", # Red for upregulated in M1_Old
+      "Up_in_M2_Young" = "#218380", # Teal for upregulated in M2_Young
+      "Other" = "grey70"          # Grey for others
+    ),
+    labels = c(
+      "TF" = "Transcription Factor",
+      "Up_in_M1_Old" = "Up in M1_Old", 
+      "Up_in_M2_Young" = "Up in M2_Young", 
+      "Other" = "Other"
+    )
+  ) +
+  scale_size_manual(
+    name = "Node Type",
+    values = c("TF" = 5, "Target" = 3),
+    labels = c("TF" = "Transcription Factor", "Target" = "Target Gene")
+  ) +
+  theme_void() +
+  labs(
+    title = "TF-Target Regulatory Network",
+    subtitle = "M1_Old_anagen vs M2_Young_anagen"
+  ) +
+  theme(
+    plot.title = element_text(hjust = 0, face = "bold", size = 16),
+    plot.subtitle = element_text(hjust = 0, color = "grey40", size = 12),
+    legend.position = "right",
+    legend.title = element_text(size = 12, face = "bold"),
+    legend.text = element_text(size = 10)
+  )
+
+print(p_network)
+
+# Save network plot
+ggsave(
+  file.path(OUTPUT_DIR, "figures", "melanocyte", "tf_target_network.png"),
+  plot = p_network, width = 7, height = 6, dpi = 300
+)
+```
+
+```{r monocle2_trajectory}
+# Description: Monocle2 trajectory analysis for melanocyte subpopulations
+# Workflow: Part 04 - scRNA-seq validation
+
+# ========== Monocle2 Trajectory Analysis ==========
+library(monocle)
+library(Seurat)
+library(dplyr)
+library(ggplot2)
+library(gridExtra)
+library(viridis)
+
+# Filter cells (keep M0, M1, M2)
+melanocyte_filtered <- subset(melanocyte, idents = c("M0", "M1", "M2"))
+
+# Build Monocle2 object
+expr_matrix <- GetAssayData(melanocyte_filtered, assay = "RNA", slot = "counts")
+cell_metadata <- melanocyte_filtered@meta.data
+gene_annotation <- data.frame(
+  gene_short_name = rownames(expr_matrix),
+  row.names = rownames(expr_matrix)
+)
+
+cds <- newCellDataSet(
+  expr_matrix,
+  phenoData = new("AnnotatedDataFrame", data = cell_metadata),
+  featureData = new("AnnotatedDataFrame", data = gene_annotation),
+  expressionFamily = negbinomial.size()
+)
+
+cds <- estimateSizeFactors(cds)
+cds <- estimateDispersions(cds)
+
+# Select trajectory genes
+diff_genes <- differentialGeneTest(
+  cds,
+  fullModelFormulaStr = "~cellType",
+  cores = 4
+)
+
+ordering_genes <- rownames(diff_genes[order(diff_genes$qval), ])[1:2000]
+cds <- setOrderingFilter(cds, ordering_genes)
+
+# Dimensionality reduction + ordering
+cds <- reduceDimension(
+  cds,
+  max_components = 2,
+  method = "DDRTree",
+  norm_method = "log",
+  pseudo_expr = 1
+)
+
+cds <- orderCells(cds)
+
+# Set M0-enriched state as root
+state_table <- table(pData(cds)$State, pData(cds)$cellType)
+m0_rich_state <- names(which.max(prop.table(state_table, margin = 1)[, "M0"]))
+cds <- orderCells(cds, root_state = m0_rich_state)
+```
+
+```{r trajectory_plots}
+# Description: Visualization of Monocle2 trajectory analysis results
+# Workflow: Part 04 - scRNA-seq validation
+
+# ========== Trajectory Visualization ==========
+
+# By cell type
+p1 <- plot_cell_trajectory(cds, color_by = "cellType", size = 1) +
+  scale_color_manual(values = c("M0" = "#6a60a9", "M1" = "#d81159", "M2" = "#218380")) +
+  ggtitle("Trajectory by Cell Type")
+
+# By Pseudotime
+p2 <- plot_cell_trajectory(cds, color_by = "Pseudotime", size = 1) +
+  scale_color_viridis_c(
+    name = "Pseudotime",
+    guide = guide_colorbar(
+      barwidth = 15,
+      barheight = 0.5,
+      title.position = "top",
+      title.hjust = 0.5,
+      direction = "horizontal",
+      label.position = "top"
+    )
+  ) +
+  ggtitle("Pseudotime Trajectory") +
+  theme(
+    legend.position = "top",
+    legend.title = element_text(margin = margin(b = 3)),
+    legend.text = element_text(size = 8)
+  )
+
+# By State
+p3 <- plot_cell_trajectory(cds, color_by = "State", size = 1) +
+  ggtitle("Trajectory by States")
+
+# By stim (condition)
+stim_cols <- c(
+  "Old_anagen" = '#d81159',
+  "Old_telogen" = '#6a60a9',
+  "Young_anagen" = '#ffbc42',
+  "Young_telogen" = '#218380'
+)
+
+p4 <- plot_cell_trajectory(cds, color_by = "stim", size = 1) +
+  scale_color_manual(values = stim_cols, name = "Condition") +
+  ggtitle("Trajectory by Age Condition")
+
+# Display individual plots
+print(p1)
+print(p2)
+print(p3)
+print(p4)
+
+# Save combined plot
+combined_plot <- grid.arrange(p2, p3, p1, p4, ncol = 2)
+ggsave(file.path(OUTPUT_DIR, "figures", "melanocyte", "trajectory_plots.png"),
+       plot = combined_plot, width = 16, height = 12, dpi = 300)
+```
+
+```{r state_composition}
+# Description: Analysis of state composition by condition
+# Workflow: Part 04 - scRNA-seq validation
+
+# ========== State Composition Analysis ==========
+# Prepare data
+state_stim_df <- as.data.frame(table(
+  State = pData(cds)$State,
+  stim = pData(cds)$stim
+))
+colnames(state_stim_df)[3] <- "Freq"
+
+# Define colors
+stim_cols <- c(
+  "Old_anagen" = '#d81159',
+  "Old_telogen" = '#6a60a9',
+  "Young_anagen" = '#ffbc42',
+  "Young_telogen" = '#218380'
+)
+
+# Generate plot
+state_stim_plot <- ggplot(
+  state_stim_df,
+  aes(x = State, y = Freq, fill = stim)
+) +
+  geom_bar(
+    stat = "identity",
+    position = "fill",
+    width = 0.85,
+    color = "black",
+    linewidth = 0.25
+  ) +
+  scale_y_continuous(
+    labels = scales::percent_format(accuracy = 1),
+    expand = c(0, 0)
+  ) +
+  scale_fill_manual(
+    values = stim_cols,
+    name = "Condition"
+  ) +
+  labs(
+    x = "State",
+    y = "Cell proportion (%)",
+    title = "Condition composition across States"
+  ) +
+  theme_classic(base_size = 14) +
+  theme(
+    plot.title = element_text(hjust = 0.5, face = "bold", size = 16, margin = margin(b = 10)),
+    axis.text.x = element_text(size = 12, color = "black", angle = 0, hjust = 0.5),
+    axis.text.y = element_text(size = 12, color = "black"),
+    axis.title.x = element_text(size = 14, face = "bold", margin = margin(t = 10)),
+    axis.title.y = element_text(size = 14, face = "bold", margin = margin(r = 10)),
+    legend.title = element_text(size = 14, face = "bold"),
+    legend.text = element_text(size = 13),
+    legend.key.height = unit(0.6, "cm"),
+    panel.grid = element_blank(),
+    plot.margin = margin(15, 15, 15, 15)
+  )
+
+print(state_stim_plot)
+
+# Save plot
+ggsave(
+  file.path(OUTPUT_DIR, "figures", "melanocyte", "state_composition.png"),
+  plot = state_stim_plot, 
+  width = 12, height = 8, dpi = 300
+)
+```
+
+```{r branch_analysis}
+# Description: Branch-dependent gene expression analysis using BEAM
+# Workflow: Part 04 - scRNA-seq validation
+
+# ========== Branch-Dependent Gene Analysis (BEAM) ==========
+library(monocle)
+library(dplyr)
+
+# Prepare data
+pt <- pData(cds)
+
+############################################################
+# Define branch analysis function
+############################################################
+analyze_branch <- function(cds, bp_id, stateA, stateB, output_dir) {
+
+  # 1. BEAM: identify branch-dependent genes
+  beam_res <- BEAM(
+    cds,
+    branch_point = bp_id,
+    progenitor_method = "duplicate",
+    cores = 20
+  )
+  beam_res <- beam_res[order(beam_res$qval), ]
+  
+  # Filter significant genes (q < 0.05)
+  q_cutoff <- 0.05
+  beam_sig <- rownames(beam_res[beam_res$qval < q_cutoff, ])
+  
+  # Ensure genes exist in expression matrix
+  beam_sig <- beam_sig[beam_sig %in% rownames(cds)]
+  
+  # Skip if no significant genes
+  if (length(beam_sig) == 0) {
+    return(NULL)
+  }
+  
+  # 2. Calculate log2FC between stateA and stateB
+  cells_A <- rownames(pt[pt$State == stateA, ])
+  cells_B <- rownames(pt[pt$State == stateB, ])
+  
+  expr_mat <- exprs(cds)[beam_sig, c(cells_A, cells_B)]
+  
+  mean_A <- rowMeans(expr_mat[, cells_A, drop = FALSE])
+  mean_B <- rowMeans(expr_mat[, cells_B, drop = FALSE])
+  
+  log2FC <- log2((mean_B + 1e-6) / (mean_A + 1e-6))
+  
+  # Get corresponding q-values
+  qvals <- beam_res[beam_sig, "qval"]
+  
+  branch_df <- data.frame(
+    gene        = beam_sig,
+    qval        = qvals,
+    mean_stateA = mean_A,
+    mean_stateB = mean_B,
+    log2FC      = log2FC
+  )
+  
+  names(branch_df)[3:4] <- c(
+    paste0("mean_state", stateA),
+    paste0("mean_state", stateB)
+  )
+  
+  # 3. Classify genes based on branch bias
+  fc_cutoff <- 0.25
+  branch_df$group <- ifelse(
+    branch_df$log2FC >  fc_cutoff,
+    paste0("Up_in_state", stateB),
+    ifelse(
+      branch_df$log2FC < -fc_cutoff,
+      paste0("Up_in_state", stateA),
+      "No_bias"
+    )
+  )
+  
+  # 4. Save results
+  out_file <- file.path(output_dir, sprintf("mela_BP%d_state%d_vs_state%d_BEAM_fate_program.csv", bp_id, stateA, stateB))
+  write.csv(branch_df, out_file, row.names = FALSE)
+  
+  return(branch_df)
+}
+
+############################################################
+# Execute analysis for both branch points
+############################################################
+# Create output directory
+output_dir <- file.path("results", "tables", "melanocyte")
+dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
+
+# Branch point 1: state1 vs state2
+branch1_result <- analyze_branch(cds, bp_id = 1, stateA = 1, stateB = 2, output_dir = output_dir)
+
+# Branch point 2: state3 vs state5
+branch2_result <- analyze_branch(cds, bp_id = 2, stateA = 3, stateB = 5, output_dir = output_dir)
+
+# Store results in list
+beam_results <- list(
+  branch1 = branch1_result,
+  branch2 = branch2_result
+)
+```
+
+```{r beam_volcano_visualization}
+# Description: Volcano plot visualization for BEAM branch analysis results
+# Workflow: Part 04 - scRNA-seq validation
+
+# ========== BEAM Branch Volcano Plot Visualization ==========
+library(ggplot2)
+library(ggrepel)
+
+# Define volcano plot function
+plot_beam_volcano <- function(branch_result, bp_id, stateA, stateB, output_dir) {
+  
+  # Get data from branch_result
+  volcano_df <- branch_result
+  
+  # Add -log10(qval) column
+  volcano_df$neglog10q <- -log10(volcano_df$qval + 1e-20)
+  
+  # Set thresholds
+  q_cutoff <- 0.05
+  fc_cutoff <- 0.25
+  
+  # Classify genes
+  volcano_df$group <- "Not_sig"
+  volcano_df$group[
+    volcano_df$qval < q_cutoff & volcano_df$log2FC > fc_cutoff
+  ] <- paste0("Up_in_state", stateB)  # log2FC > 0 indicates up in stateB
+  
+  volcano_df$group[
+    volcano_df$qval < q_cutoff & volcano_df$log2FC < -fc_cutoff
+  ] <- paste0("Up_in_state", stateA)  # log2FC < 0 indicates up in stateA
+  
+  # Label significant genes (optional)
+  volcano_df$label <- ifelse(
+    volcano_df$group != "Not_sig" &
+    abs(volcano_df$log2FC) > 0.5 &
+    volcano_df$neglog10q > 10,
+    volcano_df$gene,
+    ""
+  )
+  
+  # Color settings
+  color_values <- c(
+    "#d81159",  # Up_in_stateA
+    "#218380",  # Up_in_stateB
+    "grey70"    # Not_sig
+  )
+  names(color_values) <- c(
+    paste0("Up_in_state", stateA),
+    paste0("Up_in_state", stateB),
+    "Not_sig"
+  )
+  
+  # Generate volcano plot
+  p <- ggplot(volcano_df, aes(x = log2FC, y = neglog10q, color = group)) +
+    geom_point(alpha = 0.8, size = 1.8) +
+    geom_vline(xintercept = c(-fc_cutoff, fc_cutoff),
+               linetype = 2, color = "grey40") +
+    geom_hline(yintercept = -log10(q_cutoff),
+               linetype = 2, color = "grey40") +
+    scale_color_manual(values = color_values) +
+    ggrepel::geom_text_repel(aes(label = label), size = 3, max.overlaps = Inf) +
+    labs(
+      title = paste0("Branchpoint ", bp_id, ": State", stateA, " vs State", stateB),
+      x = paste0("log2FC (State", stateB, " / State", stateA, ")"),
+      y = "-log10(q-value)",
+      color = "Gene Class"
+    ) +
+    theme_bw(base_size = 14) +
+    theme(
+      legend.position = "right",
+      plot.title = element_text(face = "bold", hjust = 0.5)
+    )
+  
+  print(p)
+  
+  # Save figure
+  ggsave(
+    filename = file.path(output_dir, "figures", "melanocyte", 
+                         sprintf("BEAM_branch%d_state%d_vs_state%d_volcano.png", 
+                                 bp_id, stateA, stateB)),
+    plot = p,
+    width = 10,
+    height = 8,
+    dpi = 300
+  )
+  
+  return(p)
+}
+
+# Generate volcano plots for both branch points
+if (!is.null(branch1_result)) {
+  p1 <- plot_beam_volcano(
+    branch_result = branch1_result,
+    bp_id = 1,
+    stateA = 1,
+    stateB = 2,
+    output_dir = OUTPUT_DIR
+  )
+}
+
+if (!is.null(branch2_result)) {
+  p2 <- plot_beam_volcano(
+    branch_result = branch2_result,
+    bp_id = 2,
+    stateA = 3,
+    stateB = 5,
+    output_dir = OUTPUT_DIR
+  )
+}
+```
+
+```{r top_genes_trend}
+# Description: Pseudotime trend plots for top branch-dependent genes
+# Workflow: Part 04 - scRNA-seq validation
+
+# ========== Branch Gene Expression Trend Plots ==========
+############################################################
+# 0. Subset cells by state and condition for each branch
+############################################################
+# Branch A: state4 -> state3 -> state1 (old individuals)
+cells_A <- rownames(pData(cds))[
+  pData(cds)$State %in% c(4, 3, 1) & pData(cds)$stim %in% c("Old_anagen", "Old_telogen")
+]
+cds_A <- cds[, cells_A]
+
+# Branch B: state4 -> state3 -> state2 (young individuals)
+cells_B <- rownames(pData(cds))[
+  pData(cds)$State %in% c(4, 3, 2) & pData(cds)$stim %in% c("Young_anagen", "Young_telogen")
+]
+cds_B <- cds[, cells_B]
+
+############################################################
+# 1. Select top genes by q-value from branch point 1 results
+############################################################
+# Read branch point 1 results
+branch_df <- read.csv("results/tables/melanocyte/mela_BP1_state1_vs_state2_BEAM_fate_program.csv")
+
+# Set branch parameters
+stateA <- 1
+stateB <- 2
+
+# Ensure qval is numeric
+if ("qval" %in% colnames(branch_df)) {
+  branch_df$qval <- as.numeric(as.character(branch_df$qval))
+} else {
+  branch_df$qval <- 1:nrow(branch_df)
+}
+
+# Extract upregulated genes for each branch
+branchA_df <- subset(branch_df, group == paste0("Up_in_state", stateA))
+branchB_df <- subset(branch_df, group == paste0("Up_in_state", stateB))
+
+# Sort by q-value
+if (nrow(branchA_df) > 0) {
+  branchA_df <- branchA_df[order(as.numeric(branchA_df$qval)), ]
+}
+if (nrow(branchB_df) > 0) {
+  branchB_df <- branchB_df[order(as.numeric(branchB_df$qval)), ]
+}
+
+# Select top 5 genes per branch (or all if fewer)
+n_top <- 5
+topA_genes <- head(branchA_df$gene, min(n_top, nrow(branchA_df)))
+topB_genes <- head(branchB_df$gene, min(n_top, nrow(branchB_df)))
+
+all_genes <- unique(c(topA_genes, topB_genes))
+
+# Stop if no genes found
+if (length(all_genes) == 0) {
+  stop("No genes found for plotting")
+}
+
+############################################################
+# 2. Generate pseudotime trend plots for both branches
+############################################################
+state_colors <- c("1" = "#FF6347", "2" = "#4682B4", "3" = "#32CD32", "4" = "#FFD700")
+
+# Branch A plot
+pA <- plot_genes_in_pseudotime(
+  cds_A[all_genes, ],
+  color_by = "State",
+  ncol = 5,
+  nrow = 2
+) + 
+  ggtitle(paste0("Branch A: State ", stateA, " Fate Program"),
+          subtitle = paste("States:", paste(c(4, 3, stateA), collapse = " -> "))) +
+  scale_color_manual(values = state_colors) +
+  theme(
+    plot.title = element_text(face = "bold", size = 16),
+    plot.subtitle = element_text(size = 12, color = "gray50"),
+    legend.title = element_text(face = "bold", size = 14),
+    legend.text = element_text(size = 12),
+    strip.text = element_text(face = "bold", size = 14),
+    axis.title = element_text(size = 14),
+    axis.text = element_text(size = 12)
+  ) +
+  guides(color = guide_legend(override.aes = list(size = 5)))
+
+print(pA)
+
+# Branch B plot
+pB <- plot_genes_in_pseudotime(
+  cds_B[all_genes, ],
+  color_by = "State",
+  ncol = 5,
+  nrow = 2
+) + 
+  ggtitle(paste0("Branch B: State ", stateB, " Fate Program"),
+          subtitle = paste("States:", paste(c(4, 3, stateB), collapse = " -> "))) +
+  scale_color_manual(values = state_colors) +
+  theme(
+    plot.title = element_text(face = "bold", size = 16),
+    plot.subtitle = element_text(size = 12, color = "gray50"),
+    legend.title = element_text(face = "bold", size = 14),
+    legend.text = element_text(size = 12),
+    strip.text = element_text(face = "bold", size = 14),
+    axis.title = element_text(size = 14),
+    axis.text = element_text(size = 12)
+  ) +
+  guides(color = guide_legend(override.aes = list(size = 5)))
+
+print(pB)
+
+############################################################
+# 3. Save results
+############################################################
+dir.create(file.path(OUTPUT_DIR, "figures", "melanocyte"), recursive = TRUE, showWarnings = FALSE)
+
+ggsave(
+  file.path(OUTPUT_DIR, "figures", "melanocyte", sprintf("branch_A_%d_genes.png", length(all_genes))),
+  plot = pA, width = 12, height = 6, dpi = 300
+)
+
+ggsave(
+  file.path(OUTPUT_DIR, "figures", "melanocyte", sprintf("branch_B_%d_genes.png", length(all_genes))),
+  plot = pB, width = 12, height = 6, dpi = 300
+)
+```
+
+```{r dual_branch_expression}
+# Description: Comparative expression trends of genes across two fate branches
+# Workflow: Part 04 - scRNA-seq validation
+
+# ========== Dual-Branch Gene Expression Trend Comparison ==========
+library(monocle)
+library(ggplot2)
+library(patchwork)
+
+############################################################
+# Parameter Configuration
+############################################################
+
+# 1. Branch configuration
+stateA <- 1  # State 1 (Old-anagen fate)
+stateB <- 2  # State 2 (Young-anagen fate)
+
+# 2. Plot parameters
+state_colors <- c("1" = "#FF6347", "2" = "#4682B4", "3" = "#32CD32", "4" = "#FFD700")
+
+# 3. Y-axis optimization parameters
+coverage <- 0.95     # Percentage of fitted curve to cover
+y_buffer <- 0.1      # Buffer ratio
+min_points <- 10     # Minimum cell count
+
+# 4. Output parameters
+output_dir <- file.path(OUTPUT_DIR, "figures", "melanocyte")
+dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
+output_file <- "fate_branch_gene_expression.png"
+
+############################################################
+# Core Plotting Function
+############################################################
+
+plot_gene_dual_branch_optimized <- function(gene, cds_A, cds_B, 
+                                            stateA_label = "Old-anagen fate",
+                                            stateB_label = "Young-anagen fate") {
+  
+  # 1. Extract expression data for the gene in both branches
+  cells_A <- rownames(pData(cds_A))
+  expr_A <- exprs(cds_A[gene, cells_A])[1, ]
+  
+  df_A <- data.frame(
+    Pseudotime = pData(cds_A)$Pseudotime,
+    Expression = as.numeric(expr_A),
+    Branch = stateA_label,
+    State = as.factor(pData(cds_A)$State),
+    Cell = cells_A
+  )
+  
+  cells_B <- rownames(pData(cds_B))
+  expr_B <- exprs(cds_B[gene, cells_B])[1, ]
+  
+  df_B <- data.frame(
+    Pseudotime = pData(cds_B)$Pseudotime,
+    Expression = as.numeric(expr_B),
+    Branch = stateB_label,
+    State = as.factor(pData(cds_B)$State),
+    Cell = cells_B
+  )
+  
+  # 2. Check data sufficiency
+  if (nrow(df_A) < min_points | nrow(df_B) < min_points) {
+    return(NULL)
+  }
+  
+  # 3. Fit curves for both branches
+  fit_A <- tryCatch({
+    loess(Expression ~ Pseudotime, data = df_A, span = 0.7, 
+          control = loess.control(surface = "direct"))
+  }, error = function(e) {
+    lm(Expression ~ Pseudotime, data = df_A)
+  })
+  
+  df_A$Fitted <- predict(fit_A)
+  
+  fit_B <- tryCatch({
+    loess(Expression ~ Pseudotime, data = df_B, span = 0.7,
+          control = loess.control(surface = "direct"))
+  }, error = function(e) {
+    lm(Expression ~ Pseudotime, data = df_B)
+  })
+  
+  df_B$Fitted <- predict(fit_B)
+  
+  # 4. Calculate optimal Y-axis range based on fitted values
+  all_fitted <- c(df_A$Fitted, df_B$Fitted)
+  
+  q_low <- quantile(all_fitted, probs = (1 - coverage)/2, na.rm = TRUE)
+  q_high <- quantile(all_fitted, probs = 1 - (1 - coverage)/2, na.rm = TRUE)
+  
+  fitted_range <- c(q_low, q_high)
+  range_span <- diff(fitted_range)
+  
+  if (range_span < 0.1 * diff(range(all_fitted, na.rm = TRUE))) {
+    range_span <- 0.5 * diff(range(all_fitted, na.rm = TRUE))
+  }
+  
+  y_center <- mean(fitted_range)
+  y_half_range <- range_span/2 * (1 + y_buffer)
+  y_limits <- c(y_center - y_half_range, y_center + y_half_range)
+  
+  y_limits[1] <- min(y_limits[1], min(all_fitted, na.rm = TRUE))
+  y_limits[2] <- max(y_limits[2], max(all_fitted, na.rm = TRUE))
+  y_limits[1] <- max(0, y_limits[1])
+  
+  # 5. Combine data
+  df_combined <- rbind(df_A, df_B)
+  df_combined$Branch <- factor(df_combined$Branch, 
+                               levels = c(stateA_label, stateB_label))
+  
+  # 6. Create plot
+  p <- ggplot(df_combined, aes(x = Pseudotime, y = Expression)) +
+    theme_minimal(base_size = 12) +
+    geom_point(aes(color = State), size = 1.2, alpha = 0.6, 
+               position = position_jitter(width = 0.05)) +
+    geom_smooth(aes(group = Branch), method = "loess", span = 0.7,
+                color = "black", linewidth = 1.2, se = TRUE, 
+                fill = "gray80", alpha = 0.3) +
+    facet_grid(. ~ Branch, scales = "free_x") +
+    scale_color_manual(values = state_colors, 
+                       name = "Cell State") +
+    coord_cartesian(ylim = y_limits) +
+    labs(title = gene, x = "Pseudotime", y = "Expression Level") +
+    theme(
+      plot.title = element_text(face = "bold", size = 14, hjust = 0.5, margin = margin(b = 10)),
+      strip.text = element_text(face = "bold", size = 12, margin = margin(t = 5, b = 5)),
+      axis.title = element_text(face = "bold", size = 12),
+      axis.text = element_text(size = 10),
+      axis.line = element_line(color = "black", linewidth = 0.5),
+      legend.position = "bottom",
+      legend.title = element_text(face = "bold", size = 11),
+      legend.text = element_text(size = 10),
+      panel.grid.major = element_line(color = "gray90", linewidth = 0.3),
+      panel.grid.minor = element_blank(),
+      panel.spacing = unit(15, "points")
+    )
+  
+  return(p)
+}
+
+############################################################
+# Main Execution
+############################################################
+
+# Ensure all_genes exists from previous analysis
+if (!exists("all_genes")) {
+  stop("Please run branch point 1 analysis first to generate all_genes list")
+}
+
+plot_list <- list()
+success_count <- 0
+
+for (i in seq_along(all_genes)) {
+  gene <- all_genes[i]
+  
+  p <- plot_gene_dual_branch_optimized(
+    gene = gene,
+    cds_A = cds_A,
+    cds_B = cds_B,
+    stateA_label = paste0("State ", stateA, " (Old-anagen)"),
+    stateB_label = paste0("State ", stateB, " (Young-anagen)")
+  )
+  
+  if (!is.null(p)) {
+    plot_list[[gene]] <- p
+    success_count <- success_count + 1
+  }
+}
+
+if (success_count > 0) {
+  n_col <- 5
+  n_row <- ceiling(success_count / n_col)
+  
+  combined_plot <- wrap_plots(plot_list, ncol = n_col, guides = "collect") &
+    theme(legend.position = "bottom")
+  
+  output_path <- file.path(output_dir, output_file)
+  
+  ggsave(
+    filename = output_path,
+    plot = combined_plot,
+    width = 8 * n_col,
+    height = 5 * n_row,
+    dpi = 300,
+    bg = "white"
+  )
+  
+  print(combined_plot)
+}
+```
+
+```{r multiple_genes_violin}
+# Description: Violin plots for multiple gene expression across cell types and conditions
+# Workflow: Part 04 - scRNA-seq validation
+
+# ========== Multiple Gene Expression Violin Plots ==========
+library(ggpubr)
+library(ggplot2)
+library(patchwork)
+
+# List of genes to plot
+genes_to_plot <- c("Gstp1", "Tmsb10", "Gpc1", "Actg1", "Fdft1", "Actb", "Lamtor4")
+
+# Create violin plots
+gene_violin_plot <- VlnPlot(merged_hair, 
+              features = genes_to_plot, 
+              group.by = "majorCellType", 
+              split.by = "stim", 
+              pt.size = 0, 
+              cols = c('#d81159','#6a60a9','#ffbc42','#218380'),
+              ncol = 7) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "right")
+
+# Display and save
+print(gene_violin_plot)
+
+ggsave(file.path(OUTPUT_DIR, "figures", "melanocyte", "multiple_genes_expression.png"), 
+       plot = gene_violin_plot,
+       width = 24,
+       height = 4,
+       dpi = 300)
+```

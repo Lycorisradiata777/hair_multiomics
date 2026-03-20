@@ -1,0 +1,506 @@
+```{r mixomics_integration, message=FALSE, warning=FALSE}
+# Description: Multi-omics integration analysis using MINT (mixOmics)
+# Workflow: Part 03 - Multi-modal integration
+
+library(mixOmics)
+library(dplyr)
+
+# ========== Load Data ==========
+RNA <- read.csv('results/tables/tpm_rna.csv', row.names = 1)
+ATAC <- read.csv('results/tables/integration/atac_promoter_genes.csv', row.names = 1)
+RNA_group <- read.csv('data/rna_group.csv')
+ATAC_group <- read.csv('data/atac_group.csv')
+
+# ========== Data Integration ==========
+# Find common genes
+intgene <- intersect(rownames(RNA), rownames(ATAC))
+new_RNA <- RNA[intgene, ]
+new_ATAC <- ATAC[intgene, ]
+
+# Combine data (keep row order)
+new_data <- cbind(new_RNA, new_ATAC)
+t_new_data <- t(new_data)  # Transpose to samples × genes matrix
+
+# ========== Prepare Group Information ==========
+# Extract sample and colour columns
+rna_group_sub <- RNA_group[, c("sample", "colour")]
+atac_group_sub <- ATAC_group[, c("sample", "colour")]
+
+# Combine groups
+new_group <- rbind(rna_group_sub, atac_group_sub)
+
+# ========== Align Group Order with Data Order ==========
+new_group <- new_group[match(rownames(t_new_data), new_group$sample), ]
+
+# Check perfect match
+if (!all(rownames(t_new_data) == new_group$sample)) {
+  stop("Sample names in data and group file do not match")
+}
+
+# Add omics information
+new_group$omics <- c(rep('RNA', nrow(RNA_group)), rep('ATAC', nrow(ATAC_group)))
+
+# Unify color naming
+new_group <- new_group %>%
+  mutate(colour = ifelse(colour == "Black", "black", colour)) %>%
+  mutate(colour = ifelse(colour == "Gray", "gray", colour))
+
+# Convert to factors
+omics <- as.factor(new_group$omics)
+colour <- as.factor(new_group$colour)
+
+# ========== MINT Analysis ==========
+set.seed(123)
+mint_data <- mint.plsda(
+  X = t_new_data,
+  Y = colour,
+  study = omics,
+  ncomp = 10,
+  scale = TRUE
+)
+
+# ========== Visualization ==========
+plotIndiv(mint_data, legend = TRUE)
+
+# ========== Extract Results ==========
+ATAC$gene <- rownames(ATAC)
+mint <- as.data.frame(t(mint_data$X))
+mint.x <- mint_data$variates$X
+mint.loading <- mint_data$loadings$X
+loading <- as.data.frame(mint.loading)
+loading$gene <- rownames(loading)
+
+# ========== Save Results ==========
+dir.create("results/tables/integration", recursive = TRUE, showWarnings = FALSE)
+write.csv(loading, "results/tables/integration/mint_loadings.csv", row.names = FALSE)
+```
+
+```{r mint_visualization, message=FALSE, warning=FALSE}
+# Description: Visualization of MINT PLS-DA results
+# Workflow: Part 03 - Multi-modal integration
+
+# ========== MINT PLS-DA Results Visualization ==========
+library(ggplot2)
+
+# ========== Configuration ==========
+OUTPUT_DIR <- "results/figures"
+dir.create(OUTPUT_DIR, showWarnings = FALSE, recursive = TRUE)
+
+i <- 1
+j <- 2
+
+# Extract sample coordinates
+mint.x <- as.data.frame(mint_data$variates$X)
+colnames(mint.x) <- paste0("PLS_DA_", 1:ncol(mint.x))
+
+# Combine with group information
+plot_df <- cbind(mint.x, new_group)
+
+# ========== Generate PLS-DA Plot ==========
+p <- ggplot(plot_df, aes(x = PLS_DA_1, y = PLS_DA_2, 
+                          color = colour, shape = omics)) +
+  geom_point(size = 3.5, alpha = 0.85) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "gray70", linewidth = 0.4) +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "gray70", linewidth = 0.4) +
+  scale_color_manual(name = "Hair Colour", 
+                     values = c("black" = "#3f60aa", "gray" = "#e6553a")) +
+  scale_shape_manual(name = "Omics", 
+                     values = c("RNA" = 16, "ATAC" = 17)) +
+  theme_bw(base_size = 14) +
+  theme(
+    panel.grid = element_blank(),
+    panel.border = element_rect(linewidth = 0.8, color = "black"),
+    legend.position = "right",
+    legend.title = element_text(face = "bold", size = 18),
+    legend.text = element_text(size = 16),
+    axis.title = element_text(face = "bold", size = 15),
+    axis.text = element_text(color = "black", size = 13),
+    aspect.ratio = 1
+  ) +
+  labs(x = paste0("PLS-DA component ", i),
+       y = paste0("PLS-DA component ", j),
+       title = "")
+
+print(p)
+
+# ========== Save Figure ==========
+ggsave(file.path(OUTPUT_DIR, "mint_plsda.png"), 
+       plot = p, width = 8, height = 6, dpi = 300)
+```
+
+```{r extract_loading_genes, message=FALSE, warning=FALSE}
+# Description: Extract significant genes from MINT PLS-DA loadings using Z-score threshold
+# Workflow: Part 03 - Multi-modal integration
+
+# ========== Extract MINT PLS-DA Significant Genes ==========
+library(dplyr)
+
+# ========== Configuration ==========
+OUTPUT_DIR <- "results/tables/loading_genes"
+target_p <- 0.1                # Two-tailed significance level
+fallback_top_pct <- 0.05        # Fallback top percentage if no significant genes
+ncomp_to_extract <- 2           # Extract first 2 components
+
+# Create output directory
+dir.create(OUTPUT_DIR, recursive = TRUE, showWarnings = FALSE)
+
+# ========== Prepare Loading Matrix ==========
+if (!exists("mint_data") || is.null(mint_data$loadings$X)) {
+  stop("mint_data$loadings$X not found. Run MINT analysis first.")
+}
+
+loading_mat <- as.matrix(mint_data$loadings$X)
+if (is.null(rownames(loading_mat))) {
+  rownames(loading_mat) <- paste0("gene_", seq_len(nrow(loading_mat)))
+}
+
+# Calculate Z-score threshold
+z_threshold <- qnorm(1 - target_p / 2)
+
+# ========== Main Loop ==========
+all_topload <- vector("list", length = ncomp_to_extract)
+
+for (i in 1:ncomp_to_extract) {
+  pc_loading <- loading_mat[, i]
+  
+  # Standardize to Z-score
+  if (sd(pc_loading) == 0) {
+    pc_z <- rep(0, length(pc_loading))
+  } else {
+    pc_z <- as.numeric(scale(pc_loading))
+  }
+  names(pc_z) <- rownames(loading_mat)
+  
+  # Find significant genes
+  pos_idx <- which(pc_z > z_threshold)
+  neg_idx <- which(pc_z < -z_threshold)
+  
+  # Fallback if no significant genes
+  if (length(pos_idx) + length(neg_idx) == 0 && fallback_top_pct > 0) {
+    ntop <- max(1, round(fallback_top_pct * length(pc_loading)))
+    pos_idx <- order(pc_loading, decreasing = TRUE)[1:ntop]
+    neg_idx <- order(pc_loading)[1:ntop]
+  }
+  
+  # Positive significant
+  positive <- if (length(pos_idx) > 0) {
+    data.frame(
+      gene = names(pc_z)[pos_idx],
+      zscore = pc_z[pos_idx],
+      loading = pc_loading[pos_idx],
+      group = "positive",
+      component = i,
+      stringsAsFactors = FALSE
+    ) %>% arrange(desc(zscore))
+  } else data.frame()
+  
+  # Negative significant
+  negative <- if (length(neg_idx) > 0) {
+    data.frame(
+      gene = names(pc_z)[neg_idx],
+      zscore = pc_z[neg_idx],
+      loading = pc_loading[neg_idx],
+      group = "negative",
+      component = i,
+      stringsAsFactors = FALSE
+    ) %>% arrange(zscore)
+  } else data.frame()
+  
+  # Combine
+  topload <- bind_rows(positive, negative)
+  
+  # Save
+  out_file <- file.path(OUTPUT_DIR, paste0("mint_comp", i, "_genes.csv"))
+  write.csv(topload, out_file, row.names = FALSE)
+  
+  all_topload[[i]] <- topload
+}
+
+# ========== Combine All Components ==========
+final_table <- bind_rows(all_topload)
+final_file <- file.path(OUTPUT_DIR, "mint_all_components_genes.csv")
+write.csv(final_table, final_file, row.names = FALSE)
+```
+
+```{r loading_heatmap, message=FALSE, warning=FALSE}
+# Description: Heatmap visualization of loading genes for PLS-DA components
+# Workflow: Part 03 - Multi-modal integration
+
+# ========== Loading Heatmap for PLS-DA Components ==========
+library(pheatmap)
+library(RColorBrewer)
+library(grid)
+
+# ========== Define Plot Function ==========
+plot_loading_heatmap <- function(i) {
+  
+  # ====== 1. Get top genes ======
+  if (exists("all_topload") && length(all_topload) >= i) {
+    top_genes <- unique(all_topload[[i]]$gene)
+  } else {
+    csvf <- file.path("results/tables/loading_genes", paste0("mint_comp", i, "_genes.csv"))
+    if (file.exists(csvf)) {
+      top_genes <- unique(read.csv(csvf, stringsAsFactors = FALSE)$gene)
+    } else {
+      stop("Cannot find all_topload or mint_comp", i, "_genes.csv")
+    }
+  }
+  
+  # ====== 2. Build expression matrix ======
+  if (!exists("mint")) {
+    mint <- t(t_new_data)  # rows = genes, columns = samples
+  }
+  
+  HM <- mint[rownames(mint) %in% top_genes, , drop = FALSE]
+  if (nrow(HM) == 0) stop("HM is empty: check gene name consistency")
+  HM <- log(HM + 1)
+  
+  # Row-wise Z-score normalization
+  HM_scaled <- t(scale(t(HM)))
+  HM_scaled[is.na(HM_scaled)] <- 0
+  
+  # ====== 3. Order samples by PLS-DA scores ======
+  if (exists("mint.x") && ncol(mint.x) >= i) {
+    HM_scaled <- HM_scaled[, order(mint.x[colnames(HM_scaled), i]), drop = FALSE]
+  }
+  
+  # ====== 4. Column annotation ======
+  col_anno <- data.frame(
+    Omics = new_group$omics,
+    Colour = new_group$colour,
+    row.names = new_group$sample
+  )
+  
+  annotation_col <- col_anno[colnames(HM_scaled), , drop = FALSE]
+  
+  # ====== 5. Color settings ======
+  # Main heatmap colors
+  color_palette <- colorRampPalette(c("#2166ac", "white", "#b2182b"))(100)
+  breaks_range <- seq(-2, 2, length.out = 91)
+  
+  # Annotation colors
+  annotation_colors <- list(
+    Omics = c(RNA = "#4DAF4A", ATAC = "#984EA3"),
+    Colour = c(black = "#2166AC", gray = "#B2182B")
+  )
+  
+  # ====== 6. Generate heatmap ======
+  pm <- pheatmap(HM_scaled,
+                 cluster_rows = TRUE,
+                 cluster_cols = FALSE,
+                 show_rownames = FALSE,
+                 show_colnames = FALSE,
+                 annotation_col = annotation_col,
+                 annotation_colors = annotation_colors,
+                 annotation_legend = TRUE,
+                 legend = TRUE,
+                 main = paste0(""),
+                 color = color_palette,
+                 breaks = breaks_range,
+                 border_color = NA,
+                 annotation_names_col = TRUE,
+                 treeheight_row = 0,
+                 fontsize = 10,
+                 clustering_method = "ward.D2")
+  
+  # ====== 7. Save ======
+  outdir <- "results/figures"
+  dir.create(outdir, showWarnings = FALSE, recursive = TRUE)
+  outfn <- file.path(outdir, paste0("mint_var", i, "_loading_heatmap.png"))
+  
+  png(outfn, width = 8, height = 5, units = "in", res = 300)
+  grid::grid.draw(pm$gtable)
+  dev.off()
+  
+  return(pm)
+}
+
+# ========== Generate heatmaps for var1 and var2 ==========
+hm1 <- plot_loading_heatmap(1)
+hm2 <- plot_loading_heatmap(2)
+```
+
+```{r omics_correlation, message=FALSE, warning=FALSE}
+# Description: Correlation analysis between RNA and ATAC log2 fold changes
+# Workflow: Part 03 - Multi-modal integration
+
+library(ggpubr)
+library(ggplot2)
+
+# Create example expression data frame
+gene_name <- unique(c(all_topload[[1]]$gene))
+expr_RNA <- subset(RNA, rownames(RNA) %in% gene_name)
+fold_changes <- data.frame(matrix(NA, nrow = nrow(expr_RNA), ncol = 1))
+names(fold_changes) <- "RNA"
+row.names(fold_changes) <- gene_name
+
+# Use new_group to match black/gray samples
+rna_samples_black <- new_group$sample[new_group$omics == "RNA" & new_group$colour == "black"]
+rna_samples_gray <- new_group$sample[new_group$omics == "RNA" & new_group$colour == "gray"]
+
+# Extract means for control and experimental groups
+black_means <- rowMeans(expr_RNA[, rna_samples_black, drop = FALSE])
+gray_means <- rowMeans(expr_RNA[, rna_samples_gray, drop = FALSE])  
+expr_RNA$fc <- log(gray_means / black_means)
+expr_RNA$gene <- row.names(expr_RNA)
+expr_RNA <- expr_RNA[,(ncol(expr_RNA) - 1):ncol(expr_RNA)]
+
+expr_ATAC <- subset(ATAC, rownames(ATAC) %in% gene_name)
+atac_samples_black <- new_group$sample[new_group$omics == "ATAC" & new_group$colour == "black"]
+atac_samples_gray <- new_group$sample[new_group$omics == "ATAC" & new_group$colour == "gray"]
+
+black_means <- rowMeans(expr_ATAC[, atac_samples_black, drop = FALSE])
+gray_means <- rowMeans(expr_ATAC[, atac_samples_gray, drop = FALSE])  
+expr_ATAC$fc <- log(gray_means / black_means)
+expr_ATAC$gene <- row.names(expr_ATAC)
+expr_ATAC <- expr_ATAC[,(ncol(expr_ATAC) - 1):ncol(expr_ATAC)]
+
+fold_changes <- merge(expr_RNA, expr_ATAC, by = 'gene')
+names(fold_changes) <- c('gene', "Log2FC(RNA)", "Log2FC(ATAC)")
+
+# Set quantile range (keep 1%–99% interval)
+lower_rna <- quantile(fold_changes$`Log2FC(RNA)`, 0.01, na.rm = TRUE)
+upper_rna <- quantile(fold_changes$`Log2FC(RNA)`, 0.99, na.rm = TRUE)
+lower_atac <- quantile(fold_changes$`Log2FC(ATAC)`, 0.01, na.rm = TRUE)
+upper_atac <- quantile(fold_changes$`Log2FC(ATAC)`, 0.99, na.rm = TRUE)
+
+# Filter out extreme values
+fold_changes_filtered <- subset(fold_changes,
+  `Log2FC(RNA)` >= lower_rna & `Log2FC(RNA)` <= upper_rna &
+  `Log2FC(ATAC)` >= lower_atac & `Log2FC(ATAC)` <= upper_atac)
+
+# ====== Enhanced Scatter Plot ======
+omics_cor <- ggplot(fold_changes_filtered, aes(x = `Log2FC(RNA)`, y = `Log2FC(ATAC)`)) +
+  # Points
+  geom_point(size = 3, alpha = 0.7, color = "#2c7fb8") +
+  
+  # Reference lines
+  geom_hline(yintercept = 0, linetype = "dashed", color = "gray70", linewidth = 0.4) +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "gray70", linewidth = 0.4) +
+  
+  # Fitted line
+  geom_smooth(method = "lm", color = "black", se = FALSE, linewidth = 1) +
+  
+  # Correlation labels
+  stat_cor(method = "pearson", 
+           label.x = 0.75,
+           label.y = -0.13,
+           size = 5, color = "black") +
+  
+  # Theme styling
+  theme_bw(base_size = 14) +
+  theme(
+    panel.grid = element_blank(),
+    panel.border = element_rect(linewidth = 0.8, color = "black"),
+    legend.position = "none",
+    axis.title = element_text(face = "bold", size = 15),
+    axis.text = element_text(color = "black", size = 13),
+    aspect.ratio = 1,
+    plot.title = element_text(hjust = 0.5, face = "bold", size = 16)
+  ) +
+  
+  # Axis labels
+  labs(
+    title = "",
+    x = "Log2FC (RNA expression)",
+    y = "Log2FC (ATAC accessibility)"
+  )
+
+print(omics_cor)
+
+# Save figure
+outdir <- "results/figures"
+dir.create(outdir, showWarnings = FALSE, recursive = TRUE)
+ggsave(file.path(outdir, "omics_correlation.png"), 
+       plot = omics_cor, width = 8, height = 8, dpi = 300)
+```
+
+```{r enrichment_dotplot, message=FALSE, warning=FALSE}
+# Description: Enrichment dot plot for integrated multi-omics analysis
+# Workflow: Part 03 - Multi-modal integration
+
+# ========== Enrichment Dot Plot for Integration Analysis ==========
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+
+# ========== Load Data ==========
+df_wide <- read.csv("data/integration_enrichment.csv", 
+                     check.names = FALSE, stringsAsFactors = FALSE)
+
+# ========== Reshape to Long Format ==========
+df_long <- df_wide %>%
+  pivot_longer(
+    cols = starts_with("_LogP_"),
+    names_to = "Condition",
+    names_prefix = "_LogP_",
+    values_to = "LogP"
+  ) %>%
+  mutate(
+    LogP = as.numeric(LogP),
+    score = -LogP,
+    Description = factor(Description, levels = rev(unique(Description))),
+    var = case_when(
+      grepl("var1", Condition) ~ "PLS-DA var1",
+      grepl("var2", Condition) ~ "PLS-DA var2"
+    ),
+    direction = case_when(
+      grepl("Gray", Condition) ~ "Gray-associated",
+      grepl("Black", Condition) ~ "Black-associated"
+    ),
+    x_label = paste0(var, "\n(", direction, ")")
+  ) %>%
+  filter(score > 0)
+
+# ========== Set Factor Order ==========
+x_order <- c(
+  "PLS-DA var1\n(Gray-associated)",
+  "PLS-DA var2\n(Gray-associated)", 
+  "PLS-DA var1\n(Black-associated)",
+  "PLS-DA var2\n(Black-associated)"
+)
+df_long$x_label <- factor(df_long$x_label, levels = x_order)
+
+# ========== Color Scheme ==========
+var_colors <- c(
+  "PLS-DA var1\n(Gray-associated)" = "#E41A1C",
+  "PLS-DA var2\n(Gray-associated)" = "#E41A1C",
+  "PLS-DA var1\n(Black-associated)" = "#1f77b4",
+  "PLS-DA var2\n(Black-associated)" = "#1f77b4"
+)
+
+# ========== Generate Dot Plot ==========
+p <- ggplot(df_long, aes(x = x_label, y = Description)) +
+  geom_point(aes(size = score, color = x_label), alpha = 0.85) +
+  scale_color_manual(values = var_colors, guide = "none") +
+  scale_size_continuous(
+    name = expression(bold(-log[10](p))),
+    range = c(5, 12),
+    breaks = c(2, 5, 10, 20)
+  ) +
+  scale_x_discrete(labels = c("var1\nGray", "var2\nGray", "var1\nBlack", "var2\nBlack")) +
+  theme_minimal(base_size = 12) +
+  theme(
+    axis.text.y = element_text(size = 12, color = "black", face = "bold"),
+    axis.text.x = element_text(size = 11, color = "black", face = "bold", 
+                               angle = 0, hjust = 0.5),
+    axis.title = element_blank(),
+    legend.position = "right",
+    legend.title = element_text(size = 12, face = "bold"),
+    legend.text = element_text(size = 10),
+    legend.key.size = unit(0.8, "cm"),
+    panel.grid.major = element_line(color = "gray90", linewidth = 0.3),
+    panel.grid.minor = element_blank(),
+    panel.border = element_rect(fill = NA, color = "gray50", linewidth = 0.5),
+    plot.background = element_rect(fill = "white", color = NA),
+    plot.margin = margin(10, 10, 10, 10)
+  ) +
+  labs(title = "", x = NULL, y = NULL)
+
+print(p)
+
+# ========== Save ==========
+ggsave("results/figures/integration_enrichment_bubble.png", 
+       p, width = 8, height = 8, dpi = 300, bg = "white")
+```
+

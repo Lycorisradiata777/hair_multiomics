@@ -1,0 +1,745 @@
+```{r data_loading_qc_pca, message=FALSE, warning=FALSE}
+# Description: Data loading, TPM normalization, and Sample QC (Correlation & PCA)
+# Part 05: Bulk RNA-seq analysis for GSTP1 validation
+
+library(dplyr)
+library(edgeR)
+library(limma)
+library(ggplot2)
+library(ggrepel)
+library(pheatmap)
+library(RColorBrewer)
+
+# ========== 1. Data Loading ==========
+# Using the cleaned matrix generated from the previous Shell script
+count_file <- "./results/counts/bulk_counts_matrix.tsv"
+raw_counts <- read.delim(count_file, check.names = FALSE, stringsAsFactors = FALSE)
+
+# Select relevant columns: SYMBOL for gene naming and all sample columns
+annot_cols <- c("Geneid", "SYMBOL", "Length")
+sample_cols <- setdiff(colnames(raw_counts), annot_cols)
+count_data <- raw_counts[, c("SYMBOL", sample_cols)]
+
+# ========== 2. Metadata Construction ==========
+samples <- colnames(count_data)[-1]
+metadata <- data.frame(
+  sample_id = samples,
+  # Assuming sample naming prefix: C_ (Control), K_ (Knockdown), O_ (Overexpression)
+  condition = ifelse(grepl("^C_", samples), "Ctrl", 
+                     ifelse(grepl("^K_", samples), "KD", "OE")),
+  replicate = sub(".*_", "", samples),
+  stringsAsFactors = FALSE
+)
+# Ensure the condition factor levels are set logically
+metadata$condition <- factor(metadata$condition, levels = c("Ctrl", "KD", "OE"))
+
+# ========== 3. TPM Normalization ==========
+# TPM = [ (counts/gene_length_kb) / sum(counts/gene_length_kb) ] * 1e6
+gene_len_vec <- raw_counts$Length
+valid_genes <- !is.na(gene_len_vec) & gene_len_vec > 0
+count_data <- count_data[valid_genes, , drop = FALSE]
+gene_len_use <- gene_len_vec[valid_genes]
+
+counts_matrix <- as.matrix(count_data[, -1])
+rownames(counts_matrix) <- count_data$SYMBOL
+
+# Calculate TPM (Transcripts Per Million)
+rpk <- sweep(counts_matrix, 1, gene_len_use / 1000, "/")
+tpm <- sweep(rpk, 2, colSums(rpk) / 1e6, "/")
+log_tpm <- log2(tpm + 1)
+
+# ========== 4. Low Expression Filtering ==========
+# Remove genes and samples with zero variance
+gene_vars <- apply(log_tpm, 1, var)
+log_tpm_filtered <- log_tpm[gene_vars > 0 & !is.na(gene_vars), ]
+sample_vars <- apply(log_tpm_filtered, 2, var)
+log_tpm_filtered <- log_tpm_filtered[, sample_vars > 0 & !is.na(sample_vars)]
+metadata <- metadata[match(colnames(log_tpm_filtered), metadata$sample_id), ]
+
+# ========== 5. Sample Correlation Analysis ==========
+correlation_matrix <- cor(log_tpm_filtered, method = "pearson")
+annotation_col <- data.frame(condition = metadata$condition, row.names = metadata$sample_id)
+
+pheatmap(correlation_matrix, 
+         clustering_distance_rows = "euclidean", 
+         clustering_distance_cols = "euclidean",
+         clustering_method = "complete", 
+         color = colorRampPalette(c("#313695", "white", "#a50026"))(100),
+         main = "Sample Correlation (Pearson)", 
+         border_color = "gray", 
+         show_rownames = TRUE, 
+         show_colnames = TRUE,
+         annotation_col = annotation_col)
+
+# ========== 6. PCA Analysis ==========
+pca <- prcomp(t(log_tpm_filtered), scale. = TRUE)
+pca_df <- data.frame(
+  PC1 = pca$x[, 1], 
+  PC2 = pca$x[, 2], 
+  condition = metadata$condition, 
+  sample = metadata$sample_id
+)
+var_exp <- round(100 * summary(pca)$importance[2, 1:2], 1)
+
+pca_plot <- ggplot(pca_df, aes(PC1, PC2, color = condition, label = sample)) +
+  geom_point(size = 4) + 
+  geom_text_repel(size = 3, show.legend = FALSE) +
+  scale_color_manual(values = c(Ctrl = "#1f78b4", KD = "#e31a1c", OE = "#33a02c")) + 
+  theme_bw() +
+  labs(title = "PCA Plot",
+       x = paste0("PC1 (", var_exp[1], "%)"), 
+       y = paste0("PC2 (", var_exp[2], "%)"))
+
+print(pca_plot)
+
+# ========== 7. Export Results ==========
+dir.create("./results/figures", showWarnings = FALSE, recursive = TRUE)
+ggsave("./results/figures/gstp1_pca_plot.png", pca_plot, width = 8, height = 6, dpi = 300)
+```
+
+```{r gstp1_expression_analysis, message=FALSE, warning=FALSE}
+# Description: Total GSTP1 expression analysis (combining human and mouse Gstp1)
+# Part 05: Bulk RNA-seq validation using cleaned count matrix
+
+library(dplyr)
+library(ggplot2)
+
+# ========== 1. Load Mouse Gstp1 Data ==========
+# Using the local data directory for external mouse Gstp1 counts
+mouse_gstp1_file <- "./data/mouseGstp1_RPM.csv"
+
+if (file.exists(mouse_gstp1_file)) {
+    mouse_gstp1 <- read.csv(mouse_gstp1_file)
+    
+    # Standard sample list for validation
+    mouse_samples <- c("C_1", "C_2", "C_3", "K_1", "K_2", "K_3", "O_1", "O_2", "O_3")
+    mouse_values <- sapply(mouse_samples, function(s) {
+        val <- mouse_gstp1$Gstp1_reads[mouse_gstp1$Sample == s]
+        if(length(val) == 0) return(0) else return(val)
+    })
+    
+    # Format mouse data to match the human count matrix structure
+    mouse_gstp1_row <- data.frame(
+        Geneid = "mouseGstp1",
+        SYMBOL = "mouseGstp1",
+        Length = 633,
+        t(mouse_values),
+        check.names = FALSE
+    )
+    colnames(mouse_gstp1_row)[4:12] <- mouse_samples
+} else {
+    stop("Error: External data 'mouseGstp1_RPM.csv' not found in ./data/")
+}
+
+# ========== 2. Load Cleaned Human Counts & Merge ==========
+# FIXED: Using the cleaned matrix from 04_bulk_quant.sh
+human_counts_file <- "./results/counts/bulk_counts_matrix.tsv"
+human_counts <- read.delim(human_counts_file, check.names = FALSE, stringsAsFactors = FALSE)
+
+# Combine human and mouse datasets
+# Both now share the same column structure: Geneid, SYMBOL, Length, Samples...
+full_data <- rbind(human_counts, mouse_gstp1_row)
+
+# ========== 3. TPM Calculation ==========
+# Extract counts and gene lengths
+counts_matrix <- as.matrix(full_data[, 4:ncol(full_data)])
+rownames(counts_matrix) <- full_data$Geneid
+gene_lengths <- full_data$Length
+names(gene_lengths) <- full_data$Geneid
+
+# TPM = [ (counts/L_kb) / sum(counts/L_kb) ] * 1e6
+calculate_tpm <- function(counts, lengths) {
+    rpk <- counts / (lengths / 1000)
+    tpm <- sweep(rpk, 2, colSums(rpk, na.rm = TRUE) / 1e6, "/")
+    return(tpm)
+}
+
+tpm_matrix <- calculate_tpm(counts_matrix, gene_lengths)
+
+# ========== 4. Extract Total GSTP1 (Human + Mouse) ==========
+# Locate human GSTP1 by SYMBOL (works for both Ensembl and Gene Symbols)
+human_gstp1_id <- full_data$Geneid[full_data$SYMBOL == "GSTP1"][1]
+if(is.na(human_gstp1_id)) human_gstp1_id <- "GSTP1"
+
+# Aggregate expression for plotting
+mouse_tpm <- tpm_matrix["mouseGstp1", ]
+human_tpm <- tpm_matrix[human_gstp1_id, ]
+total_tpm <- mouse_tpm + human_tpm
+
+gstp1_total_df <- data.frame(
+    sample = colnames(tpm_matrix),
+    Total_TPM = as.numeric(total_tpm),
+    stringsAsFactors = FALSE
+)
+
+# Reorder factor levels for correct plotting sequence
+gstp1_total_df$condition <- factor(rep(c("Ctrl", "KD", "OE"), each = 3),
+                                   levels = c("Ctrl", "KD", "OE"))
+
+# ========== 5. Visualization ==========
+gstp1_plot <- ggplot(gstp1_total_df, aes(x = sample, y = Total_TPM, fill = condition)) +
+    geom_bar(stat = "identity", width = 0.7, color = "black") +
+    geom_text(aes(label = round(Total_TPM, 1)), vjust = -0.4, size = 3.5) +
+    scale_fill_manual(values = c(Ctrl = "#4DBBD5FF", KD = "#E64B35FF", OE = "#00A087FF")) +
+    theme_bw(base_size = 14) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1),
+          panel.grid.major.x = element_blank()) +
+    labs(title = "Combined GSTP1 Expression (Endogenous + Exogenous)",
+         x = "Sample Name", 
+         y = "Expression (TPM)", 
+         fill = "Experimental Group") +
+    ylim(0, max(gstp1_total_df$Total_TPM) * 1.15)
+
+print(gstp1_plot)
+
+# ========== 6. Save Figure ==========
+dir.create("./results/figures", showWarnings = FALSE, recursive = TRUE)
+ggsave("./results/figures/gstp1_total_expression_bar.png", gstp1_plot, width = 8, height = 6, dpi = 300)
+```
+
+```{r gstp1_statistical_testing, message=FALSE, warning=FALSE}
+# Description: Inter-group comparison of GSTP1 expression levels
+# Part 05: Bulk RNA-seq validation - Statistical Testing
+
+library(ggplot2)
+library(ggsignif)
+
+# ========== 1. Calculate P-values using T-test ==========
+# Maintaining original logic for pairwise comparisons
+max_value <- max(gstp1_total_df$Total_TPM)
+
+# Ctrl vs KD
+ctrl_kd <- t.test(
+  gstp1_total_df$Total_TPM[gstp1_total_df$condition == "Ctrl"],
+  gstp1_total_df$Total_TPM[gstp1_total_df$condition == "KD"]
+)
+
+# Ctrl vs OE
+ctrl_oe <- t.test(
+  gstp1_total_df$Total_TPM[gstp1_total_df$condition == "Ctrl"],
+  gstp1_total_df$Total_TPM[gstp1_total_df$condition == "OE"]
+)
+
+# KD vs OE
+kd_oe <- t.test(
+  gstp1_total_df$Total_TPM[gstp1_total_df$condition == "KD"],
+  gstp1_total_df$Total_TPM[gstp1_total_df$condition == "OE"]
+)
+
+# ========== 2. Significance Annotation Logic ==========
+p_values <- c(ctrl_kd$p.value, ctrl_oe$p.value, kd_oe$p.value)
+annotations <- ifelse(p_values < 0.001, "***",
+                      ifelse(p_values < 0.01, "**",
+                             ifelse(p_values < 0.05, "*", "ns")))
+
+# Setting y-axis positions for brackets
+y_positions <- c(max_value * 1.15, max_value * 1.25, max_value * 1.35)
+
+# ========== 3. Visualization ==========
+gstp1_boxplot <- ggplot(gstp1_total_df, aes(x = condition, y = Total_TPM, fill = condition)) +
+  geom_boxplot(width = 0.6, alpha = 0.7, outlier.shape = NA) +
+  geom_jitter(width = 0.2, size = 2, alpha = 0.6) +
+  geom_signif(
+    comparisons = list(c("Ctrl", "KD"), c("Ctrl", "OE"), c("KD", "OE")),
+    y_position = y_positions,
+    annotation = annotations,
+    textsize = 4,
+    tip_length = 0.01,
+    size = 0.5
+  ) +
+  scale_fill_manual(values = c("Ctrl" = "#4DBBD5FF", "KD" = "#E64B35FF", "OE" = "#00A087FF")) +
+  theme_bw(base_size = 13) +
+  theme(
+    axis.text.x = element_text(angle = 0, hjust = 0.5),
+    legend.position = "none",
+    panel.grid.minor = element_blank()
+  ) +
+  labs(x = "Condition", y = "TPM", title = "GSTP1 Expression Comparison") +
+  ylim(0, max_value * 1.45)
+
+print(gstp1_boxplot)
+
+# ========== 4. Save Results ==========
+# Directory should already exist from previous steps
+ggsave("./results/figures/gstp1_boxplot.png", gstp1_boxplot, width = 6, height = 5, dpi = 300)
+```
+
+```{r differential_expression_analysis, message=FALSE, warning=FALSE}
+# Description: Differential Gene Expression (DGE) Analysis using edgeR
+# Part 05: Bulk RNA-seq - Contrast modeling and visualization
+
+library(edgeR)
+library(limma)
+library(ggplot2)
+library(ggrepel)
+library(dplyr)
+
+# ========== 0. Input Data Preparation ==========
+# Ensure the counts matrix is integer and aligned with metadata
+counts_matrix <- as.matrix(counts_matrix)
+storage.mode(counts_matrix) <- "integer"
+counts_matrix <- counts_matrix[, metadata$sample_id]
+counts_matrix[is.na(counts_matrix)] <- 0
+
+# ========== 1. Metadata Setup ==========
+meta <- metadata %>%
+  mutate(condition = factor(condition, levels = c("Ctrl", "KD", "OE")))
+
+# ========== 2. DGEList Creation ==========
+dge <- DGEList(counts = counts_matrix, samples = meta)
+
+# ========== 3. Low Expression Filtering ==========
+# Keep genes with sufficient counts in at least one group
+keep <- filterByExpr(dge, group = meta$condition)
+dge <- dge[keep, , keep.lib.sizes = FALSE]
+
+# ========== 4. TMM Normalization ==========
+dge <- calcNormFactors(dge)
+
+# ========== 5. Design Matrix ==========
+design <- model.matrix(~ 0 + condition, data = meta)
+colnames(design) <- make.names(colnames(design))
+
+# ========== 6. Dispersion Estimation & Fitting ==========
+dge <- estimateDisp(dge, design)
+fit <- glmQLFit(dge, design)
+
+# ========== 7. Contrast Matrix ==========
+# Defining specific group comparisons
+contrasts <- makeContrasts(
+  KD_vs_Ctrl = conditionKD - conditionCtrl,
+  OE_vs_Ctrl = conditionOE - conditionCtrl,
+  OE_vs_KD   = conditionOE - conditionKD,
+  levels = design
+)
+
+# ========== 8. DEG Identification ==========
+table_output_dir <- "./results/tables"
+figure_output_dir <- "./results/figures"
+dir.create(table_output_dir, recursive = TRUE, showWarnings = FALSE)
+dir.create(figure_output_dir, recursive = TRUE, showWarnings = FALSE)
+
+lfc_cutoff <- 1
+p_cutoff   <- 0.05
+label_n    <- 10
+
+deg_results <- list()
+
+for (cn in colnames(contrasts)) {
+  # Statistical testing
+  qlf <- glmQLFTest(fit, contrast = contrasts[, cn])
+  res <- topTags(qlf, n = Inf)$table
+  res <- res %>%
+    mutate(
+      Symbol = rownames(.),
+      log2FoldChange = logFC,
+      padj = FDR
+    )
+
+  # Parsing group names for labeling
+  groups <- strsplit(cn, "_vs_")[[1]]
+  group1 <- groups[1]
+  group2 <- groups[2]
+
+  # Filter significant DEGs
+  sig_deg <- res %>%
+    filter(padj < p_cutoff & abs(log2FoldChange) > lfc_cutoff) %>%
+    mutate(
+      group = ifelse(
+        log2FoldChange > 0,
+        paste0(group1, "_high"),
+        paste0(group2, "_high")
+      )
+    ) %>%
+    arrange(padj)
+
+  # Save CSV results
+  write.csv(sig_deg, file.path(table_output_dir, paste0("DEG_", cn, "_sig.csv")), row.names = FALSE)
+  deg_results[[cn]] <- res
+}
+
+# ========== 9. Volcano Plot Visualization ==========
+for (cn in names(deg_results)) {
+  res <- deg_results[[cn]]
+  groups <- strsplit(cn, "_vs_")[[1]]
+  group1 <- groups[1]
+  group2 <- groups[2]
+
+  up_lab   <- paste0(group1, "_high")
+  down_lab <- paste0(group2, "_high")
+
+  # Define significance levels for plotting
+  res <- res %>%
+    mutate(
+      significance = case_when(
+        padj < p_cutoff & log2FoldChange >  lfc_cutoff ~ up_lab,
+        padj < p_cutoff & log2FoldChange < -lfc_cutoff ~ down_lab,
+        TRUE ~ "NotSig"
+      )
+    )
+  res$significance <- factor(res$significance, levels = c("NotSig", up_lab, down_lab))
+
+  # Summary statistics for plot subtitle
+  n_up   <- sum(res$significance == up_lab)
+  n_down <- sum(res$significance == down_lab)
+  subtitle_text <- paste0(up_lab, ": ", n_up, " | ", down_lab, ": ", n_down)
+
+  # Maintaining original color palette (NPG Style)
+  color_map <- setNames(c("grey70", "#E64B35FF", "#4DBBD5FF"), c("NotSig", up_lab, down_lab))
+
+  # Select top genes for labeling
+  label_df <- res %>%
+    filter(significance != "NotSig") %>%
+    group_by(significance) %>%
+    arrange(padj) %>%
+    slice_head(n = label_n) %>%
+    ungroup()
+
+  # Generate Plot
+  p <- ggplot(res, aes(log2FoldChange, -log10(padj), color = significance)) +
+    geom_point(size = 2, alpha = 0.7) +
+    geom_text_repel(data = label_df, aes(label = Symbol), size = 4,
+                    box.padding = 0.4, point.padding = 0.3,
+                    max.overlaps = Inf, segment.color = "grey50",
+                    show.legend = FALSE) +
+    scale_color_manual(values = color_map, drop = FALSE) +
+    geom_vline(xintercept = c(-lfc_cutoff, lfc_cutoff), linetype = "dashed", color = "grey50") +
+    geom_hline(yintercept = -log10(p_cutoff), linetype = "dashed", color = "grey50") +
+    theme_bw(base_size = 14) +
+    labs(title = paste("Volcano Plot:", cn), 
+         subtitle = subtitle_text,
+         x = "log2 Fold Change", 
+         y = "-log10(FDR)", 
+         color = "Regulation")
+
+  # Export Figures
+  ggsave(file.path(figure_output_dir, paste0("Volcano_", cn, ".png")), p, width = 9, height = 8, dpi = 300)
+  print(p)
+}
+
+# Store results for downstream analysis
+deg_results_GSTP1 <- deg_results
+```
+
+```{r geneset_enrichment_ssgsea, message=FALSE, warning=FALSE}
+# Description: Gene Set Enrichment Analysis (ssGSEA) for validation pathways
+# Part 05: Bulk RNA-seq - Functional scoring using custom ssGSEA function
+
+library(ggplot2)
+
+# ========== 1. Custom ssGSEA Function ==========
+# Note: Maintaining original weighting and ranking logic
+ssgsea_score <- function(expr_matrix, gene_list) {
+  available_genes <- intersect(gene_list, rownames(expr_matrix))
+  if (length(available_genes) < 3) return(NULL)
+  
+  scores <- sapply(colnames(expr_matrix), function(sample) {
+    expr_values <- expr_matrix[, sample]
+    # Rank-based weighting logic
+    expr_rank <- rank(-expr_values, ties.method = "average")
+    weights <- 1/expr_rank
+    in_set <- rownames(expr_matrix) %in% available_genes
+    
+    weighted_sum <- sum(expr_values[in_set] * weights[in_set])
+    total_weight <- sum(weights[in_set])
+    
+    if (total_weight > 0) weighted_sum / total_weight else 0
+  })
+  return(scores)
+}
+
+# ========== 2. Load Pathway Gene Sets ==========
+# Ensure the gene set file is in the local data directory
+gene_set_file <- "./data/pathway_gene_sets.csv"
+gene_sets_df <- read.csv(gene_set_file, stringsAsFactors = FALSE)
+
+# Mapping pathways and gene symbols
+gene_sets <- split(gene_sets_df$Gene, gene_sets_df$Pathway_Code)
+gene_sets <- lapply(gene_sets, function(x) paste(x, collapse = ","))
+pathway_names_map <- split(gene_sets_df$Pathway_Name, gene_sets_df$Pathway_Code)
+pathway_names_map <- lapply(pathway_names_map, function(x) x[1])
+
+# ========== 3. Batch ssGSEA Analysis ==========
+all_results <- list()
+expr_matrix <- log_tpm # Using log_tpm from previous QC cell
+metadata_df <- metadata
+
+for (selected_set in names(gene_sets)) {
+  gene_input <- gene_sets[[selected_set]]  
+  pathway_name <- pathway_names_map[[selected_set]]
+  
+  # Clean and match gene list
+  genes <- trimws(unlist(strsplit(gene_input, ",")))
+  available_genes <- genes[genes %in% rownames(expr_matrix)]
+  
+  # Minimum requirement: at least 3 genes must be present in the matrix
+  if (length(available_genes) < 3) next
+  
+  # Calculate scores
+  geneset_scores <- ssgsea_score(expr_matrix, available_genes)
+  if (is.null(geneset_scores)) next
+  
+  # Organize results into a data frame
+  result_df <- data.frame(
+    sample = names(geneset_scores),
+    Pathway_Score = geneset_scores,
+    condition = metadata_df$condition[match(names(geneset_scores), metadata_df$sample_id)]
+  )
+  result_df$condition <- factor(result_df$condition, levels = c("Ctrl", "KD", "OE"))
+  
+  # Perform group-wise comparisons (t-test)
+  comparisons <- list(c("Ctrl", "KD"), c("Ctrl", "OE"), c("KD", "OE"))
+  p_values <- sapply(comparisons, function(comp){
+    data1 <- result_df$Pathway_Score[result_df$condition == comp[1]]
+    data2 <- result_df$Pathway_Score[result_df$condition == comp[2]]
+    t.test(data1, data2)$p.value
+  })
+  
+  # Store scores, p-values, and gene overlap information
+  all_results[[selected_set]] <- list(
+    scores = result_df,
+    p_values = p_values,
+    available_genes = available_genes,
+    pathway_name = pathway_name
+  )
+}
+
+# ========== 4. Final Results Object ==========
+ssgsea_results <- all_results
+```
+
+```{r significant_pathway_heatmap, message=FALSE, warning=FALSE}
+# Description: Heatmap visualization of significant pathway scores (ssGSEA)
+# Part 05: Bulk RNA-seq - Functional analysis results
+
+library(pheatmap)
+library(RColorBrewer)
+
+# ========== 1. Filter Significant Pathways (p < 0.05) ==========
+significant_pathways <- c()
+for (pathway_name in names(ssgsea_results)) {
+  p_vals <- ssgsea_results[[pathway_name]]$p_values
+  if (any(p_vals < 0.05)) {
+    significant_pathways <- c(significant_pathways, pathway_name)
+  }
+}
+
+message("Number of significant pathways: ", length(significant_pathways))
+
+if (length(significant_pathways) > 0) {
+  
+  # ========== 2. Construct Score Matrix ==========
+  expr_matrix <- log_tpm
+  
+  geneset_score_mat <- do.call(rbind, lapply(significant_pathways, function(gs) {
+    # Extracting genes for current pathway
+    genes <- trimws(unlist(strsplit(gene_sets[[gs]], ",")))
+    g <- intersect(genes, rownames(expr_matrix))
+    # Using original ssgsea_score logic
+    if (length(g) > 2) ssgsea_score(expr_matrix, g) else rep(NA, ncol(expr_matrix))
+  }))
+  
+  rownames(geneset_score_mat) <- significant_pathways
+  # Remove any rows containing all NA
+  geneset_score_mat <- geneset_score_mat[rowSums(!is.na(geneset_score_mat)) > 0, ]
+  
+  # Map Pathway Codes to Full Names
+  if (exists("pathway_names_map")) {
+    rownames(geneset_score_mat) <- sapply(rownames(geneset_score_mat), function(x) {
+      if (x %in% names(pathway_names_map)) pathway_names_map[[x]] else x
+    })
+  }
+  
+  # ========== 3. Sample Sorting & Metadata Preparation ==========
+  # Sorting by Condition then Replicate for professional presentation
+  metadata$replicate <- sapply(strsplit(metadata$sample_id, "_"), function(x) tail(x, 1))
+  metadata$Condition <- factor(metadata$condition, levels = c("Ctrl", "KD", "OE"))
+  metadata_sorted <- metadata[order(metadata$Condition, metadata$replicate), ]
+  
+  common_samples <- intersect(colnames(geneset_score_mat), metadata_sorted$sample_id)
+  geneset_score_mat <- geneset_score_mat[, common_samples, drop = FALSE]
+  
+  # ========== 4. Annotation Setup ==========
+  anno_col <- data.frame(Condition = metadata_sorted$Condition, 
+                         row.names = metadata_sorted$sample_id)
+  
+  # Maintaining original hexadecimal color palette
+  condition_colors <- c("Ctrl" = "#1f78b4", "KD" = "#e31a1c", "OE" = "#33a02c")
+  anno_colors <- list(Condition = condition_colors)
+  
+  # ========== 5. Visualization & Export ==========
+  output_figure <- "./results/figures/gstp1_pathway_heatmap.png"
+  dir.create("./results/figures", recursive = TRUE, showWarnings = FALSE)
+  
+  # Plotting Heatmap
+  png(output_figure, width = 1600, height = 1200, res = 150)
+  pheatmap(geneset_score_mat, 
+           scale = "row", 
+           annotation_col = anno_col,
+           annotation_colors = anno_colors, 
+           cluster_rows = TRUE, 
+           cluster_cols = FALSE, # Preserving sorted column order
+           treeheight_row = 30, 
+           treeheight_col = 0, 
+           border_color = NA,
+           show_colnames = TRUE, 
+           show_rownames = TRUE, 
+           fontsize_row = 9, 
+           fontsize_col = 10,
+           main = "Significant Gene Sets (p < 0.05)",
+           color = colorRampPalette(c("blue", "white", "red"))(100))
+  dev.off()
+  
+  message("Heatmap saved to: ", output_figure)
+} else {
+  message("No significant pathways (p < 0.05) found.")
+}
+```
+
+```{r gsea_enrichment_analysis, message=FALSE, warning=FALSE}
+# Description: Gene Set Enrichment Analysis (GSEA) using MSigDB Hallmark sets
+# Part 05: Bulk RNA-seq - Pathway enrichment and visualization
+
+library(clusterProfiler)
+library(msigdbr)
+library(DOSE)
+library(ggplot2)
+
+# ========== 1. Custom Title Case Function for Biological Terms ==========
+# Preserves standard nomenclature for DNA, RNA, signaling pathways, etc.
+custom_toTitleCase <- function(x) {
+  x <- tolower(x)
+  x <- gsub("\\bdna\\b", "DNA", x)
+  x <- gsub("\\brna\\b", "RNA", x)
+  x <- gsub("\\buv\\b", "UV", x)
+  x <- gsub("\\begf\\b", "EGF", x)
+  x <- gsub("\\btnf\\b", "TNF", x)
+  x <- gsub("\\bifn\\b", "IFN", x)
+  x <- gsub("\\bmtorc\\b", "mTORC", x)
+  x <- gsub("\\btgf\\b", "TGF", x)
+  x <- gsub("\\bwnt\\b", "WNT", x)
+  x <- gsub("\\bbmp\\b", "BMP", x)
+  x <- gsub("\\bmapk\\b", "MAPK", x)
+  x <- gsub("\\bnfkb\\b", "NFkappa-B", x)
+  x <- gsub("\\bpi3k\\b", "PI3K", x)
+  x <- gsub("\\bakt\\b", "AKT", x)
+  x <- gsub("\\bhypoxia\\b", "Hypoxia", x)
+  x <- gsub("\\be2f\\b", "E2F", x)
+  x <- gsub("\\bg2m\\b", "G2M", x)
+  x <- gsub("\\bmyc\\b", "MYC", x)
+  x <- gsub("\\bv1\\b", "V1", x)
+  x <- gsub("\\bv2\\b", "V2", x)
+  x <- gsub("\\balpha\\b", "Alpha", x)
+  x <- gsub("\\bbeta\\b", "Beta", x)
+  x <- gsub("\\bgamma\\b", "Gamma", x)
+  x <- gsub("\\bdelta\\b", "Delta", x)
+  x <- gsub("\\bmtorc1\\b", "mTORC1", x) # Fixed typo from original
+  x <- gsub("\\berk\\b", "ERK", x)
+  x <- gsub("\\bjak\\b", "JAK", x)
+  x <- gsub("\\bstat\\b", "STAT", x)
+  x <- gsub("\\bkras\\b", "KRAS", x)
+  x <- gsub("\\btnfa\\b", "TNF-alpha", x)
+  x <- gsub("\\bstat3\\b", "STAT3", x)
+  x <- tools::toTitleCase(x)
+  return(x)
+}
+
+# ========== 2. Load MSigDB Hallmark Gene Sets ==========
+msigdb_hallmark <- msigdbr(species = "Homo sapiens", category = "H")
+gene_sets <- msigdb_hallmark[, c("gs_name", "gene_symbol")]
+
+# ========== 3. GSEA Processing Function ==========
+generate_gsea_results <- function(deg_results, comparison_name) {
+  res <- deg_results[[comparison_name]]
+  
+  if ("Symbol" %in% colnames(res)) {
+    res$SYMBOL <- res$Symbol
+  }
+  
+  # Ranked gene list based on log2FoldChange
+  geneList <- res$log2FoldChange
+  names(geneList) <- res$SYMBOL
+  geneList <- sort(geneList, decreasing = TRUE)
+  
+  # Run GSEA
+  gsea_res <- GSEA(
+    geneList = geneList,
+    TERM2GENE = gene_sets, 
+    pvalueCutoff = 0.05, 
+    verbose = FALSE
+  )
+  
+  df <- as.data.frame(gsea_res)
+  
+  if (nrow(df) > 0) {
+    # Clean up descriptions for plotting
+    df$Description <- gsub("^HALLMARK_", "", df$Description)
+    df$Description <- gsub("_", " ", df$Description)
+    df$Description <- custom_toTitleCase(df$Description)
+    
+    # Assign group direction based on NES
+    group_labels <- unlist(strsplit(comparison_name, "_vs_"))
+    group1 <- group_labels[1]
+    group2 <- group_labels[2]
+    df$GroupHigh <- ifelse(df$NES > 0, paste(group1, "high"), paste(group2, "high"))
+  }
+  
+  return(df)
+}
+
+# ========== 4. GSEA Barplot Function ==========
+generate_gsea_barplot <- function(df, comparison_name, top_n = 20) {
+  df_plot <- df[order(df$NES), ]
+  df_plot <- head(df_plot, top_n)
+  df_plot$Description <- factor(df_plot$Description, levels = df_plot$Description)
+  
+  group_labels <- unlist(strsplit(comparison_name, "_vs_"))
+  group1 <- group_labels[1]
+  group2 <- group_labels[2]
+  
+  p <- ggplot(df_plot, aes(x = NES, y = Description, fill = GroupHigh)) +
+    geom_col(width = 0.8) +
+    geom_vline(xintercept = 0, linetype = "dashed") +
+    theme_bw(base_size = 12) +
+    labs(
+      title = paste("GSEA (Hallmark) -", comparison_name),
+      x = paste0("NES ( >0: ", group1, " High | <0: ", group2, " High )"),
+      y = NULL
+    ) +
+    theme(legend.title = element_blank())
+  
+  return(p)
+}
+
+# ========== 5. Execution & Batch Export ==========
+comparisons <- names(deg_results_GSTP1)
+gsea_results <- list()
+
+output_fig_dir <- "./results/figures"
+output_table_dir <- "./results/tables"
+dir.create(output_fig_dir, recursive = TRUE, showWarnings = FALSE)
+dir.create(output_table_dir, recursive = TRUE, showWarnings = FALSE)
+
+for (comp in comparisons) {
+  message("Processing GSEA for: ", comp)
+  gsea_df <- generate_gsea_results(deg_results_GSTP1, comp)
+  
+  if (nrow(gsea_df) == 0) {
+    message("No significant enrichment for: ", comp)
+    next
+  }
+  
+  p <- generate_gsea_barplot(gsea_df, comp)
+  print(p)
+  
+  gsea_results[[comp]] <- list(
+    comparison = comp, 
+    gsea_df = gsea_df, 
+    plot = p
+  )
+  
+  # Exporting results
+  write.csv(gsea_df, file.path(output_table_dir, paste0("GSEA_", comp, ".csv")), row.names = FALSE)
+  ggsave(file.path(output_fig_dir, paste0("GSEA_", comp, ".png")), p, width = 10, height = 8, dpi = 300)
+}
+```
