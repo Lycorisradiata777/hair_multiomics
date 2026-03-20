@@ -1,0 +1,63 @@
+name: hair_omics
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  # R base
+  - r-base=4.2.3
+  - r-essentials=4.2
+  
+  # Data manipulation
+  - r-dplyr
+  - r-tidyr
+  - r-readr
+  - r-stringr
+  - r-purrr
+  - r-tibble
+  - r-reshape2
+  - r-matrix
+  - r-matrixstats
+  
+  # Visualization
+  - r-ggplot2
+  - r-ggrepel
+  - r-ggpubr
+  - r-pheatmap
+  - r-rcolorbrewer
+  - r-patchwork
+  - r-viridis
+  - r-ggraph
+  - r-forcats
+  - r-cairo
+  
+  # Statistics
+  - r-vegan
+  - r-ggsignif
+  
+  # Bioconductor packages (via bioconda)
+  - bioconductor-edger
+  - bioconductor-limma
+  - bioconductor-clusterprofiler
+  - bioconductor-dose
+  - bioconductor-genomicranges
+  - bioconductor-genomeinfodb
+  - bioconductor-chipseeker
+  - bioconductor-txdb.hsapiens.ucsc.hg38.knowngene
+  - bioconductor-org.hs.eg.db
+  - bioconductor-rgreat
+  - bioconductor-seurat
+  - bioconductor-monocle
+  - bioconductor-viper
+  - bioconductor-mixomics
+  
+  # Machine learning / clustering
+  - r-uwot
+  - r-igraph
+  - r-fnn
+  - r-tidygraph
+  
+  # CRAN packages not in defaults
+  - r-msigdbr
+  - r-dorothea
+  - r-remotes
