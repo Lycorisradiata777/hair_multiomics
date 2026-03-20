@@ -65,7 +65,9 @@ conda activate hair_omics
 # 4. Knit Rmd files for downstream analysis
 
 ### Data
-[To be added upon publication]
+The raw sequence data of human sample have been deposited in the Genome Sequence Archive in BIG Data Center, under accession numbers HRA015148 and HRA015056. 
+The single cell RNA-seq data of mice has been deposited in Genome Sequence Archive in BIG Data Center under accession number CRA034666. 
+Bulk RNA-seq data of GSTP1 knockdown/overexpression/control groups (functional validation) has been deposited in Genome Sequence Archive in BIG Data Center under accession number HRA017261.
 
 ### Citation
 [To be added upon publication]
