@@ -30,7 +30,7 @@ object.list <- list()
 for (i in 1:length(data.path)) {
   object.list[[i]] <- CreateSeuratObject(counts = Read10X(data.dir = data.path[i]), 
                                           min.cells = 1, min.features = 100)
-  object.list[[i]]$stim <- c("Y1", "Y2", "O1", "O2")[i]
+  object.list[[i]]$stim <- c("Young_anagen", "Young_telogen", "Aged_anagen", "Aged_anagen")[i]
   object.list[[i]]$stage <- c("Anagen", "Telogen", "Anagen", "Telogen")[i]
   object.list[[i]]$age <- c("3 months", "2 months", "12 months", "18 months")[i]
 }
@@ -120,7 +120,7 @@ merged_hair$majorCellType <- factor(merged_hair$majorCellType,
 
 # ========== Set stim Factor Levels ==========
 Idents(merged_hair) <- "stim"
-merged_hair$stim <- factor(Idents(merged_hair), levels = c("Young_anagen", "Old_anagen", "Young_telogen", "Old_telogen"))
+merged_hair$stim <- factor(Idents(merged_hair), levels = c("Young_anagen", "Aged_anagen", "Young_telogen", "Aged_telogen"))
 
 # ========== Visualization ==========
 library(ggplot2)
@@ -344,7 +344,7 @@ colnames(Cellratio) <- c("Cluster", "Condition", "Freq")
 # Set condition factor levels
 Cellratio$Condition <- factor(
   Cellratio$Condition,
-  levels = c("Old_anagen", "Old_telogen", "Young_anagen", "Young_telogen")
+  levels = c("Aged__anagen", "Aged__telogen", "Young_anagen", "Young_telogen")
 )
 
 # Define colors
@@ -416,33 +416,33 @@ Idents(melanocyte_subset) <- "celltype_stim"
 print(table(Idents(melanocyte_subset)))
 
 # Adjust comparison groups based on actual ident names
-# Example: M1_Old_anagen vs M2_Young_anagen - modify according to your data
-ident.1 <- "M1_Old_anagen"
+# Example: M1_Aged_anagen vs M2_Young_anagen - modify according to your data
+ident.1 <- "M1_Aged_anagen"
 ident.2 <- "M2_Young_anagen"
 
 # Extract differentially expressed genes
-m2_young_vs_m1_old <- FindMarkers(melanocyte_subset,
+m2_young_vs_m1_Aged <- FindMarkers(melanocyte_subset,
                                  ident.1 = ident.1,
                                  ident.2 = ident.2,
                                  logfc.threshold = 0,
                                  min.pct = 0.1)
 
 # Filter significant DEGs
-m2_young_vs_m1_old_sig <- m2_young_vs_m1_old %>% 
+m2_young_vs_m1_Aged_sig <- m2_young_vs_m1_Aged %>% 
   filter(p_val_adj < 0.05 & abs(avg_log2FC) > 0.25)
 
-print(head(m2_young_vs_m1_old_sig, 20))
+print(head(m2_young_vs_m1_Aged_sig, 20))
 
 # ========== Volcano Plot ==========
 # Prepare volcano plot data
 lfc_cutoff <- 0.25
 p_cutoff   <- 0.05
 
-m2_young_vs_m1_old_volcano <- rownames_to_column(m2_young_vs_m1_old, "gene")
-m2_young_vs_m1_old_volcano <- m2_young_vs_m1_old_volcano %>%
+m2_young_vs_m1_Aged_volcano <- rownames_to_column(m2_young_vs_m1_Aged, "gene")
+m2_young_vs_m1_Aged_volcano <- m2_young_vs_m1_Aged_volcano %>%
   mutate(
     group = case_when(
-      p_val_adj < p_cutoff & avg_log2FC >  lfc_cutoff  ~ "Up_in_M1_Old",
+      p_val_adj < p_cutoff & avg_log2FC >  lfc_cutoff  ~ "Up_in_M1_Aged",
       p_val_adj < p_cutoff & avg_log2FC < -lfc_cutoff  ~ "Up_in_M2_Young",
       TRUE ~ "Not_Sig"
     ),
@@ -450,21 +450,21 @@ m2_young_vs_m1_old_volcano <- m2_young_vs_m1_old_volcano %>%
   )
 
 # Count genes in each group
-n_m1_old   <- sum(m2_young_vs_m1_old_volcano$group == "Up_in_M1_Old")
-n_m2_young <- sum(m2_young_vs_m1_old_volcano$group == "Up_in_M2_Young")
+n_m1_Aged   <- sum(m2_young_vs_m1_Aged_volcano$group == "Up_in_M1_Aged")
+n_m2_young <- sum(m2_young_vs_m1_Aged_volcano$group == "Up_in_M2_Young")
 n_total <- n_m1_old + n_m2_young
 
 subtitle_text <- paste0(
-  "Up_in_M1_Old: ", n_m1_old, " | ",
+  "Up_in_M1_Aged: ", n_m1_Aged, " | ",
   "Up_in_M2_Young: ", n_m2_young, " | ",
   "Total DEGs: ", n_total
 )
 
 # Set colors
-pal <- c("Up_in_M1_Old" = "#d81159", "Up_in_M2_Young" = "#218380", "Not_Sig" = "grey80")
+pal <- c("Up_in_M1_Aged" = "#d81159", "Up_in_M2_Young" = "#218380", "Not_Sig" = "grey80")
 
 # Generate volcano plot
-volcano_plot <- ggplot(m2_young_vs_m1_old_volcano, aes(x = avg_log2FC, y = -log10(p_val_adj), color = group)) +
+volcano_plot <- ggplot(m2_young_vs_m1_Aged_volcano, aes(x = avg_log2FC, y = -log10(p_val_adj), color = group)) +
   geom_point(alpha = 0.8, size = 3) +
   geom_text_repel(
     aes(label = label),
@@ -479,7 +479,7 @@ volcano_plot <- ggplot(m2_young_vs_m1_old_volcano, aes(x = avg_log2FC, y = -log1
   geom_hline(yintercept = -log10(p_cutoff), linetype = 2, color = "grey60") +
   theme_bw(base_size = 14) +
   labs(
-    title = "M1_Old vs M2_Young",
+    title = "M1_Aged vs M2_Young",
     subtitle = subtitle_text,
     x = "log2 Fold Change",
     y = "-log10(adj. p-value)",
@@ -500,7 +500,7 @@ print(volcano_plot)
 
 # Save volcano plot
 ggsave(
-  file.path(OUTPUT_DIR, "figures", "melanocyte", "M1_Old_vs_M2_Young_volcano.png"),
+  file.path(OUTPUT_DIR, "figures", "melanocyte", "M1_Aged_vs_M2_Young_volcano.png"),
   plot = volcano_plot, width = 8, height = 6, dpi = 300
 )
 ```
@@ -515,7 +515,7 @@ library(ggplot2)
 library(dplyr)
 
 # Read enrichment results
-enrich_data <- read_csv("results/tables/melanocyte/M1_old_vs_M2_young_enrichment.csv")
+enrich_data <- read_csv("results/tables/melanocyte/M1_aged_vs_M2_young_enrichment.csv")
 
 # Prepare bubble plot data
 bubble_data <- enrich_data %>%
@@ -526,10 +526,10 @@ bubble_data <- enrich_data %>%
 # Generate bubble plot
 bubble_plot <- ggplot(bubble_data, aes(x = Cluster, y = Description)) +
   geom_point(aes(size = LogP, color = Cluster), alpha = 0.8) +
-  scale_color_manual(values = c("M1_old" = "#d81159", "M2_young" = "#218380"),
+  scale_color_manual(values = c("M1_aged" = "#d81159", "M2_young" = "#218380"),
                      name = "Cluster") +
   scale_size_continuous(name = "-log10(p-value)", range = c(7, 12)) +
-  labs(title = "M1_Old vs M2_Young Enrichment", x = "Cluster", y = "") +
+  labs(title = "M1_Aged vs M2_Young Enrichment", x = "Cluster", y = "") +
   theme_bw(base_size = 14) +
   theme(
     axis.text.y = element_text(color = "black", size = 13),
@@ -607,7 +607,7 @@ Idents(melanocyte_subset) <- "celltype_stim"
 # Differential TF activity analysis
 tf_deg <- FindMarkers(
   object = melanocyte_subset,
-  ident.1 = "M1_Old_anagen",
+  ident.1 = "M1_Aged_anagen",
   ident.2 = "M2_Young_anagen",
   logfc.threshold = 0,
   min.pct = 0.1
@@ -621,7 +621,7 @@ tf_DE <- tf_deg %>%
 
 # Save results
 dir.create(file.path(OUTPUT_DIR, "tables", "melanocyte"), recursive = TRUE, showWarnings = FALSE)
-write.csv(tf_DE, file.path(OUTPUT_DIR, "tables", "melanocyte", "TF_M1_Old_vs_M2_Young.csv"), row.names = FALSE)
+write.csv(tf_DE, file.path(OUTPUT_DIR, "tables", "melanocyte", "TF_M1_Aged_vs_M2_Young.csv"), row.names = FALSE)
 
 # Plot significant TFs
 sig_tfs <- tf_deg %>%
@@ -634,11 +634,11 @@ if(nrow(sig_tfs) > 0) {
                                 fill = avg_log2FC > 0)) +
     geom_bar(stat = "identity") +
     scale_fill_manual(values = c("FALSE" = "#218380", "TRUE" = "#d81159"), 
-                      labels = c("Higher in M2_Young", "Higher in M1_Old")) +
+                      labels = c("Higher in M2_Young", "Higher in M1_Aged")) +
     coord_flip() +
     theme_bw(base_size = 14) +
     labs(
-      title = "Differential TF Activity: M1_Old_anagen vs M2_Young_anagen",
+      title = "Differential TF Activity: M1_Aged_anagen vs M2_Young_anagen",
       x = "Transcription Factors",
       y = "log2 Fold Change",
       fill = "Activity Direction"
@@ -676,7 +676,7 @@ tf_target_relationships <- tf_regulons_high %>%
   filter(tf %in% significant_tf_names)
 
 # Get all differentially expressed genes
-de_genes <- rownames(m2_young_vs_m1_old_sig)
+de_genes <- rownames(m2_young_vs_m1_aged_sig)
 
 # Find overlap: DE genes regulated by significant TFs
 regulated_de_genes <- tf_target_relationships %>%
@@ -710,12 +710,12 @@ network_edges <- regulated_de_genes %>%
   dplyr::select(tf, target) %>%
   distinct()
 
-# Identify genes upregulated in M1_Old and M2_Young
-de_genes_m1_old <- m2_young_vs_m1_old_sig %>% 
-  filter(avg_log2FC > 0) %>%  # Upregulated in M1_Old
+# Identify genes upregulated in M1_Aged and M2_Young
+de_genes_m1_aged <- m2_young_vs_m1_aged_sig %>% 
+  filter(avg_log2FC > 0) %>%  # Upregulated in M1_Aged
   rownames()
 
-de_genes_m2_young <- m2_young_vs_m1_old_sig %>% 
+de_genes_m2_young <- m2_young_vs_m1_aged_sig %>% 
   filter(avg_log2FC < 0) %>%  # Upregulated in M2_Young
   rownames()
 
@@ -729,7 +729,7 @@ V(g)$type <- ifelse(V(g)$name %in% significant_tf_names, "TF", "Target")
 V(g)$group <- ifelse(
   V(g)$name %in% significant_tf_names, "TF",
   ifelse(
-    V(g)$name %in% de_genes_m1_old, "Up_in_M1_Old",
+    V(g)$name %in% de_genes_m1_aged, "Up_in_M1_Aged",
     ifelse(
       V(g)$name %in% de_genes_m2_young, "Up_in_M2_Young", "Other"
     )
@@ -761,13 +761,13 @@ p_network <- ggraph(g, layout = "fr") +
     name = "Gene Group",
     values = c(
       "TF" = "#8B4513",           # Brown for TFs
-      "Up_in_M1_Old" = "#D81159", # Red for upregulated in M1_Old
+      "Up_in_M1_Aged" = "#D81159", # Red for upregulated in M1_Aged
       "Up_in_M2_Young" = "#218380", # Teal for upregulated in M2_Young
       "Other" = "grey70"          # Grey for others
     ),
     labels = c(
       "TF" = "Transcription Factor",
-      "Up_in_M1_Old" = "Up in M1_Old", 
+      "Up_in_M1_Aged" = "Up in M1_Aged", 
       "Up_in_M2_Young" = "Up in M2_Young", 
       "Other" = "Other"
     )
@@ -780,7 +780,7 @@ p_network <- ggraph(g, layout = "fr") +
   theme_void() +
   labs(
     title = "TF-Target Regulatory Network",
-    subtitle = "M1_Old_anagen vs M2_Young_anagen"
+    subtitle = "M1_Aged_anagen vs M2_Young_anagen"
   ) +
   theme(
     plot.title = element_text(hjust = 0, face = "bold", size = 16),
@@ -896,8 +896,8 @@ p3 <- plot_cell_trajectory(cds, color_by = "State", size = 1) +
 
 # By stim (condition)
 stim_cols <- c(
-  "Old_anagen" = '#d81159',
-  "Old_telogen" = '#6a60a9',
+  "Aged_anagen" = '#d81159',
+  "Aged_telogen" = '#6a60a9',
   "Young_anagen" = '#ffbc42',
   "Young_telogen" = '#218380'
 )
@@ -932,8 +932,8 @@ colnames(state_stim_df)[3] <- "Freq"
 
 # Define colors
 stim_cols <- c(
-  "Old_anagen" = '#d81159',
-  "Old_telogen" = '#6a60a9',
+  "Aged_anagen" = '#d81159',
+  "Aged_telogen" = '#6a60a9',
   "Young_anagen" = '#ffbc42',
   "Young_telogen" = '#218380'
 )
@@ -1209,9 +1209,9 @@ if (!is.null(branch2_result)) {
 ############################################################
 # 0. Subset cells by state and condition for each branch
 ############################################################
-# Branch A: state4 -> state3 -> state1 (old individuals)
+# Branch A: state4 -> state3 -> state1 (Aged individuals)
 cells_A <- rownames(pData(cds))[
-  pData(cds)$State %in% c(4, 3, 1) & pData(cds)$stim %in% c("Old_anagen", "Old_telogen")
+  pData(cds)$State %in% c(4, 3, 1) & pData(cds)$stim %in% c("Aged_anagen", "Aged_telogen")
 ]
 cds_A <- cds[, cells_A]
 
@@ -1343,7 +1343,7 @@ library(patchwork)
 ############################################################
 
 # 1. Branch configuration
-stateA <- 1  # State 1 (Old-anagen fate)
+stateA <- 1  # State 1 (Aged-anagen fate)
 stateB <- 2  # State 2 (Young-anagen fate)
 
 # 2. Plot parameters
@@ -1364,7 +1364,7 @@ output_file <- "fate_branch_gene_expression.png"
 ############################################################
 
 plot_gene_dual_branch_optimized <- function(gene, cds_A, cds_B, 
-                                            stateA_label = "Old-anagen fate",
+                                            stateA_label = "Aged-anagen fate",
                                             stateB_label = "Young-anagen fate") {
   
   # 1. Extract expression data for the gene in both branches
@@ -1489,7 +1489,7 @@ for (i in seq_along(all_genes)) {
     gene = gene,
     cds_A = cds_A,
     cds_B = cds_B,
-    stateA_label = paste0("State ", stateA, " (Old-anagen)"),
+    stateA_label = paste0("State ", stateA, " (Aged-anagen)"),
     stateB_label = paste0("State ", stateB, " (Young-anagen)")
   )
   
