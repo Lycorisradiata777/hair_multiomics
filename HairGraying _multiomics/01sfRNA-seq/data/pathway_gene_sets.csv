@@ -1,0 +1,3570 @@
+Pathway_Code,Pathway_Name,Gene
+UV_up,UV response up,ABCB1
+UV_up,UV response up,ACAA1
+UV_up,UV response up,AGO2
+UV_up,UV response up,ALAS1
+UV_up,UV response up,ALDOA
+UV_up,UV response up,AMD1
+UV_up,UV response up,AP2S1
+UV_up,UV response up,APOM
+UV_up,UV response up,AQP3
+UV_up,UV response up,ARRB2
+UV_up,UV response up,ASNS
+UV_up,UV response up,ATF3
+UV_up,UV response up,ATP6V1C1
+UV_up,UV response up,ATP6V1F
+UV_up,UV response up,BAK1
+UV_up,UV response up,BCL2L11
+UV_up,UV response up,BID
+UV_up,UV response up,BMP2
+UV_up,UV response up,BSG
+UV_up,UV response up,BTG1
+UV_up,UV response up,BTG2
+UV_up,UV response up,BTG3
+UV_up,UV response up,C4BPB
+UV_up,UV response up,CA2
+UV_up,UV response up,CASP3
+UV_up,UV response up,CCK
+UV_up,UV response up,CCND3
+UV_up,UV response up,CCNE1
+UV_up,UV response up,CDC34
+UV_up,UV response up,CDC5L
+UV_up,UV response up,CDK2
+UV_up,UV response up,CDKN1C
+UV_up,UV response up,CDKN2B
+UV_up,UV response up,CDO1
+UV_up,UV response up,CEBPG
+UV_up,UV response up,CHKA
+UV_up,UV response up,CHRNA5
+UV_up,UV response up,CLCN2
+UV_up,UV response up,CLTB
+UV_up,UV response up,CNP
+UV_up,UV response up,COL2A1
+UV_up,UV response up,CREG1
+UV_up,UV response up,CTSV
+UV_up,UV response up,CXCL2
+UV_up,UV response up,CYB5B
+UV_up,UV response up,CYB5R1
+UV_up,UV response up,CYP1A1
+UV_up,UV response up,DDX21
+UV_up,UV response up,DGAT1
+UV_up,UV response up,DLG4
+UV_up,UV response up,DNAJA1
+UV_up,UV response up,DNAJB1
+UV_up,UV response up,E2F5
+UV_up,UV response up,EIF2S3
+UV_up,UV response up,EIF5
+UV_up,UV response up,ENO2
+UV_up,UV response up,EPCAM
+UV_up,UV response up,EPHX1
+UV_up,UV response up,FEN1
+UV_up,UV response up,FGF18
+UV_up,UV response up,FKBP4
+UV_up,UV response up,FMO1
+UV_up,UV response up,FOS
+UV_up,UV response up,FOSB
+UV_up,UV response up,FURIN
+UV_up,UV response up,GAL
+UV_up,UV response up,GCH1
+UV_up,UV response up,GGH
+UV_up,UV response up,GLS
+UV_up,UV response up,GPX3
+UV_up,UV response up,GRINA
+UV_up,UV response up,GRPEL1
+UV_up,UV response up,H2AX
+UV_up,UV response up,HLA-F
+UV_up,UV response up,HMOX1
+UV_up,UV response up,HNRNPU
+UV_up,UV response up,HSPA13
+UV_up,UV response up,HSPA2
+UV_up,UV response up,HTR7
+UV_up,UV response up,HYAL2
+UV_up,UV response up,ICAM1
+UV_up,UV response up,IGFBP2
+UV_up,UV response up,IL6
+UV_up,UV response up,IL6ST
+UV_up,UV response up,IRF1
+UV_up,UV response up,JUNB
+UV_up,UV response up,KCNH2
+UV_up,UV response up,KLHDC3
+UV_up,UV response up,LHX2
+UV_up,UV response up,LYN
+UV_up,UV response up,MAOA
+UV_up,UV response up,MAPK8IP2
+UV_up,UV response up,MARK2
+UV_up,UV response up,MGAT1
+UV_up,UV response up,MMP14
+UV_up,UV response up,MRPL23
+UV_up,UV response up,MSX1
+UV_up,UV response up,NAT1
+UV_up,UV response up,NFKBIA
+UV_up,UV response up,NKX2-5
+UV_up,UV response up,NPTX2
+UV_up,UV response up,NPTXR
+UV_up,UV response up,NR4A1
+UV_up,UV response up,NTRK3
+UV_up,UV response up,NUP58
+UV_up,UV response up,NXF1
+UV_up,UV response up,OLFM1
+UV_up,UV response up,ONECUT1
+UV_up,UV response up,PARP2
+UV_up,UV response up,PDAP1
+UV_up,UV response up,PDLIM3
+UV_up,UV response up,PLCL1
+UV_up,UV response up,POLE3
+UV_up,UV response up,POLG2
+UV_up,UV response up,POLR2H
+UV_up,UV response up,PPAT
+UV_up,UV response up,PPIF
+UV_up,UV response up,PPP1R2
+UV_up,UV response up,PPT1
+UV_up,UV response up,PRKACA
+UV_up,UV response up,PRKCD
+UV_up,UV response up,PRPF3
+UV_up,UV response up,PSMC3
+UV_up,UV response up,PTPRD
+UV_up,UV response up,RAB27A
+UV_up,UV response up,RASGRP1
+UV_up,UV response up,RET
+UV_up,UV response up,RFC4
+UV_up,UV response up,RHOB
+UV_up,UV response up,RPN1
+UV_up,UV response up,RRAD
+UV_up,UV response up,RXRB
+UV_up,UV response up,SELENOW
+UV_up,UV response up,SHOX2
+UV_up,UV response up,SIGMAR1
+UV_up,UV response up,SLC25A4
+UV_up,UV response up,SLC6A12
+UV_up,UV response up,SLC6A8
+UV_up,UV response up,SOD2
+UV_up,UV response up,SPR
+UV_up,UV response up,SQSTM1
+UV_up,UV response up,STARD3
+UV_up,UV response up,STIP1
+UV_up,UV response up,STK25
+UV_up,UV response up,SULT1A1
+UV_up,UV response up,TACR3
+UV_up,UV response up,TAP1
+UV_up,UV response up,TARS1
+UV_up,UV response up,TCHH
+UV_up,UV response up,TFRC
+UV_up,UV response up,TGFBRAP1
+UV_up,UV response up,TMBIM6
+UV_up,UV response up,TST
+UV_up,UV response up,TUBA4A
+UV_up,UV response up,TYRO3
+UV_up,UV response up,UROD
+UV_up,UV response up,WIZ
+UV_up,UV response up,YKT6
+ATF2,ATF2 pathway,ACHE
+ATF2,ATF2 pathway,ARG1
+ATF2,ATF2 pathway,ATF2
+ATF2,ATF2 pathway,ATF3
+ATF2,ATF2 pathway,BCL2
+ATF2,ATF2 pathway,BCL2L1
+ATF2,ATF2 pathway,BRCA1
+ATF2,ATF2 pathway,CBFB
+ATF2,ATF2 pathway,CCNA2
+ATF2,ATF2 pathway,CCND1
+ATF2,ATF2 pathway,CDK4
+ATF2,ATF2 pathway,COL24A1
+ATF2,ATF2 pathway,CREB1
+ATF2,ATF2 pathway,CSRP2
+ATF2,ATF2 pathway,CUL3
+ATF2,ATF2 pathway,CXCL8
+ATF2,ATF2 pathway,DDIT3
+ATF2,ATF2 pathway,DUSP1
+ATF2,ATF2 pathway,DUSP10
+ATF2,ATF2 pathway,DUSP5
+ATF2,ATF2 pathway,DUSP8
+ATF2,ATF2 pathway,EP300
+ATF2,ATF2 pathway,ESR1
+ATF2,ATF2 pathway,FOS
+ATF2,ATF2 pathway,GADD45A
+ATF2,ATF2 pathway,HBG2
+ATF2,ATF2 pathway,HES1
+ATF2,ATF2 pathway,HRK
+ATF2,ATF2 pathway,IFNG
+ATF2,ATF2 pathway,IL23A
+ATF2,ATF2 pathway,IL6
+ATF2,ATF2 pathway,INS
+ATF2,ATF2 pathway,JDP2
+ATF2,ATF2 pathway,JUN
+ATF2,ATF2 pathway,JUNB
+ATF2,ATF2 pathway,JUND
+ATF2,ATF2 pathway,KAT5
+ATF2,ATF2 pathway,MACROH2A1
+ATF2,ATF2 pathway,MAPK1
+ATF2,ATF2 pathway,MAPK11
+ATF2,ATF2 pathway,MAPK14
+ATF2,ATF2 pathway,MAPK3
+ATF2,ATF2 pathway,MAPK8
+ATF2,ATF2 pathway,MAPK9
+ATF2,ATF2 pathway,MMP2
+ATF2,ATF2 pathway,NF1
+ATF2,ATF2 pathway,NOS2
+ATF2,ATF2 pathway,PDGFRA
+ATF2,ATF2 pathway,PLAU
+ATF2,ATF2 pathway,POU2F1
+ATF2,ATF2 pathway,PPARGC1A
+ATF2,ATF2 pathway,PRKCA
+ATF2,ATF2 pathway,RB1
+ATF2,ATF2 pathway,RUVBL2
+ATF2,ATF2 pathway,SELE
+ATF2,ATF2 pathway,SERPINB5
+ATF2,ATF2 pathway,SOCS3
+ATF2,ATF2 pathway,TGFB2
+ATF2,ATF2 pathway,TH
+MAPK,MAPK signaling pathway,ATF2
+MAPK,MAPK signaling pathway,CEBPA
+MAPK,MAPK signaling pathway,CHUK
+MAPK,MAPK signaling pathway,CREB1
+MAPK,MAPK signaling pathway,DAXX
+MAPK,MAPK signaling pathway,ELK1
+MAPK,MAPK signaling pathway,FOS
+MAPK,MAPK signaling pathway,GRB2
+MAPK,MAPK signaling pathway,HRAS
+MAPK,MAPK signaling pathway,IKBKB
+MAPK,MAPK signaling pathway,JUN
+MAPK,MAPK signaling pathway,MAP2K1
+MAPK,MAPK signaling pathway,MAP2K2
+MAPK,MAPK signaling pathway,MAP2K3
+MAPK,MAPK signaling pathway,MAP2K4
+MAPK,MAPK signaling pathway,MAP2K5
+MAPK,MAPK signaling pathway,MAP2K6
+MAPK,MAPK signaling pathway,MAP2K7
+MAPK,MAPK signaling pathway,MAP3K1
+MAPK,MAPK signaling pathway,MAP3K10
+MAPK,MAPK signaling pathway,MAP3K11
+MAPK,MAPK signaling pathway,MAP3K12
+MAPK,MAPK signaling pathway,MAP3K13
+MAPK,MAPK signaling pathway,MAP3K14
+MAPK,MAPK signaling pathway,MAP3K2
+MAPK,MAPK signaling pathway,MAP3K3
+MAPK,MAPK signaling pathway,MAP3K4
+MAPK,MAPK signaling pathway,MAP3K5
+MAPK,MAPK signaling pathway,MAP3K6
+MAPK,MAPK signaling pathway,MAP3K7
+MAPK,MAPK signaling pathway,MAP3K8
+MAPK,MAPK signaling pathway,MAP3K9
+MAPK,MAPK signaling pathway,MAP4K1
+MAPK,MAPK signaling pathway,MAP4K2
+MAPK,MAPK signaling pathway,MAP4K3
+MAPK,MAPK signaling pathway,MAP4K4
+MAPK,MAPK signaling pathway,MAP4K5
+MAPK,MAPK signaling pathway,MAPK1
+MAPK,MAPK signaling pathway,MAPK10
+MAPK,MAPK signaling pathway,MAPK11
+MAPK,MAPK signaling pathway,MAPK12
+MAPK,MAPK signaling pathway,MAPK13
+MAPK,MAPK signaling pathway,MAPK14
+MAPK,MAPK signaling pathway,MAPK3
+MAPK,MAPK signaling pathway,MAPK4
+MAPK,MAPK signaling pathway,MAPK6
+MAPK,MAPK signaling pathway,MAPK7
+MAPK,MAPK signaling pathway,MAPK8
+MAPK,MAPK signaling pathway,MAPK9
+MAPK,MAPK signaling pathway,MAPKAPK2
+MAPK,MAPK signaling pathway,MAPKAPK3
+MAPK,MAPK signaling pathway,MAPKAPK5
+MAPK,MAPK signaling pathway,MAX
+MAPK,MAPK signaling pathway,MKNK1
+MAPK,MAPK signaling pathway,MKNK2
+MAPK,MAPK signaling pathway,MYC
+MAPK,MAPK signaling pathway,NFKB1
+MAPK,MAPK signaling pathway,NFKBIA
+MAPK,MAPK signaling pathway,PAK1
+MAPK,MAPK signaling pathway,PAK2
+MAPK,MAPK signaling pathway,RAC1
+MAPK,MAPK signaling pathway,RAF1
+MAPK,MAPK signaling pathway,RAPGEF2
+MAPK,MAPK signaling pathway,RELA
+MAPK,MAPK signaling pathway,RIPK1
+MAPK,MAPK signaling pathway,RPS6KA1
+MAPK,MAPK signaling pathway,RPS6KA2
+MAPK,MAPK signaling pathway,RPS6KA3
+MAPK,MAPK signaling pathway,RPS6KA4
+MAPK,MAPK signaling pathway,RPS6KA5
+MAPK,MAPK signaling pathway,RPS6KB1
+MAPK,MAPK signaling pathway,RPS6KB2
+MAPK,MAPK signaling pathway,SHC1
+MAPK,MAPK signaling pathway,SP1
+MAPK,MAPK signaling pathway,STAT1
+MAPK,MAPK signaling pathway,TGFB1
+MAPK,MAPK signaling pathway,TGFB2
+MAPK,MAPK signaling pathway,TGFB3
+MAPK,MAPK signaling pathway,TGFBR1
+MAPK,MAPK signaling pathway,TRADD
+MAPK,MAPK signaling pathway,TRAF2
+BMP,BMP signaling pathway,ACVR2A
+BMP,BMP signaling pathway,ACVR2B
+BMP,BMP signaling pathway,ACVRL1
+BMP,BMP signaling pathway,AMH
+BMP,BMP signaling pathway,AMHR2
+BMP,BMP signaling pathway,BMP10
+BMP,BMP signaling pathway,BMP2
+BMP,BMP signaling pathway,BMPR1A
+BMP,BMP signaling pathway,BMPR1B
+BMP,BMP signaling pathway,BMPR2
+BMP,BMP signaling pathway,CER1
+BMP,BMP signaling pathway,CHRDL1
+BMP,BMP signaling pathway,FSTL1
+BMP,BMP signaling pathway,GDF2
+BMP,BMP signaling pathway,GREM2
+BMP,BMP signaling pathway,INHA
+BMP,BMP signaling pathway,INHBA
+BMP,BMP signaling pathway,NOG
+BMP,BMP signaling pathway,SKI
+BMP,BMP signaling pathway,SMAD1
+BMP,BMP signaling pathway,SMAD4
+BMP,BMP signaling pathway,SMAD5
+BMP,BMP signaling pathway,SMAD6
+BMP,BMP signaling pathway,SMAD7
+BMP,BMP signaling pathway,SMAD9
+BMP,BMP signaling pathway,SMURF1
+BMP,BMP signaling pathway,SMURF2
+BMP,BMP signaling pathway,TGFBR3
+BMP,BMP signaling pathway,UBE2D1
+BMP,BMP signaling pathway,UBE2D3
+BMP,BMP signaling pathway,ZFYVE16
+p53,p53 signaling pathway,ABAT
+p53,p53 signaling pathway,ABCC5
+p53,p53 signaling pathway,ABHD4
+p53,p53 signaling pathway,ACVR1B
+p53,p53 signaling pathway,ADA
+p53,p53 signaling pathway,AEN
+p53,p53 signaling pathway,AK1
+p53,p53 signaling pathway,ALOX15B
+p53,p53 signaling pathway,ANKRA2
+p53,p53 signaling pathway,APAF1
+p53,p53 signaling pathway,APP
+p53,p53 signaling pathway,ATF3
+p53,p53 signaling pathway,BAIAP2
+p53,p53 signaling pathway,BAK1
+p53,p53 signaling pathway,BAX
+p53,p53 signaling pathway,BLCAP
+p53,p53 signaling pathway,BMP2
+p53,p53 signaling pathway,BTG1
+p53,p53 signaling pathway,BTG2
+p53,p53 signaling pathway,CASP1
+p53,p53 signaling pathway,CCND2
+p53,p53 signaling pathway,CCND3
+p53,p53 signaling pathway,CCNG1
+p53,p53 signaling pathway,CCNK
+p53,p53 signaling pathway,CCP110
+p53,p53 signaling pathway,CD81
+p53,p53 signaling pathway,CD82
+p53,p53 signaling pathway,CDH13
+p53,p53 signaling pathway,CDK5R1
+p53,p53 signaling pathway,CDKN1A
+p53,p53 signaling pathway,CDKN2A
+p53,p53 signaling pathway,CDKN2AIP
+p53,p53 signaling pathway,CDKN2B
+p53,p53 signaling pathway,CEBPA
+p53,p53 signaling pathway,CGRRF1
+p53,p53 signaling pathway,CLCA2
+p53,p53 signaling pathway,COQ8A
+p53,p53 signaling pathway,CSRNP2
+p53,p53 signaling pathway,CTSD
+p53,p53 signaling pathway,CTSF
+p53,p53 signaling pathway,CYFIP2
+p53,p53 signaling pathway,DCXR
+p53,p53 signaling pathway,DDB2
+p53,p53 signaling pathway,DDIT3
+p53,p53 signaling pathway,DDIT4
+p53,p53 signaling pathway,DEF6
+p53,p53 signaling pathway,DGKA
+p53,p53 signaling pathway,DNTTIP2
+p53,p53 signaling pathway,DRAM1
+p53,p53 signaling pathway,EI24
+p53,p53 signaling pathway,ELP1
+p53,p53 signaling pathway,EPHA2
+p53,p53 signaling pathway,EPHX1
+p53,p53 signaling pathway,EPS8L2
+p53,p53 signaling pathway,ERCC5
+p53,p53 signaling pathway,F2R
+p53,p53 signaling pathway,FAM162A
+p53,p53 signaling pathway,FAS
+p53,p53 signaling pathway,FBXW7
+p53,p53 signaling pathway,FDXR
+p53,p53 signaling pathway,FGF13
+p53,p53 signaling pathway,FOS
+p53,p53 signaling pathway,FOXO3
+p53,p53 signaling pathway,FUCA1
+p53,p53 signaling pathway,GADD45A
+p53,p53 signaling pathway,GLS2
+p53,p53 signaling pathway,GM2A
+p53,p53 signaling pathway,GPX2
+p53,p53 signaling pathway,H1-2
+p53,p53 signaling pathway,H2AC25
+p53,p53 signaling pathway,H2AJ
+p53,p53 signaling pathway,HBEGF
+p53,p53 signaling pathway,HDAC3
+p53,p53 signaling pathway,HEXIM1
+p53,p53 signaling pathway,HINT1
+p53,p53 signaling pathway,HMOX1
+p53,p53 signaling pathway,HRAS
+p53,p53 signaling pathway,HSPA4L
+p53,p53 signaling pathway,IER3
+p53,p53 signaling pathway,IER5
+p53,p53 signaling pathway,IFI30
+p53,p53 signaling pathway,IL1A
+p53,p53 signaling pathway,INHBB
+p53,p53 signaling pathway,IP6K2
+p53,p53 signaling pathway,IRAG2
+p53,p53 signaling pathway,IRAK1
+p53,p53 signaling pathway,ISCU
+p53,p53 signaling pathway,ITGB4
+p53,p53 signaling pathway,JAG2
+p53,p53 signaling pathway,JUN
+p53,p53 signaling pathway,KIF13B
+p53,p53 signaling pathway,KLF4
+p53,p53 signaling pathway,KLK8
+p53,p53 signaling pathway,KRT17
+p53,p53 signaling pathway,LDHB
+p53,p53 signaling pathway,LIF
+p53,p53 signaling pathway,MAPKAPK3
+p53,p53 signaling pathway,MDM2
+p53,p53 signaling pathway,MKNK2
+p53,p53 signaling pathway,MXD1
+p53,p53 signaling pathway,MXD4
+p53,p53 signaling pathway,NDRG1
+p53,p53 signaling pathway,NHLH2
+p53,p53 signaling pathway,NINJ1
+p53,p53 signaling pathway,NOL8
+p53,p53 signaling pathway,NOTCH1
+p53,p53 signaling pathway,NUDT15
+p53,p53 signaling pathway,NUPR1
+p53,p53 signaling pathway,OSGIN1
+p53,p53 signaling pathway,PCNA
+p53,p53 signaling pathway,PDGFA
+p53,p53 signaling pathway,PERP
+p53,p53 signaling pathway,PHLDA3
+p53,p53 signaling pathway,PIDD1
+p53,p53 signaling pathway,PITPNC1
+p53,p53 signaling pathway,PLK2
+p53,p53 signaling pathway,PLK3
+p53,p53 signaling pathway,PLXNB2
+p53,p53 signaling pathway,PMM1
+p53,p53 signaling pathway,POLH
+p53,p53 signaling pathway,POM121
+p53,p53 signaling pathway,PPM1D
+p53,p53 signaling pathway,PPP1R15A
+p53,p53 signaling pathway,PRKAB1
+p53,p53 signaling pathway,PRMT2
+p53,p53 signaling pathway,PROCR
+p53,p53 signaling pathway,PTPN14
+p53,p53 signaling pathway,PTPRE
+p53,p53 signaling pathway,PVT1
+p53,p53 signaling pathway,RAB40C
+p53,p53 signaling pathway,RACK1
+p53,p53 signaling pathway,RAD51C
+p53,p53 signaling pathway,RAD9A
+p53,p53 signaling pathway,RALGDS
+p53,p53 signaling pathway,RAP2B
+p53,p53 signaling pathway,RB1
+p53,p53 signaling pathway,RCHY1
+p53,p53 signaling pathway,RETSAT
+p53,p53 signaling pathway,RGS16
+p53,p53 signaling pathway,RHBDF2
+p53,p53 signaling pathway,RNF19B
+p53,p53 signaling pathway,RPL18
+p53,p53 signaling pathway,RPL36
+p53,p53 signaling pathway,RPS12
+p53,p53 signaling pathway,RPS27L
+p53,p53 signaling pathway,RRAD
+p53,p53 signaling pathway,RRP8
+p53,p53 signaling pathway,RXRA
+p53,p53 signaling pathway,S100A10
+p53,p53 signaling pathway,S100A4
+p53,p53 signaling pathway,SAT1
+p53,p53 signaling pathway,SDC1
+p53,p53 signaling pathway,SEC61A1
+p53,p53 signaling pathway,SERPINB5
+p53,p53 signaling pathway,SERTAD3
+p53,p53 signaling pathway,SESN1
+p53,p53 signaling pathway,SFN
+p53,p53 signaling pathway,SLC19A2
+p53,p53 signaling pathway,SLC35D1
+p53,p53 signaling pathway,SLC3A2
+p53,p53 signaling pathway,SLC7A11
+p53,p53 signaling pathway,SOCS1
+p53,p53 signaling pathway,SP1
+p53,p53 signaling pathway,SPHK1
+p53,p53 signaling pathway,ST14
+p53,p53 signaling pathway,STEAP3
+p53,p53 signaling pathway,STOM
+p53,p53 signaling pathway,TAP1
+p53,p53 signaling pathway,TAX1BP3
+p53,p53 signaling pathway,TCHH
+p53,p53 signaling pathway,TCN2
+p53,p53 signaling pathway,TGFA
+p53,p53 signaling pathway,TGFB1
+p53,p53 signaling pathway,TM4SF1
+p53,p53 signaling pathway,TM7SF3
+p53,p53 signaling pathway,TNFSF9
+p53,p53 signaling pathway,TNNI1
+p53,p53 signaling pathway,TOB1
+p53,p53 signaling pathway,TP53
+p53,p53 signaling pathway,TP63
+p53,p53 signaling pathway,TPD52L1
+p53,p53 signaling pathway,TPRKB
+p53,p53 signaling pathway,TRAF4
+p53,p53 signaling pathway,TRAFD1
+p53,p53 signaling pathway,TRIAP1
+p53,p53 signaling pathway,TRIB3
+p53,p53 signaling pathway,TSC22D1
+p53,p53 signaling pathway,TSPYL2
+p53,p53 signaling pathway,TXNIP
+p53,p53 signaling pathway,UPP1
+p53,p53 signaling pathway,VAMP8
+p53,p53 signaling pathway,VDR
+p53,p53 signaling pathway,VWA5A
+p53,p53 signaling pathway,WRAP73
+p53,p53 signaling pathway,WWP1
+p53,p53 signaling pathway,XPC
+p53,p53 signaling pathway,ZBTB16
+p53,p53 signaling pathway,ZFP36L1
+p53,p53 signaling pathway,ZMAT3
+p53,p53 signaling pathway,ZNF365
+TGFB,TGF-beta signaling pathway,ACVR1
+TGFB,TGF-beta signaling pathway,APC
+TGFB,TGF-beta signaling pathway,ARID4B
+TGFB,TGF-beta signaling pathway,BCAR3
+TGFB,TGF-beta signaling pathway,BMP2
+TGFB,TGF-beta signaling pathway,BMPR1A
+TGFB,TGF-beta signaling pathway,BMPR2
+TGFB,TGF-beta signaling pathway,CDH1
+TGFB,TGF-beta signaling pathway,CDK9
+TGFB,TGF-beta signaling pathway,CDKN1C
+TGFB,TGF-beta signaling pathway,CTNNB1
+TGFB,TGF-beta signaling pathway,ENG
+TGFB,TGF-beta signaling pathway,FKBP1A
+TGFB,TGF-beta signaling pathway,FNTA
+TGFB,TGF-beta signaling pathway,FURIN
+TGFB,TGF-beta signaling pathway,HDAC1
+TGFB,TGF-beta signaling pathway,HIPK2
+TGFB,TGF-beta signaling pathway,ID1
+TGFB,TGF-beta signaling pathway,ID2
+TGFB,TGF-beta signaling pathway,ID3
+TGFB,TGF-beta signaling pathway,IFNGR2
+TGFB,TGF-beta signaling pathway,JUNB
+TGFB,TGF-beta signaling pathway,KLF10
+TGFB,TGF-beta signaling pathway,LEFTY2
+TGFB,TGF-beta signaling pathway,LTBP2
+TGFB,TGF-beta signaling pathway,MAP3K7
+TGFB,TGF-beta signaling pathway,NCOR2
+TGFB,TGF-beta signaling pathway,NOG
+TGFB,TGF-beta signaling pathway,PMEPA1
+TGFB,TGF-beta signaling pathway,PPM1A
+TGFB,TGF-beta signaling pathway,PPP1CA
+TGFB,TGF-beta signaling pathway,PPP1R15A
+TGFB,TGF-beta signaling pathway,RAB31
+TGFB,TGF-beta signaling pathway,RHOA
+TGFB,TGF-beta signaling pathway,SERPINE1
+TGFB,TGF-beta signaling pathway,SKI
+TGFB,TGF-beta signaling pathway,SKIL
+TGFB,TGF-beta signaling pathway,SLC20A1
+TGFB,TGF-beta signaling pathway,SMAD1
+TGFB,TGF-beta signaling pathway,SMAD3
+TGFB,TGF-beta signaling pathway,SMAD6
+TGFB,TGF-beta signaling pathway,SMAD7
+TGFB,TGF-beta signaling pathway,SMURF1
+TGFB,TGF-beta signaling pathway,SMURF2
+TGFB,TGF-beta signaling pathway,SPTBN1
+TGFB,TGF-beta signaling pathway,TGFB1
+TGFB,TGF-beta signaling pathway,TGFBR1
+TGFB,TGF-beta signaling pathway,TGIF1
+TGFB,TGF-beta signaling pathway,THBS1
+TGFB,TGF-beta signaling pathway,TJP1
+TGFB,TGF-beta signaling pathway,TRIM33
+TGFB,TGF-beta signaling pathway,UBE2D3
+TGFB,TGF-beta signaling pathway,WWTR1
+TGFB,TGF-beta signaling pathway,XIAP
+WNT,Wnt signaling pathway,ADAM17
+WNT,Wnt signaling pathway,AXIN1
+WNT,Wnt signaling pathway,AXIN2
+WNT,Wnt signaling pathway,CCND2
+WNT,Wnt signaling pathway,CSNK1E
+WNT,Wnt signaling pathway,CTNNB1
+WNT,Wnt signaling pathway,CUL1
+WNT,Wnt signaling pathway,DKK1
+WNT,Wnt signaling pathway,DKK4
+WNT,Wnt signaling pathway,DLL1
+WNT,Wnt signaling pathway,DVL2
+WNT,Wnt signaling pathway,FRAT1
+WNT,Wnt signaling pathway,FZD1
+WNT,Wnt signaling pathway,FZD8
+WNT,Wnt signaling pathway,GNAI1
+WNT,Wnt signaling pathway,HDAC11
+WNT,Wnt signaling pathway,HDAC2
+WNT,Wnt signaling pathway,HDAC5
+WNT,Wnt signaling pathway,HEY1
+WNT,Wnt signaling pathway,HEY2
+WNT,Wnt signaling pathway,JAG1
+WNT,Wnt signaling pathway,JAG2
+WNT,Wnt signaling pathway,KAT2A
+WNT,Wnt signaling pathway,LEF1
+WNT,Wnt signaling pathway,MAML1
+WNT,Wnt signaling pathway,MYC
+WNT,Wnt signaling pathway,NCOR2
+WNT,Wnt signaling pathway,NCSTN
+WNT,Wnt signaling pathway,NKD1
+WNT,Wnt signaling pathway,NOTCH1
+WNT,Wnt signaling pathway,NOTCH4
+WNT,Wnt signaling pathway,NUMB
+WNT,Wnt signaling pathway,PPARD
+WNT,Wnt signaling pathway,PSEN2
+WNT,Wnt signaling pathway,PTCH1
+WNT,Wnt signaling pathway,RBPJ
+WNT,Wnt signaling pathway,SKP2
+WNT,Wnt signaling pathway,TCF7
+WNT,Wnt signaling pathway,TP53
+WNT,Wnt signaling pathway,WNT1
+WNT,Wnt signaling pathway,WNT5B
+WNT,Wnt signaling pathway,WNT6
+mTORC1,mTORC1 signaling pathway,ABCF2
+mTORC1,mTORC1 signaling pathway,ACACA
+mTORC1,mTORC1 signaling pathway,ACLY
+mTORC1,mTORC1 signaling pathway,ACSL3
+mTORC1,mTORC1 signaling pathway,ACTR2
+mTORC1,mTORC1 signaling pathway,ACTR3
+mTORC1,mTORC1 signaling pathway,ADD3
+mTORC1,mTORC1 signaling pathway,ADIPOR2
+mTORC1,mTORC1 signaling pathway,AK4
+mTORC1,mTORC1 signaling pathway,ALDOA
+mTORC1,mTORC1 signaling pathway,ARPC5L
+mTORC1,mTORC1 signaling pathway,ASNS
+mTORC1,mTORC1 signaling pathway,ATP2A2
+mTORC1,mTORC1 signaling pathway,ATP5MC1
+mTORC1,mTORC1 signaling pathway,ATP6V1D
+mTORC1,mTORC1 signaling pathway,AURKA
+mTORC1,mTORC1 signaling pathway,BCAT1
+mTORC1,mTORC1 signaling pathway,BHLHE40
+mTORC1,mTORC1 signaling pathway,BTG2
+mTORC1,mTORC1 signaling pathway,BUB1
+mTORC1,mTORC1 signaling pathway,CACYBP
+mTORC1,mTORC1 signaling pathway,CALR
+mTORC1,mTORC1 signaling pathway,CANX
+mTORC1,mTORC1 signaling pathway,CCNF
+mTORC1,mTORC1 signaling pathway,CCNG1
+mTORC1,mTORC1 signaling pathway,CCT6A
+mTORC1,mTORC1 signaling pathway,CD9
+mTORC1,mTORC1 signaling pathway,CDC25A
+mTORC1,mTORC1 signaling pathway,CDKN1A
+mTORC1,mTORC1 signaling pathway,CFP
+mTORC1,mTORC1 signaling pathway,COPS5
+mTORC1,mTORC1 signaling pathway,CORO1A
+mTORC1,mTORC1 signaling pathway,CTH
+mTORC1,mTORC1 signaling pathway,CTSC
+mTORC1,mTORC1 signaling pathway,CXCR4
+mTORC1,mTORC1 signaling pathway,CYB5B
+mTORC1,mTORC1 signaling pathway,CYP51A1
+mTORC1,mTORC1 signaling pathway,DAPP1
+mTORC1,mTORC1 signaling pathway,DDIT3
+mTORC1,mTORC1 signaling pathway,DDIT4
+mTORC1,mTORC1 signaling pathway,DDX39A
+mTORC1,mTORC1 signaling pathway,DHCR24
+mTORC1,mTORC1 signaling pathway,DHCR7
+mTORC1,mTORC1 signaling pathway,DHFR
+mTORC1,mTORC1 signaling pathway,EBP
+mTORC1,mTORC1 signaling pathway,EDEM1
+mTORC1,mTORC1 signaling pathway,EEF1E1
+mTORC1,mTORC1 signaling pathway,EGLN3
+mTORC1,mTORC1 signaling pathway,EIF2S2
+mTORC1,mTORC1 signaling pathway,ELOVL5
+mTORC1,mTORC1 signaling pathway,ELOVL6
+mTORC1,mTORC1 signaling pathway,ENO1
+mTORC1,mTORC1 signaling pathway,EPRS1
+mTORC1,mTORC1 signaling pathway,ERO1A
+mTORC1,mTORC1 signaling pathway,ETF1
+mTORC1,mTORC1 signaling pathway,FADS1
+mTORC1,mTORC1 signaling pathway,FADS2
+mTORC1,mTORC1 signaling pathway,FDXR
+mTORC1,mTORC1 signaling pathway,FGL2
+mTORC1,mTORC1 signaling pathway,FKBP2
+mTORC1,mTORC1 signaling pathway,G6PD
+mTORC1,mTORC1 signaling pathway,GAPDH
+mTORC1,mTORC1 signaling pathway,GBE1
+mTORC1,mTORC1 signaling pathway,GCLC
+mTORC1,mTORC1 signaling pathway,GGA2
+mTORC1,mTORC1 signaling pathway,GLA
+mTORC1,mTORC1 signaling pathway,GLRX
+mTORC1,mTORC1 signaling pathway,GMPS
+mTORC1,mTORC1 signaling pathway,GOT1
+mTORC1,mTORC1 signaling pathway,GPI
+mTORC1,mTORC1 signaling pathway,GSK3B
+mTORC1,mTORC1 signaling pathway,GSR
+mTORC1,mTORC1 signaling pathway,GTF2H1
+mTORC1,mTORC1 signaling pathway,HK2
+mTORC1,mTORC1 signaling pathway,HMBS
+mTORC1,mTORC1 signaling pathway,HMGCR
+mTORC1,mTORC1 signaling pathway,HMGCS1
+mTORC1,mTORC1 signaling pathway,HPRT1
+mTORC1,mTORC1 signaling pathway,HSP90B1
+mTORC1,mTORC1 signaling pathway,HSPA4
+mTORC1,mTORC1 signaling pathway,HSPA5
+mTORC1,mTORC1 signaling pathway,HSPA9
+mTORC1,mTORC1 signaling pathway,HSPD1
+mTORC1,mTORC1 signaling pathway,HSPE1
+mTORC1,mTORC1 signaling pathway,IDH1
+mTORC1,mTORC1 signaling pathway,IDI1
+mTORC1,mTORC1 signaling pathway,IFI30
+mTORC1,mTORC1 signaling pathway,IFRD1
+mTORC1,mTORC1 signaling pathway,IGFBP5
+mTORC1,mTORC1 signaling pathway,IMMT
+mTORC1,mTORC1 signaling pathway,INSIG1
+mTORC1,mTORC1 signaling pathway,ITGB2
+mTORC1,mTORC1 signaling pathway,LDHA
+mTORC1,mTORC1 signaling pathway,LDLR
+mTORC1,mTORC1 signaling pathway,LGMN
+mTORC1,mTORC1 signaling pathway,LTA4H
+mTORC1,mTORC1 signaling pathway,M6PR
+mTORC1,mTORC1 signaling pathway,MAP2K3
+mTORC1,mTORC1 signaling pathway,MCM2
+mTORC1,mTORC1 signaling pathway,MCM4
+mTORC1,mTORC1 signaling pathway,ME1
+mTORC1,mTORC1 signaling pathway,MLLT11
+mTORC1,mTORC1 signaling pathway,MTHFD2
+mTORC1,mTORC1 signaling pathway,MTHFD2L
+mTORC1,mTORC1 signaling pathway,NAMPT
+mTORC1,mTORC1 signaling pathway,NFIL3
+mTORC1,mTORC1 signaling pathway,NFKBIB
+mTORC1,mTORC1 signaling pathway,NFYC
+mTORC1,mTORC1 signaling pathway,NHERF1
+mTORC1,mTORC1 signaling pathway,NIBAN1
+mTORC1,mTORC1 signaling pathway,NMT1
+mTORC1,mTORC1 signaling pathway,NUFIP1
+mTORC1,mTORC1 signaling pathway,NUP205
+mTORC1,mTORC1 signaling pathway,NUPR1
+mTORC1,mTORC1 signaling pathway,P4HA1
+mTORC1,mTORC1 signaling pathway,PDAP1
+mTORC1,mTORC1 signaling pathway,PDK1
+mTORC1,mTORC1 signaling pathway,PFKL
+mTORC1,mTORC1 signaling pathway,PGK1
+mTORC1,mTORC1 signaling pathway,PGM1
+mTORC1,mTORC1 signaling pathway,PHGDH
+mTORC1,mTORC1 signaling pathway,PIK3R3
+mTORC1,mTORC1 signaling pathway,PITPNB
+mTORC1,mTORC1 signaling pathway,PLK1
+mTORC1,mTORC1 signaling pathway,PLOD2
+mTORC1,mTORC1 signaling pathway,PNO1
+mTORC1,mTORC1 signaling pathway,PNP
+mTORC1,mTORC1 signaling pathway,POLR3G
+mTORC1,mTORC1 signaling pathway,PPA1
+mTORC1,mTORC1 signaling pathway,PPIA
+mTORC1,mTORC1 signaling pathway,PPP1R15A
+mTORC1,mTORC1 signaling pathway,PRDX1
+mTORC1,mTORC1 signaling pathway,PSAT1
+mTORC1,mTORC1 signaling pathway,PSMA3
+mTORC1,mTORC1 signaling pathway,PSMA4
+mTORC1,mTORC1 signaling pathway,PSMB5
+mTORC1,mTORC1 signaling pathway,PSMC2
+mTORC1,mTORC1 signaling pathway,PSMC4
+mTORC1,mTORC1 signaling pathway,PSMC6
+mTORC1,mTORC1 signaling pathway,PSMD12
+mTORC1,mTORC1 signaling pathway,PSMD13
+mTORC1,mTORC1 signaling pathway,PSMD14
+mTORC1,mTORC1 signaling pathway,PSME3
+mTORC1,mTORC1 signaling pathway,PSMG1
+mTORC1,mTORC1 signaling pathway,PSPH
+mTORC1,mTORC1 signaling pathway,QDPR
+mTORC1,mTORC1 signaling pathway,RAB1A
+mTORC1,mTORC1 signaling pathway,RDH11
+mTORC1,mTORC1 signaling pathway,RIT1
+mTORC1,mTORC1 signaling pathway,RPA1
+mTORC1,mTORC1 signaling pathway,RPN1
+mTORC1,mTORC1 signaling pathway,RRM2
+mTORC1,mTORC1 signaling pathway,RRP9
+mTORC1,mTORC1 signaling pathway,SC5D
+mTORC1,mTORC1 signaling pathway,SCD
+mTORC1,mTORC1 signaling pathway,SDF2L1
+mTORC1,mTORC1 signaling pathway,SEC11A
+mTORC1,mTORC1 signaling pathway,SERP1
+mTORC1,mTORC1 signaling pathway,SERPINH1
+mTORC1,mTORC1 signaling pathway,SHMT2
+mTORC1,mTORC1 signaling pathway,SKAP2
+mTORC1,mTORC1 signaling pathway,SLA
+mTORC1,mTORC1 signaling pathway,SLC1A4
+mTORC1,mTORC1 signaling pathway,SLC1A5
+mTORC1,mTORC1 signaling pathway,SLC2A1
+mTORC1,mTORC1 signaling pathway,SLC2A3
+mTORC1,mTORC1 signaling pathway,SLC37A4
+mTORC1,mTORC1 signaling pathway,SLC6A6
+mTORC1,mTORC1 signaling pathway,SLC7A11
+mTORC1,mTORC1 signaling pathway,SLC7A5
+mTORC1,mTORC1 signaling pathway,SORD
+mTORC1,mTORC1 signaling pathway,SQLE
+mTORC1,mTORC1 signaling pathway,SQSTM1
+mTORC1,mTORC1 signaling pathway,SRD5A1
+mTORC1,mTORC1 signaling pathway,SSR1
+mTORC1,mTORC1 signaling pathway,STARD4
+mTORC1,mTORC1 signaling pathway,STC1
+mTORC1,mTORC1 signaling pathway,STIP1
+mTORC1,mTORC1 signaling pathway,SYTL2
+mTORC1,mTORC1 signaling pathway,TBK1
+mTORC1,mTORC1 signaling pathway,TCEA1
+mTORC1,mTORC1 signaling pathway,TES
+mTORC1,mTORC1 signaling pathway,TFRC
+mTORC1,mTORC1 signaling pathway,TM7SF2
+mTORC1,mTORC1 signaling pathway,TMEM97
+mTORC1,mTORC1 signaling pathway,TOMM40
+mTORC1,mTORC1 signaling pathway,TPI1
+mTORC1,mTORC1 signaling pathway,TRIB3
+mTORC1,mTORC1 signaling pathway,TUBA4A
+mTORC1,mTORC1 signaling pathway,TUBG1
+mTORC1,mTORC1 signaling pathway,TXNRD1
+mTORC1,mTORC1 signaling pathway,UBE2D3
+mTORC1,mTORC1 signaling pathway,UCHL5
+mTORC1,mTORC1 signaling pathway,UFM1
+mTORC1,mTORC1 signaling pathway,UNG
+mTORC1,mTORC1 signaling pathway,USO1
+mTORC1,mTORC1 signaling pathway,VLDLR
+mTORC1,mTORC1 signaling pathway,WARS1
+mTORC1,mTORC1 signaling pathway,XBP1
+mTORC1,mTORC1 signaling pathway,YKT6
+CS,Cellular senescence,AGO1
+CS,Cellular senescence,AGO3
+CS,Cellular senescence,AGO4
+CS,Cellular senescence,BMI1
+CS,Cellular senescence,CBX2
+CS,Cellular senescence,CBX4
+CS,Cellular senescence,CBX6
+CS,Cellular senescence,CBX8
+CS,Cellular senescence,CDK4
+CS,Cellular senescence,CDK6
+CS,Cellular senescence,CDKN2A
+CS,Cellular senescence,CDKN2B
+CS,Cellular senescence,CDKN2C
+CS,Cellular senescence,CDKN2D
+CS,Cellular senescence,E2F1
+CS,Cellular senescence,E2F2
+CS,Cellular senescence,E2F3
+CS,Cellular senescence,EED
+CS,Cellular senescence,EZH2
+CS,Cellular senescence,FOS
+CS,Cellular senescence,H2AB1
+CS,Cellular senescence,H2AC14
+CS,Cellular senescence,H2AC18
+CS,Cellular senescence,H2AC19
+CS,Cellular senescence,H2AC20
+CS,Cellular senescence,H2AC4
+CS,Cellular senescence,H2AC6
+CS,Cellular senescence,H2AC7
+CS,Cellular senescence,H2AC8
+CS,Cellular senescence,H2AJ
+CS,Cellular senescence,H2AX
+CS,Cellular senescence,H2AZ2
+CS,Cellular senescence,H2BC1
+CS,Cellular senescence,H2BC10
+CS,Cellular senescence,H2BC11
+CS,Cellular senescence,H2BC12
+CS,Cellular senescence,H2BC12L
+CS,Cellular senescence,H2BC13
+CS,Cellular senescence,H2BC14
+CS,Cellular senescence,H2BC15
+CS,Cellular senescence,H2BC17
+CS,Cellular senescence,H2BC21
+CS,Cellular senescence,H2BC26
+CS,Cellular senescence,H2BC3
+CS,Cellular senescence,H2BC4
+CS,Cellular senescence,H2BC5
+CS,Cellular senescence,H2BC6
+CS,Cellular senescence,H2BC7
+CS,Cellular senescence,H2BC8
+CS,Cellular senescence,H2BC9
+CS,Cellular senescence,H3-3A
+CS,Cellular senescence,H3-3B
+CS,Cellular senescence,H3C1
+CS,Cellular senescence,H3C10
+CS,Cellular senescence,H3C11
+CS,Cellular senescence,H3C12
+CS,Cellular senescence,H3C13
+CS,Cellular senescence,H3C14
+CS,Cellular senescence,H3C15
+CS,Cellular senescence,H3C2
+CS,Cellular senescence,H3C3
+CS,Cellular senescence,H3C4
+CS,Cellular senescence,H3C6
+CS,Cellular senescence,H3C7
+CS,Cellular senescence,H3C8
+CS,Cellular senescence,H4C1
+CS,Cellular senescence,H4C11
+CS,Cellular senescence,H4C12
+CS,Cellular senescence,H4C13
+CS,Cellular senescence,H4C14
+CS,Cellular senescence,H4C15
+CS,Cellular senescence,H4C16
+CS,Cellular senescence,H4C2
+CS,Cellular senescence,H4C3
+CS,Cellular senescence,H4C4
+CS,Cellular senescence,H4C5
+CS,Cellular senescence,H4C6
+CS,Cellular senescence,H4C8
+CS,Cellular senescence,H4C9
+CS,Cellular senescence,IFNB1
+CS,Cellular senescence,JUN
+CS,Cellular senescence,KDM6B
+CS,Cellular senescence,MAP2K3
+CS,Cellular senescence,MAP2K4
+CS,Cellular senescence,MAP2K6
+CS,Cellular senescence,MAP2K7
+CS,Cellular senescence,MAP3K5
+CS,Cellular senescence,MAP4K4
+CS,Cellular senescence,MAPK1
+CS,Cellular senescence,MAPK10
+CS,Cellular senescence,MAPK11
+CS,Cellular senescence,MAPK14
+CS,Cellular senescence,MAPK3
+CS,Cellular senescence,MAPK8
+CS,Cellular senescence,MAPK9
+CS,Cellular senescence,MAPKAPK2
+CS,Cellular senescence,MAPKAPK3
+CS,Cellular senescence,MAPKAPK5
+CS,Cellular senescence,MDM2
+CS,Cellular senescence,MDM4
+CS,Cellular senescence,MINK1
+CS,Cellular senescence,MIR24-1
+CS,Cellular senescence,MIR24-2
+CS,Cellular senescence,MOV10
+CS,Cellular senescence,PHC1
+CS,Cellular senescence,PHC2
+CS,Cellular senescence,PHC3
+CS,Cellular senescence,RBBP4
+CS,Cellular senescence,RBBP7
+CS,Cellular senescence,RING1
+CS,Cellular senescence,RNF2
+CS,Cellular senescence,RPS27A
+CS,Cellular senescence,SCMH1
+CS,Cellular senescence,SUZ12
+CS,Cellular senescence,TFDP1
+CS,Cellular senescence,TFDP2
+CS,Cellular senescence,TNIK
+CS,Cellular senescence,TNRC6A
+CS,Cellular senescence,TNRC6B
+CS,Cellular senescence,TNRC6C
+CS,Cellular senescence,TP53
+CS,Cellular senescence,TXN
+CS,Cellular senescence,UBA52
+CS,Cellular senescence,UBB
+CS,Cellular senescence,UBC
+OSR,Oxidative stress response,CAT
+OSR,Oxidative stress response,CYBB
+OSR,Oxidative stress response,CYP1A1
+OSR,Oxidative stress response,FOS
+OSR,Oxidative stress response,GCLC
+OSR,Oxidative stress response,GPX1
+OSR,Oxidative stress response,GPX3
+OSR,Oxidative stress response,GSR
+OSR,Oxidative stress response,GSTT2
+OSR,Oxidative stress response,HMOX1
+OSR,Oxidative stress response,JUNB
+OSR,Oxidative stress response,MAOA
+OSR,Oxidative stress response,MAPK10
+OSR,Oxidative stress response,MAPK14
+OSR,Oxidative stress response,MGST1
+OSR,Oxidative stress response,MT1X
+OSR,Oxidative stress response,NFE2L2
+OSR,Oxidative stress response,NFIX
+OSR,Oxidative stress response,NFKB1
+OSR,Oxidative stress response,NOX1
+OSR,Oxidative stress response,NOX3
+OSR,Oxidative stress response,NOX4
+OSR,Oxidative stress response,NOX5
+OSR,Oxidative stress response,NQO1
+OSR,Oxidative stress response,SOD1
+OSR,Oxidative stress response,SOD2
+OSR,Oxidative stress response,SOD3
+OSR,Oxidative stress response,SP1
+OSR,Oxidative stress response,TXN2
+OSR,Oxidative stress response,TXNRD1
+OSR,Oxidative stress response,TXNRD2
+OSR,Oxidative stress response,UGT1A6
+OSR,Oxidative stress response,XDH
+MP,Melanocyte proliferation,CLEC12B
+MP,Melanocyte proliferation,FAP
+MP,Melanocyte proliferation,OR51E2
+MP,Melanocyte proliferation,TBX2
+MP,Melanocyte proliferation,WNT5A
+MD,Melanocyte differentiation,ADAMTS20
+MD,Melanocyte differentiation,ADAMTS9
+MD,Melanocyte differentiation,BCL2
+MD,Melanocyte differentiation,KITLG
+MD,Melanocyte differentiation,ZEB2
+TNFAKB,TNF-α signaling via NF-κB,ABCA1
+TNFAKB,TNF-α signaling via NF-κB,ACKR3
+TNFAKB,TNF-α signaling via NF-κB,AREG
+TNFAKB,TNF-α signaling via NF-κB,ATF3
+TNFAKB,TNF-α signaling via NF-κB,ATP2B1
+TNFAKB,TNF-α signaling via NF-κB,B4GALT1
+TNFAKB,TNF-α signaling via NF-κB,B4GALT5
+TNFAKB,TNF-α signaling via NF-κB,BCL2A1
+TNFAKB,TNF-α signaling via NF-κB,BCL3
+TNFAKB,TNF-α signaling via NF-κB,BCL6
+TNFAKB,TNF-α signaling via NF-κB,BHLHE40
+TNFAKB,TNF-α signaling via NF-κB,BIRC2
+TNFAKB,TNF-α signaling via NF-κB,BIRC3
+TNFAKB,TNF-α signaling via NF-κB,BMP2
+TNFAKB,TNF-α signaling via NF-κB,BTG1
+TNFAKB,TNF-α signaling via NF-κB,BTG2
+TNFAKB,TNF-α signaling via NF-κB,BTG3
+TNFAKB,TNF-α signaling via NF-κB,CCL2
+TNFAKB,TNF-α signaling via NF-κB,CCL20
+TNFAKB,TNF-α signaling via NF-κB,CCL4
+TNFAKB,TNF-α signaling via NF-κB,CCL5
+TNFAKB,TNF-α signaling via NF-κB,CCN1
+TNFAKB,TNF-α signaling via NF-κB,CCND1
+TNFAKB,TNF-α signaling via NF-κB,CCNL1
+TNFAKB,TNF-α signaling via NF-κB,CCRL2
+TNFAKB,TNF-α signaling via NF-κB,CD44
+TNFAKB,TNF-α signaling via NF-κB,CD69
+TNFAKB,TNF-α signaling via NF-κB,CD80
+TNFAKB,TNF-α signaling via NF-κB,CD83
+TNFAKB,TNF-α signaling via NF-κB,CDKN1A
+TNFAKB,TNF-α signaling via NF-κB,CEBPB
+TNFAKB,TNF-α signaling via NF-κB,CEBPD
+TNFAKB,TNF-α signaling via NF-κB,CFLAR
+TNFAKB,TNF-α signaling via NF-κB,CLCF1
+TNFAKB,TNF-α signaling via NF-κB,CSF1
+TNFAKB,TNF-α signaling via NF-κB,CSF2
+TNFAKB,TNF-α signaling via NF-κB,CXCL1
+TNFAKB,TNF-α signaling via NF-κB,CXCL10
+TNFAKB,TNF-α signaling via NF-κB,CXCL11
+TNFAKB,TNF-α signaling via NF-κB,CXCL2
+TNFAKB,TNF-α signaling via NF-κB,CXCL3
+TNFAKB,TNF-α signaling via NF-κB,CXCL6
+TNFAKB,TNF-α signaling via NF-κB,DENND5A
+TNFAKB,TNF-α signaling via NF-κB,DNAJB4
+TNFAKB,TNF-α signaling via NF-κB,DRAM1
+TNFAKB,TNF-α signaling via NF-κB,DUSP1
+TNFAKB,TNF-α signaling via NF-κB,DUSP2
+TNFAKB,TNF-α signaling via NF-κB,DUSP4
+TNFAKB,TNF-α signaling via NF-κB,DUSP5
+TNFAKB,TNF-α signaling via NF-κB,EDN1
+TNFAKB,TNF-α signaling via NF-κB,EFNA1
+TNFAKB,TNF-α signaling via NF-κB,EGR1
+TNFAKB,TNF-α signaling via NF-κB,EGR2
+TNFAKB,TNF-α signaling via NF-κB,EGR3
+TNFAKB,TNF-α signaling via NF-κB,EHD1
+TNFAKB,TNF-α signaling via NF-κB,EIF1
+TNFAKB,TNF-α signaling via NF-κB,ETS2
+TNFAKB,TNF-α signaling via NF-κB,F2RL1
+TNFAKB,TNF-α signaling via NF-κB,F3
+TNFAKB,TNF-α signaling via NF-κB,FJX1
+TNFAKB,TNF-α signaling via NF-κB,FOS
+TNFAKB,TNF-α signaling via NF-κB,FOSB
+TNFAKB,TNF-α signaling via NF-κB,FOSL1
+TNFAKB,TNF-α signaling via NF-κB,FOSL2
+TNFAKB,TNF-α signaling via NF-κB,FUT4
+TNFAKB,TNF-α signaling via NF-κB,G0S2
+TNFAKB,TNF-α signaling via NF-κB,GADD45A
+TNFAKB,TNF-α signaling via NF-κB,GADD45B
+TNFAKB,TNF-α signaling via NF-κB,GCH1
+TNFAKB,TNF-α signaling via NF-κB,GEM
+TNFAKB,TNF-α signaling via NF-κB,GFPT2
+TNFAKB,TNF-α signaling via NF-κB,GPR183
+TNFAKB,TNF-α signaling via NF-κB,HBEGF
+TNFAKB,TNF-α signaling via NF-κB,HES1
+TNFAKB,TNF-α signaling via NF-κB,ICAM1
+TNFAKB,TNF-α signaling via NF-κB,ICOSLG
+TNFAKB,TNF-α signaling via NF-κB,ID2
+TNFAKB,TNF-α signaling via NF-κB,IER2
+TNFAKB,TNF-α signaling via NF-κB,IER3
+TNFAKB,TNF-α signaling via NF-κB,IER5
+TNFAKB,TNF-α signaling via NF-κB,IFIH1
+TNFAKB,TNF-α signaling via NF-κB,IFIT2
+TNFAKB,TNF-α signaling via NF-κB,IFNGR2
+TNFAKB,TNF-α signaling via NF-κB,IL12B
+TNFAKB,TNF-α signaling via NF-κB,IL15RA
+TNFAKB,TNF-α signaling via NF-κB,IL18
+TNFAKB,TNF-α signaling via NF-κB,IL1A
+TNFAKB,TNF-α signaling via NF-κB,IL1B
+TNFAKB,TNF-α signaling via NF-κB,IL23A
+TNFAKB,TNF-α signaling via NF-κB,IL6
+TNFAKB,TNF-α signaling via NF-κB,IL6ST
+TNFAKB,TNF-α signaling via NF-κB,IL7R
+TNFAKB,TNF-α signaling via NF-κB,INHBA
+TNFAKB,TNF-α signaling via NF-κB,IRF1
+TNFAKB,TNF-α signaling via NF-κB,IRS2
+TNFAKB,TNF-α signaling via NF-κB,JAG1
+TNFAKB,TNF-α signaling via NF-κB,JUN
+TNFAKB,TNF-α signaling via NF-κB,JUNB
+TNFAKB,TNF-α signaling via NF-κB,KDM6B
+TNFAKB,TNF-α signaling via NF-κB,KLF10
+TNFAKB,TNF-α signaling via NF-κB,KLF2
+TNFAKB,TNF-α signaling via NF-κB,KLF4
+TNFAKB,TNF-α signaling via NF-κB,KLF6
+TNFAKB,TNF-α signaling via NF-κB,KLF9
+TNFAKB,TNF-α signaling via NF-κB,KYNU
+TNFAKB,TNF-α signaling via NF-κB,LAMB3
+TNFAKB,TNF-α signaling via NF-κB,LDLR
+TNFAKB,TNF-α signaling via NF-κB,LIF
+TNFAKB,TNF-α signaling via NF-κB,LITAF
+TNFAKB,TNF-α signaling via NF-κB,MAFF
+TNFAKB,TNF-α signaling via NF-κB,MAP2K3
+TNFAKB,TNF-α signaling via NF-κB,MAP3K8
+TNFAKB,TNF-α signaling via NF-κB,MARCKS
+TNFAKB,TNF-α signaling via NF-κB,MCL1
+TNFAKB,TNF-α signaling via NF-κB,MSC
+TNFAKB,TNF-α signaling via NF-κB,MXD1
+TNFAKB,TNF-α signaling via NF-κB,MYC
+TNFAKB,TNF-α signaling via NF-κB,NAMPT
+TNFAKB,TNF-α signaling via NF-κB,NFAT5
+TNFAKB,TNF-α signaling via NF-κB,NFE2L2
+TNFAKB,TNF-α signaling via NF-κB,NFIL3
+TNFAKB,TNF-α signaling via NF-κB,NFKB1
+TNFAKB,TNF-α signaling via NF-κB,NFKB2
+TNFAKB,TNF-α signaling via NF-κB,NFKBIA
+TNFAKB,TNF-α signaling via NF-κB,NFKBIE
+TNFAKB,TNF-α signaling via NF-κB,NINJ1
+TNFAKB,TNF-α signaling via NF-κB,NR4A1
+TNFAKB,TNF-α signaling via NF-κB,NR4A2
+TNFAKB,TNF-α signaling via NF-κB,NR4A3
+TNFAKB,TNF-α signaling via NF-κB,OLR1
+TNFAKB,TNF-α signaling via NF-κB,PANX1
+TNFAKB,TNF-α signaling via NF-κB,PDE4B
+TNFAKB,TNF-α signaling via NF-κB,PDLIM5
+TNFAKB,TNF-α signaling via NF-κB,PER1
+TNFAKB,TNF-α signaling via NF-κB,PFKFB3
+TNFAKB,TNF-α signaling via NF-κB,PHLDA1
+TNFAKB,TNF-α signaling via NF-κB,PHLDA2
+TNFAKB,TNF-α signaling via NF-κB,PLAU
+TNFAKB,TNF-α signaling via NF-κB,PLAUR
+TNFAKB,TNF-α signaling via NF-κB,PLEK
+TNFAKB,TNF-α signaling via NF-κB,PLK2
+TNFAKB,TNF-α signaling via NF-κB,PLPP3
+TNFAKB,TNF-α signaling via NF-κB,PMEPA1
+TNFAKB,TNF-α signaling via NF-κB,PNRC1
+TNFAKB,TNF-α signaling via NF-κB,PPP1R15A
+TNFAKB,TNF-α signaling via NF-κB,PTGER4
+TNFAKB,TNF-α signaling via NF-κB,PTGS2
+TNFAKB,TNF-α signaling via NF-κB,PTPRE
+TNFAKB,TNF-α signaling via NF-κB,PTX3
+TNFAKB,TNF-α signaling via NF-κB,RCAN1
+TNFAKB,TNF-α signaling via NF-κB,REL
+TNFAKB,TNF-α signaling via NF-κB,RELA
+TNFAKB,TNF-α signaling via NF-κB,RELB
+TNFAKB,TNF-α signaling via NF-κB,RHOB
+TNFAKB,TNF-α signaling via NF-κB,RIGI
+TNFAKB,TNF-α signaling via NF-κB,RIPK2
+TNFAKB,TNF-α signaling via NF-κB,RNF19B
+TNFAKB,TNF-α signaling via NF-κB,SAT1
+TNFAKB,TNF-α signaling via NF-κB,SDC4
+TNFAKB,TNF-α signaling via NF-κB,SERPINB2
+TNFAKB,TNF-α signaling via NF-κB,SERPINB8
+TNFAKB,TNF-α signaling via NF-κB,SERPINE1
+TNFAKB,TNF-α signaling via NF-κB,SGK1
+TNFAKB,TNF-α signaling via NF-κB,SIK1
+TNFAKB,TNF-α signaling via NF-κB,SLC16A6
+TNFAKB,TNF-α signaling via NF-κB,SLC2A3
+TNFAKB,TNF-α signaling via NF-κB,SLC2A6
+TNFAKB,TNF-α signaling via NF-κB,SMAD3
+TNFAKB,TNF-α signaling via NF-κB,SNN
+TNFAKB,TNF-α signaling via NF-κB,SOCS3
+TNFAKB,TNF-α signaling via NF-κB,SOD2
+TNFAKB,TNF-α signaling via NF-κB,SPHK1
+TNFAKB,TNF-α signaling via NF-κB,SPSB1
+TNFAKB,TNF-α signaling via NF-κB,SQSTM1
+TNFAKB,TNF-α signaling via NF-κB,STAT5A
+TNFAKB,TNF-α signaling via NF-κB,TANK
+TNFAKB,TNF-α signaling via NF-κB,TAP1
+TNFAKB,TNF-α signaling via NF-κB,TGIF1
+TNFAKB,TNF-α signaling via NF-κB,TIPARP
+TNFAKB,TNF-α signaling via NF-κB,TLR2
+TNFAKB,TNF-α signaling via NF-κB,TNC
+TNFAKB,TNF-α signaling via NF-κB,TNF
+TNFAKB,TNF-α signaling via NF-κB,TNFAIP2
+TNFAKB,TNF-α signaling via NF-κB,TNFAIP3
+TNFAKB,TNF-α signaling via NF-κB,TNFAIP6
+TNFAKB,TNF-α signaling via NF-κB,TNFAIP8
+TNFAKB,TNF-α signaling via NF-κB,TNFRSF9
+TNFAKB,TNF-α signaling via NF-κB,TNFSF9
+TNFAKB,TNF-α signaling via NF-κB,TNIP1
+TNFAKB,TNF-α signaling via NF-κB,TNIP2
+TNFAKB,TNF-α signaling via NF-κB,TRAF1
+TNFAKB,TNF-α signaling via NF-κB,TRIB1
+TNFAKB,TNF-α signaling via NF-κB,TRIP10
+TNFAKB,TNF-α signaling via NF-κB,TSC22D1
+TNFAKB,TNF-α signaling via NF-κB,TUBB2A
+TNFAKB,TNF-α signaling via NF-κB,VEGFA
+TNFAKB,TNF-α signaling via NF-κB,YRDC
+TNFAKB,TNF-α signaling via NF-κB,ZBTB10
+TNFAKB,TNF-α signaling via NF-κB,ZC3H12A
+TNFAKB,TNF-α signaling via NF-κB,ZFP36
+Apoptosis,Apoptosis,ADD1
+Apoptosis,Apoptosis,AIFM3
+Apoptosis,Apoptosis,ANKH
+Apoptosis,Apoptosis,ANXA1
+Apoptosis,Apoptosis,APP
+Apoptosis,Apoptosis,ATF3
+Apoptosis,Apoptosis,AVPR1A
+Apoptosis,Apoptosis,BAX
+Apoptosis,Apoptosis,BCAP31
+Apoptosis,Apoptosis,BCL10
+Apoptosis,Apoptosis,BCL2L1
+Apoptosis,Apoptosis,BCL2L10
+Apoptosis,Apoptosis,BCL2L11
+Apoptosis,Apoptosis,BCL2L2
+Apoptosis,Apoptosis,BGN
+Apoptosis,Apoptosis,BID
+Apoptosis,Apoptosis,BIK
+Apoptosis,Apoptosis,BIRC3
+Apoptosis,Apoptosis,BMF
+Apoptosis,Apoptosis,BMP2
+Apoptosis,Apoptosis,BNIP3L
+Apoptosis,Apoptosis,BRCA1
+Apoptosis,Apoptosis,BTG2
+Apoptosis,Apoptosis,BTG3
+Apoptosis,Apoptosis,CASP1
+Apoptosis,Apoptosis,CASP2
+Apoptosis,Apoptosis,CASP3
+Apoptosis,Apoptosis,CASP4
+Apoptosis,Apoptosis,CASP6
+Apoptosis,Apoptosis,CASP7
+Apoptosis,Apoptosis,CASP8
+Apoptosis,Apoptosis,CASP9
+Apoptosis,Apoptosis,CAV1
+Apoptosis,Apoptosis,CCNA1
+Apoptosis,Apoptosis,CCND1
+Apoptosis,Apoptosis,CCND2
+Apoptosis,Apoptosis,CD14
+Apoptosis,Apoptosis,CD2
+Apoptosis,Apoptosis,CD38
+Apoptosis,Apoptosis,CD44
+Apoptosis,Apoptosis,CD69
+Apoptosis,Apoptosis,CDC25B
+Apoptosis,Apoptosis,CDK2
+Apoptosis,Apoptosis,CDKN1A
+Apoptosis,Apoptosis,CDKN1B
+Apoptosis,Apoptosis,CFLAR
+Apoptosis,Apoptosis,CLU
+Apoptosis,Apoptosis,CREBBP
+Apoptosis,Apoptosis,CTH
+Apoptosis,Apoptosis,CTNNB1
+Apoptosis,Apoptosis,CYLD
+Apoptosis,Apoptosis,DAP
+Apoptosis,Apoptosis,DAP3
+Apoptosis,Apoptosis,DCN
+Apoptosis,Apoptosis,DDIT3
+Apoptosis,Apoptosis,DFFA
+Apoptosis,Apoptosis,DIABLO
+Apoptosis,Apoptosis,DNAJA1
+Apoptosis,Apoptosis,DNAJC3
+Apoptosis,Apoptosis,DNM1L
+Apoptosis,Apoptosis,DPYD
+Apoptosis,Apoptosis,EBP
+Apoptosis,Apoptosis,EGR3
+Apoptosis,Apoptosis,EMP1
+Apoptosis,Apoptosis,ENO2
+Apoptosis,Apoptosis,ERBB2
+Apoptosis,Apoptosis,ERBB3
+Apoptosis,Apoptosis,EREG
+Apoptosis,Apoptosis,ETF1
+Apoptosis,Apoptosis,F2
+Apoptosis,Apoptosis,F2R
+Apoptosis,Apoptosis,FAS
+Apoptosis,Apoptosis,FASLG
+Apoptosis,Apoptosis,FDXR
+Apoptosis,Apoptosis,FEZ1
+Apoptosis,Apoptosis,GADD45A
+Apoptosis,Apoptosis,GADD45B
+Apoptosis,Apoptosis,GCH1
+Apoptosis,Apoptosis,GNA15
+Apoptosis,Apoptosis,GPX1
+Apoptosis,Apoptosis,GPX3
+Apoptosis,Apoptosis,GPX4
+Apoptosis,Apoptosis,GSN
+Apoptosis,Apoptosis,GSR
+Apoptosis,Apoptosis,GSTM1
+Apoptosis,Apoptosis,GUCY2D
+Apoptosis,Apoptosis,H1-0
+Apoptosis,Apoptosis,HGF
+Apoptosis,Apoptosis,HMGB2
+Apoptosis,Apoptosis,HMOX1
+Apoptosis,Apoptosis,HSPB1
+Apoptosis,Apoptosis,IER3
+Apoptosis,Apoptosis,IFITM3
+Apoptosis,Apoptosis,IFNB1
+Apoptosis,Apoptosis,IFNGR1
+Apoptosis,Apoptosis,IGF2R
+Apoptosis,Apoptosis,IGFBP6
+Apoptosis,Apoptosis,IL18
+Apoptosis,Apoptosis,IL1A
+Apoptosis,Apoptosis,IL1B
+Apoptosis,Apoptosis,IL6
+Apoptosis,Apoptosis,IRF1
+Apoptosis,Apoptosis,ISG20
+Apoptosis,Apoptosis,JUN
+Apoptosis,Apoptosis,KRT18
+Apoptosis,Apoptosis,LEF1
+Apoptosis,Apoptosis,LGALS3
+Apoptosis,Apoptosis,LMNA
+Apoptosis,Apoptosis,LUM
+Apoptosis,Apoptosis,MADD
+Apoptosis,Apoptosis,MCL1
+Apoptosis,Apoptosis,MGMT
+Apoptosis,Apoptosis,MMP2
+Apoptosis,Apoptosis,NEDD9
+Apoptosis,Apoptosis,NEFH
+Apoptosis,Apoptosis,PAK1
+Apoptosis,Apoptosis,PDCD4
+Apoptosis,Apoptosis,PDGFRB
+Apoptosis,Apoptosis,PEA15
+Apoptosis,Apoptosis,PLAT
+Apoptosis,Apoptosis,PLCB2
+Apoptosis,Apoptosis,PLPPR4
+Apoptosis,Apoptosis,PMAIP1
+Apoptosis,Apoptosis,PPP2R5B
+Apoptosis,Apoptosis,PPP3R1
+Apoptosis,Apoptosis,PPT1
+Apoptosis,Apoptosis,PRF1
+Apoptosis,Apoptosis,PSEN1
+Apoptosis,Apoptosis,PSEN2
+Apoptosis,Apoptosis,PTK2
+Apoptosis,Apoptosis,RARA
+Apoptosis,Apoptosis,RELA
+Apoptosis,Apoptosis,RETSAT
+Apoptosis,Apoptosis,RHOB
+Apoptosis,Apoptosis,RHOT2
+Apoptosis,Apoptosis,RNASEL
+Apoptosis,Apoptosis,ROCK1
+Apoptosis,Apoptosis,SAT1
+Apoptosis,Apoptosis,SATB1
+Apoptosis,Apoptosis,SC5D
+Apoptosis,Apoptosis,SLC20A1
+Apoptosis,Apoptosis,SMAD7
+Apoptosis,Apoptosis,SOD1
+Apoptosis,Apoptosis,SOD2
+Apoptosis,Apoptosis,SPTAN1
+Apoptosis,Apoptosis,SQSTM1
+Apoptosis,Apoptosis,TAP1
+Apoptosis,Apoptosis,TGFB2
+Apoptosis,Apoptosis,TGFBR3
+Apoptosis,Apoptosis,TIMP1
+Apoptosis,Apoptosis,TIMP2
+Apoptosis,Apoptosis,TIMP3
+Apoptosis,Apoptosis,TNF
+Apoptosis,Apoptosis,TNFRSF12A
+Apoptosis,Apoptosis,TNFSF10
+Apoptosis,Apoptosis,TOP2A
+Apoptosis,Apoptosis,TSPO
+Apoptosis,Apoptosis,TXNIP
+Apoptosis,Apoptosis,VDAC2
+Apoptosis,Apoptosis,WEE1
+Apoptosis,Apoptosis,XIAP
+Melanogenesis,Melanogenesis,ADCY1
+Melanogenesis,Melanogenesis,ADCY2
+Melanogenesis,Melanogenesis,ADCY3
+Melanogenesis,Melanogenesis,ADCY4
+Melanogenesis,Melanogenesis,ADCY5
+Melanogenesis,Melanogenesis,ADCY6
+Melanogenesis,Melanogenesis,ADCY7
+Melanogenesis,Melanogenesis,ADCY8
+Melanogenesis,Melanogenesis,ADCY9
+Melanogenesis,Melanogenesis,ASIP
+Melanogenesis,Melanogenesis,CALM1
+Melanogenesis,Melanogenesis,CALM2
+Melanogenesis,Melanogenesis,CALM3
+Melanogenesis,Melanogenesis,CALML3
+Melanogenesis,Melanogenesis,CALML5
+Melanogenesis,Melanogenesis,CALML6
+Melanogenesis,Melanogenesis,CAMK2A
+Melanogenesis,Melanogenesis,CAMK2B
+Melanogenesis,Melanogenesis,CAMK2D
+Melanogenesis,Melanogenesis,CAMK2G
+Melanogenesis,Melanogenesis,CREB1
+Melanogenesis,Melanogenesis,CREB3
+Melanogenesis,Melanogenesis,CREB3L1
+Melanogenesis,Melanogenesis,CREB3L2
+Melanogenesis,Melanogenesis,CREB3L3
+Melanogenesis,Melanogenesis,CREB3L4
+Melanogenesis,Melanogenesis,CREBBP
+Melanogenesis,Melanogenesis,CTNNB1
+Melanogenesis,Melanogenesis,DCT
+Melanogenesis,Melanogenesis,DVL1
+Melanogenesis,Melanogenesis,DVL2
+Melanogenesis,Melanogenesis,DVL3
+Melanogenesis,Melanogenesis,EDN1
+Melanogenesis,Melanogenesis,EDNRB
+Melanogenesis,Melanogenesis,EP300
+Melanogenesis,Melanogenesis,FZD1
+Melanogenesis,Melanogenesis,FZD10
+Melanogenesis,Melanogenesis,FZD2
+Melanogenesis,Melanogenesis,FZD3
+Melanogenesis,Melanogenesis,FZD4
+Melanogenesis,Melanogenesis,FZD5
+Melanogenesis,Melanogenesis,FZD6
+Melanogenesis,Melanogenesis,FZD7
+Melanogenesis,Melanogenesis,FZD8
+Melanogenesis,Melanogenesis,FZD9
+Melanogenesis,Melanogenesis,GNAI1
+Melanogenesis,Melanogenesis,GNAI2
+Melanogenesis,Melanogenesis,GNAI3
+Melanogenesis,Melanogenesis,GNAO1
+Melanogenesis,Melanogenesis,GNAQ
+Melanogenesis,Melanogenesis,GNAS
+Melanogenesis,Melanogenesis,GSK3B
+Melanogenesis,Melanogenesis,HRAS
+Melanogenesis,Melanogenesis,KIT
+Melanogenesis,Melanogenesis,KITLG
+Melanogenesis,Melanogenesis,KRAS
+Melanogenesis,Melanogenesis,LEF1
+Melanogenesis,Melanogenesis,MAP2K1
+Melanogenesis,Melanogenesis,MAP2K2
+Melanogenesis,Melanogenesis,MAPK1
+Melanogenesis,Melanogenesis,MAPK3
+Melanogenesis,Melanogenesis,MC1R
+Melanogenesis,Melanogenesis,MITF
+Melanogenesis,Melanogenesis,NRAS
+Melanogenesis,Melanogenesis,PLCB1
+Melanogenesis,Melanogenesis,PLCB2
+Melanogenesis,Melanogenesis,PLCB3
+Melanogenesis,Melanogenesis,PLCB4
+Melanogenesis,Melanogenesis,POMC
+Melanogenesis,Melanogenesis,PRKACA
+Melanogenesis,Melanogenesis,PRKACB
+Melanogenesis,Melanogenesis,PRKACG
+Melanogenesis,Melanogenesis,PRKCA
+Melanogenesis,Melanogenesis,PRKCB
+Melanogenesis,Melanogenesis,PRKCG
+Melanogenesis,Melanogenesis,PRKX
+Melanogenesis,Melanogenesis,RAF1
+Melanogenesis,Melanogenesis,TCF7
+Melanogenesis,Melanogenesis,TCF7L1
+Melanogenesis,Melanogenesis,TCF7L2
+Melanogenesis,Melanogenesis,TYR
+Melanogenesis,Melanogenesis,TYRP1
+Melanogenesis,Melanogenesis,WNT1
+Melanogenesis,Melanogenesis,WNT10A
+Melanogenesis,Melanogenesis,WNT10B
+Melanogenesis,Melanogenesis,WNT11
+Melanogenesis,Melanogenesis,WNT16
+Melanogenesis,Melanogenesis,WNT2
+Melanogenesis,Melanogenesis,WNT2B
+Melanogenesis,Melanogenesis,WNT3
+Melanogenesis,Melanogenesis,WNT3A
+Melanogenesis,Melanogenesis,WNT4
+Melanogenesis,Melanogenesis,WNT5A
+Melanogenesis,Melanogenesis,WNT5B
+Melanogenesis,Melanogenesis,WNT6
+Melanogenesis,Melanogenesis,WNT7A
+Melanogenesis,Melanogenesis,WNT7B
+Melanogenesis,Melanogenesis,WNT8A
+Melanogenesis,Melanogenesis,WNT8B
+Melanogenesis,Melanogenesis,WNT9A
+Melanogenesis,Melanogenesis,WNT9B
+OP,Oxidative phosphorylation,ABCB7
+OP,Oxidative phosphorylation,ACAA1
+OP,Oxidative phosphorylation,ACAA2
+OP,Oxidative phosphorylation,ACADM
+OP,Oxidative phosphorylation,ACADSB
+OP,Oxidative phosphorylation,ACADVL
+OP,Oxidative phosphorylation,ACAT1
+OP,Oxidative phosphorylation,ACO2
+OP,Oxidative phosphorylation,AFG3L2
+OP,Oxidative phosphorylation,AIFM1
+OP,Oxidative phosphorylation,ALAS1
+OP,Oxidative phosphorylation,ALDH6A1
+OP,Oxidative phosphorylation,ATP1B1
+OP,Oxidative phosphorylation,ATP5F1A
+OP,Oxidative phosphorylation,ATP5F1B
+OP,Oxidative phosphorylation,ATP5F1C
+OP,Oxidative phosphorylation,ATP5F1D
+OP,Oxidative phosphorylation,ATP5F1E
+OP,Oxidative phosphorylation,ATP5MC1
+OP,Oxidative phosphorylation,ATP5MC2
+OP,Oxidative phosphorylation,ATP5MC3
+OP,Oxidative phosphorylation,ATP5ME
+OP,Oxidative phosphorylation,ATP5MF
+OP,Oxidative phosphorylation,ATP5MG
+OP,Oxidative phosphorylation,ATP5PB
+OP,Oxidative phosphorylation,ATP5PD
+OP,Oxidative phosphorylation,ATP5PF
+OP,Oxidative phosphorylation,ATP5PO
+OP,Oxidative phosphorylation,ATP6AP1
+OP,Oxidative phosphorylation,ATP6V0B
+OP,Oxidative phosphorylation,ATP6V0C
+OP,Oxidative phosphorylation,ATP6V0E1
+OP,Oxidative phosphorylation,ATP6V1C1
+OP,Oxidative phosphorylation,ATP6V1D
+OP,Oxidative phosphorylation,ATP6V1E1
+OP,Oxidative phosphorylation,ATP6V1F
+OP,Oxidative phosphorylation,ATP6V1G1
+OP,Oxidative phosphorylation,ATP6V1H
+OP,Oxidative phosphorylation,BAX
+OP,Oxidative phosphorylation,BCKDHA
+OP,Oxidative phosphorylation,BDH2
+OP,Oxidative phosphorylation,CASP7
+OP,Oxidative phosphorylation,COX10
+OP,Oxidative phosphorylation,COX11
+OP,Oxidative phosphorylation,COX15
+OP,Oxidative phosphorylation,COX17
+OP,Oxidative phosphorylation,COX4I1
+OP,Oxidative phosphorylation,COX5A
+OP,Oxidative phosphorylation,COX5B
+OP,Oxidative phosphorylation,COX6A1
+OP,Oxidative phosphorylation,COX6B1
+OP,Oxidative phosphorylation,COX6C
+OP,Oxidative phosphorylation,COX7A2
+OP,Oxidative phosphorylation,COX7A2L
+OP,Oxidative phosphorylation,COX7B
+OP,Oxidative phosphorylation,COX7C
+OP,Oxidative phosphorylation,COX8A
+OP,Oxidative phosphorylation,CPT1A
+OP,Oxidative phosphorylation,CS
+OP,Oxidative phosphorylation,CYB5A
+OP,Oxidative phosphorylation,CYB5R3
+OP,Oxidative phosphorylation,CYC1
+OP,Oxidative phosphorylation,CYCS
+OP,Oxidative phosphorylation,DECR1
+OP,Oxidative phosphorylation,DLAT
+OP,Oxidative phosphorylation,DLD
+OP,Oxidative phosphorylation,DLST
+OP,Oxidative phosphorylation,ECH1
+OP,Oxidative phosphorylation,ECHS1
+OP,Oxidative phosphorylation,ECI1
+OP,Oxidative phosphorylation,ETFA
+OP,Oxidative phosphorylation,ETFB
+OP,Oxidative phosphorylation,ETFDH
+OP,Oxidative phosphorylation,FDX1
+OP,Oxidative phosphorylation,FH
+OP,Oxidative phosphorylation,FXN
+OP,Oxidative phosphorylation,GLUD1
+OP,Oxidative phosphorylation,GOT2
+OP,Oxidative phosphorylation,GPI
+OP,Oxidative phosphorylation,GPX4
+OP,Oxidative phosphorylation,GRPEL1
+OP,Oxidative phosphorylation,HADHA
+OP,Oxidative phosphorylation,HADHB
+OP,Oxidative phosphorylation,HCCS
+OP,Oxidative phosphorylation,HSD17B10
+OP,Oxidative phosphorylation,HSPA9
+OP,Oxidative phosphorylation,HTRA2
+OP,Oxidative phosphorylation,IDH1
+OP,Oxidative phosphorylation,IDH2
+OP,Oxidative phosphorylation,IDH3A
+OP,Oxidative phosphorylation,IDH3B
+OP,Oxidative phosphorylation,IDH3G
+OP,Oxidative phosphorylation,IMMT
+OP,Oxidative phosphorylation,ISCA1
+OP,Oxidative phosphorylation,ISCU
+OP,Oxidative phosphorylation,LDHA
+OP,Oxidative phosphorylation,LDHB
+OP,Oxidative phosphorylation,LRPPRC
+OP,Oxidative phosphorylation,MAOB
+OP,Oxidative phosphorylation,MDH1
+OP,Oxidative phosphorylation,MDH2
+OP,Oxidative phosphorylation,MFN2
+OP,Oxidative phosphorylation,MGST3
+OP,Oxidative phosphorylation,MPC1
+OP,Oxidative phosphorylation,MRPL11
+OP,Oxidative phosphorylation,MRPL15
+OP,Oxidative phosphorylation,MRPL34
+OP,Oxidative phosphorylation,MRPL35
+OP,Oxidative phosphorylation,MRPS11
+OP,Oxidative phosphorylation,MRPS12
+OP,Oxidative phosphorylation,MRPS15
+OP,Oxidative phosphorylation,MRPS22
+OP,Oxidative phosphorylation,MRPS30
+OP,Oxidative phosphorylation,MTRF1
+OP,Oxidative phosphorylation,MTRR
+OP,Oxidative phosphorylation,MTX2
+OP,Oxidative phosphorylation,NDUFA1
+OP,Oxidative phosphorylation,NDUFA2
+OP,Oxidative phosphorylation,NDUFA3
+OP,Oxidative phosphorylation,NDUFA4
+OP,Oxidative phosphorylation,NDUFA5
+OP,Oxidative phosphorylation,NDUFA6
+OP,Oxidative phosphorylation,NDUFA7
+OP,Oxidative phosphorylation,NDUFA8
+OP,Oxidative phosphorylation,NDUFA9
+OP,Oxidative phosphorylation,NDUFAB1
+OP,Oxidative phosphorylation,NDUFB1
+OP,Oxidative phosphorylation,NDUFB2
+OP,Oxidative phosphorylation,NDUFB3
+OP,Oxidative phosphorylation,NDUFB4
+OP,Oxidative phosphorylation,NDUFB5
+OP,Oxidative phosphorylation,NDUFB6
+OP,Oxidative phosphorylation,NDUFB7
+OP,Oxidative phosphorylation,NDUFB8
+OP,Oxidative phosphorylation,NDUFC1
+OP,Oxidative phosphorylation,NDUFC2
+OP,Oxidative phosphorylation,NDUFS1
+OP,Oxidative phosphorylation,NDUFS2
+OP,Oxidative phosphorylation,NDUFS3
+OP,Oxidative phosphorylation,NDUFS4
+OP,Oxidative phosphorylation,NDUFS6
+OP,Oxidative phosphorylation,NDUFS7
+OP,Oxidative phosphorylation,NDUFS8
+OP,Oxidative phosphorylation,NDUFV1
+OP,Oxidative phosphorylation,NDUFV2
+OP,Oxidative phosphorylation,NNT
+OP,Oxidative phosphorylation,NQO2
+OP,Oxidative phosphorylation,OAT
+OP,Oxidative phosphorylation,OGDH
+OP,Oxidative phosphorylation,OPA1
+OP,Oxidative phosphorylation,OXA1L
+OP,Oxidative phosphorylation,PDHA1
+OP,Oxidative phosphorylation,PDHB
+OP,Oxidative phosphorylation,PDHX
+OP,Oxidative phosphorylation,PDK4
+OP,Oxidative phosphorylation,PDP1
+OP,Oxidative phosphorylation,PHB2
+OP,Oxidative phosphorylation,PHYH
+OP,Oxidative phosphorylation,PMPCA
+OP,Oxidative phosphorylation,POLR2F
+OP,Oxidative phosphorylation,POR
+OP,Oxidative phosphorylation,PRDX3
+OP,Oxidative phosphorylation,RETSAT
+OP,Oxidative phosphorylation,RHOT1
+OP,Oxidative phosphorylation,RHOT2
+OP,Oxidative phosphorylation,SDHA
+OP,Oxidative phosphorylation,SDHB
+OP,Oxidative phosphorylation,SDHC
+OP,Oxidative phosphorylation,SDHD
+OP,Oxidative phosphorylation,SLC25A11
+OP,Oxidative phosphorylation,SLC25A12
+OP,Oxidative phosphorylation,SLC25A20
+OP,Oxidative phosphorylation,SLC25A3
+OP,Oxidative phosphorylation,SLC25A4
+OP,Oxidative phosphorylation,SLC25A5
+OP,Oxidative phosphorylation,SLC25A6
+OP,Oxidative phosphorylation,SUCLA2
+OP,Oxidative phosphorylation,SUCLG1
+OP,Oxidative phosphorylation,SUPV3L1
+OP,Oxidative phosphorylation,SURF1
+OP,Oxidative phosphorylation,TCIRG1
+OP,Oxidative phosphorylation,TIMM10
+OP,Oxidative phosphorylation,TIMM13
+OP,Oxidative phosphorylation,TIMM17A
+OP,Oxidative phosphorylation,TIMM50
+OP,Oxidative phosphorylation,TIMM8B
+OP,Oxidative phosphorylation,TIMM9
+OP,Oxidative phosphorylation,TOMM22
+OP,Oxidative phosphorylation,TOMM70
+OP,Oxidative phosphorylation,UQCR10
+OP,Oxidative phosphorylation,UQCR11
+OP,Oxidative phosphorylation,UQCRB
+OP,Oxidative phosphorylation,UQCRC1
+OP,Oxidative phosphorylation,UQCRC2
+OP,Oxidative phosphorylation,UQCRFS1
+OP,Oxidative phosphorylation,UQCRH
+OP,Oxidative phosphorylation,UQCRQ
+OP,Oxidative phosphorylation,VDAC1
+OP,Oxidative phosphorylation,VDAC2
+OP,Oxidative phosphorylation,VDAC3
+OIS,Oxidative stress induced senescence,AGO1
+OIS,Oxidative stress induced senescence,AGO3
+OIS,Oxidative stress induced senescence,AGO4
+OIS,Oxidative stress induced senescence,BMI1
+OIS,Oxidative stress induced senescence,CBX2
+OIS,Oxidative stress induced senescence,CBX4
+OIS,Oxidative stress induced senescence,CBX6
+OIS,Oxidative stress induced senescence,CBX8
+OIS,Oxidative stress induced senescence,CDK4
+OIS,Oxidative stress induced senescence,CDK6
+OIS,Oxidative stress induced senescence,CDKN2A
+OIS,Oxidative stress induced senescence,CDKN2B
+OIS,Oxidative stress induced senescence,CDKN2C
+OIS,Oxidative stress induced senescence,CDKN2D
+OIS,Oxidative stress induced senescence,E2F1
+OIS,Oxidative stress induced senescence,E2F2
+OIS,Oxidative stress induced senescence,E2F3
+OIS,Oxidative stress induced senescence,EED
+OIS,Oxidative stress induced senescence,EZH2
+OIS,Oxidative stress induced senescence,FOS
+OIS,Oxidative stress induced senescence,H2AB1
+OIS,Oxidative stress induced senescence,H2AC14
+OIS,Oxidative stress induced senescence,H2AC18
+OIS,Oxidative stress induced senescence,H2AC19
+OIS,Oxidative stress induced senescence,H2AC20
+OIS,Oxidative stress induced senescence,H2AC4
+OIS,Oxidative stress induced senescence,H2AC6
+OIS,Oxidative stress induced senescence,H2AC7
+OIS,Oxidative stress induced senescence,H2AC8
+OIS,Oxidative stress induced senescence,H2AJ
+OIS,Oxidative stress induced senescence,H2AX
+OIS,Oxidative stress induced senescence,H2AZ2
+OIS,Oxidative stress induced senescence,H2BC1
+OIS,Oxidative stress induced senescence,H2BC10
+OIS,Oxidative stress induced senescence,H2BC11
+OIS,Oxidative stress induced senescence,H2BC12
+OIS,Oxidative stress induced senescence,H2BC12L
+OIS,Oxidative stress induced senescence,H2BC13
+OIS,Oxidative stress induced senescence,H2BC14
+OIS,Oxidative stress induced senescence,H2BC15
+OIS,Oxidative stress induced senescence,H2BC17
+OIS,Oxidative stress induced senescence,H2BC21
+OIS,Oxidative stress induced senescence,H2BC26
+OIS,Oxidative stress induced senescence,H2BC3
+OIS,Oxidative stress induced senescence,H2BC4
+OIS,Oxidative stress induced senescence,H2BC5
+OIS,Oxidative stress induced senescence,H2BC6
+OIS,Oxidative stress induced senescence,H2BC7
+OIS,Oxidative stress induced senescence,H2BC8
+OIS,Oxidative stress induced senescence,H2BC9
+OIS,Oxidative stress induced senescence,H3-3A
+OIS,Oxidative stress induced senescence,H3-3B
+OIS,Oxidative stress induced senescence,H3C1
+OIS,Oxidative stress induced senescence,H3C10
+OIS,Oxidative stress induced senescence,H3C11
+OIS,Oxidative stress induced senescence,H3C12
+OIS,Oxidative stress induced senescence,H3C13
+OIS,Oxidative stress induced senescence,H3C14
+OIS,Oxidative stress induced senescence,H3C15
+OIS,Oxidative stress induced senescence,H3C2
+OIS,Oxidative stress induced senescence,H3C3
+OIS,Oxidative stress induced senescence,H3C4
+OIS,Oxidative stress induced senescence,H3C6
+OIS,Oxidative stress induced senescence,H3C7
+OIS,Oxidative stress induced senescence,H3C8
+OIS,Oxidative stress induced senescence,H4C1
+OIS,Oxidative stress induced senescence,H4C11
+OIS,Oxidative stress induced senescence,H4C12
+OIS,Oxidative stress induced senescence,H4C13
+OIS,Oxidative stress induced senescence,H4C14
+OIS,Oxidative stress induced senescence,H4C15
+OIS,Oxidative stress induced senescence,H4C16
+OIS,Oxidative stress induced senescence,H4C2
+OIS,Oxidative stress induced senescence,H4C3
+OIS,Oxidative stress induced senescence,H4C4
+OIS,Oxidative stress induced senescence,H4C5
+OIS,Oxidative stress induced senescence,H4C6
+OIS,Oxidative stress induced senescence,H4C8
+OIS,Oxidative stress induced senescence,H4C9
+OIS,Oxidative stress induced senescence,IFNB1
+OIS,Oxidative stress induced senescence,JUN
+OIS,Oxidative stress induced senescence,KDM6B
+OIS,Oxidative stress induced senescence,MAP2K3
+OIS,Oxidative stress induced senescence,MAP2K4
+OIS,Oxidative stress induced senescence,MAP2K6
+OIS,Oxidative stress induced senescence,MAP2K7
+OIS,Oxidative stress induced senescence,MAP3K5
+OIS,Oxidative stress induced senescence,MAP4K4
+OIS,Oxidative stress induced senescence,MAPK1
+OIS,Oxidative stress induced senescence,MAPK10
+OIS,Oxidative stress induced senescence,MAPK11
+OIS,Oxidative stress induced senescence,MAPK14
+OIS,Oxidative stress induced senescence,MAPK3
+OIS,Oxidative stress induced senescence,MAPK8
+OIS,Oxidative stress induced senescence,MAPK9
+OIS,Oxidative stress induced senescence,MAPKAPK2
+OIS,Oxidative stress induced senescence,MAPKAPK3
+OIS,Oxidative stress induced senescence,MAPKAPK5
+OIS,Oxidative stress induced senescence,MDM2
+OIS,Oxidative stress induced senescence,MDM4
+OIS,Oxidative stress induced senescence,MINK1
+OIS,Oxidative stress induced senescence,MIR24-1
+OIS,Oxidative stress induced senescence,MIR24-2
+OIS,Oxidative stress induced senescence,MOV10
+OIS,Oxidative stress induced senescence,PHC1
+OIS,Oxidative stress induced senescence,PHC2
+OIS,Oxidative stress induced senescence,PHC3
+OIS,Oxidative stress induced senescence,RBBP4
+OIS,Oxidative stress induced senescence,RBBP7
+OIS,Oxidative stress induced senescence,RING1
+OIS,Oxidative stress induced senescence,RNF2
+OIS,Oxidative stress induced senescence,RPS27A
+OIS,Oxidative stress induced senescence,SCMH1
+OIS,Oxidative stress induced senescence,SUZ12
+OIS,Oxidative stress induced senescence,TFDP1
+OIS,Oxidative stress induced senescence,TFDP2
+OIS,Oxidative stress induced senescence,TNIK
+OIS,Oxidative stress induced senescence,TNRC6A
+OIS,Oxidative stress induced senescence,TNRC6B
+OIS,Oxidative stress induced senescence,TNRC6C
+OIS,Oxidative stress induced senescence,TP53
+OIS,Oxidative stress induced senescence,TXN
+OIS,Oxidative stress induced senescence,UBA52
+OIS,Oxidative stress induced senescence,UBB
+OIS,Oxidative stress induced senescence,UBC
+EMT,Epithelial mesenchymal transition,ABI3BP
+EMT,Epithelial mesenchymal transition,ACTA2
+EMT,Epithelial mesenchymal transition,ADAM12
+EMT,Epithelial mesenchymal transition,ANPEP
+EMT,Epithelial mesenchymal transition,APLP1
+EMT,Epithelial mesenchymal transition,AREG
+EMT,Epithelial mesenchymal transition,BASP1
+EMT,Epithelial mesenchymal transition,BDNF
+EMT,Epithelial mesenchymal transition,BGN
+EMT,Epithelial mesenchymal transition,BMP1
+EMT,Epithelial mesenchymal transition,CADM1
+EMT,Epithelial mesenchymal transition,CALD1
+EMT,Epithelial mesenchymal transition,CALU
+EMT,Epithelial mesenchymal transition,CAP2
+EMT,Epithelial mesenchymal transition,CAPG
+EMT,Epithelial mesenchymal transition,CCN1
+EMT,Epithelial mesenchymal transition,CCN2
+EMT,Epithelial mesenchymal transition,CD44
+EMT,Epithelial mesenchymal transition,CD59
+EMT,Epithelial mesenchymal transition,CDH11
+EMT,Epithelial mesenchymal transition,CDH2
+EMT,Epithelial mesenchymal transition,CDH6
+EMT,Epithelial mesenchymal transition,COL11A1
+EMT,Epithelial mesenchymal transition,COL12A1
+EMT,Epithelial mesenchymal transition,COL16A1
+EMT,Epithelial mesenchymal transition,COL1A1
+EMT,Epithelial mesenchymal transition,COL1A2
+EMT,Epithelial mesenchymal transition,COL3A1
+EMT,Epithelial mesenchymal transition,COL4A1
+EMT,Epithelial mesenchymal transition,COL4A2
+EMT,Epithelial mesenchymal transition,COL5A1
+EMT,Epithelial mesenchymal transition,COL5A2
+EMT,Epithelial mesenchymal transition,COL5A3
+EMT,Epithelial mesenchymal transition,COL6A2
+EMT,Epithelial mesenchymal transition,COL6A3
+EMT,Epithelial mesenchymal transition,COL7A1
+EMT,Epithelial mesenchymal transition,COL8A2
+EMT,Epithelial mesenchymal transition,COLGALT1
+EMT,Epithelial mesenchymal transition,COMP
+EMT,Epithelial mesenchymal transition,COPA
+EMT,Epithelial mesenchymal transition,CRLF1
+EMT,Epithelial mesenchymal transition,CTHRC1
+EMT,Epithelial mesenchymal transition,CXCL1
+EMT,Epithelial mesenchymal transition,CXCL12
+EMT,Epithelial mesenchymal transition,CXCL6
+EMT,Epithelial mesenchymal transition,CXCL8
+EMT,Epithelial mesenchymal transition,DAB2
+EMT,Epithelial mesenchymal transition,DCN
+EMT,Epithelial mesenchymal transition,DKK1
+EMT,Epithelial mesenchymal transition,DPYSL3
+EMT,Epithelial mesenchymal transition,DST
+EMT,Epithelial mesenchymal transition,ECM1
+EMT,Epithelial mesenchymal transition,ECM2
+EMT,Epithelial mesenchymal transition,EDIL3
+EMT,Epithelial mesenchymal transition,EFEMP2
+EMT,Epithelial mesenchymal transition,ELN
+EMT,Epithelial mesenchymal transition,EMP3
+EMT,Epithelial mesenchymal transition,ENO2
+EMT,Epithelial mesenchymal transition,FAP
+EMT,Epithelial mesenchymal transition,FAS
+EMT,Epithelial mesenchymal transition,FBLN1
+EMT,Epithelial mesenchymal transition,FBLN2
+EMT,Epithelial mesenchymal transition,FBLN5
+EMT,Epithelial mesenchymal transition,FBN1
+EMT,Epithelial mesenchymal transition,FBN2
+EMT,Epithelial mesenchymal transition,FERMT2
+EMT,Epithelial mesenchymal transition,FGF2
+EMT,Epithelial mesenchymal transition,FLNA
+EMT,Epithelial mesenchymal transition,FMOD
+EMT,Epithelial mesenchymal transition,FN1
+EMT,Epithelial mesenchymal transition,FOXC2
+EMT,Epithelial mesenchymal transition,FSTL1
+EMT,Epithelial mesenchymal transition,FSTL3
+EMT,Epithelial mesenchymal transition,FUCA1
+EMT,Epithelial mesenchymal transition,FZD8
+EMT,Epithelial mesenchymal transition,GADD45A
+EMT,Epithelial mesenchymal transition,GADD45B
+EMT,Epithelial mesenchymal transition,GAS1
+EMT,Epithelial mesenchymal transition,GEM
+EMT,Epithelial mesenchymal transition,GJA1
+EMT,Epithelial mesenchymal transition,GLIPR1
+EMT,Epithelial mesenchymal transition,GPC1
+EMT,Epithelial mesenchymal transition,GPX7
+EMT,Epithelial mesenchymal transition,GREM1
+EMT,Epithelial mesenchymal transition,HTRA1
+EMT,Epithelial mesenchymal transition,ID2
+EMT,Epithelial mesenchymal transition,IGFBP2
+EMT,Epithelial mesenchymal transition,IGFBP3
+EMT,Epithelial mesenchymal transition,IGFBP4
+EMT,Epithelial mesenchymal transition,IL15
+EMT,Epithelial mesenchymal transition,IL32
+EMT,Epithelial mesenchymal transition,IL6
+EMT,Epithelial mesenchymal transition,INHBA
+EMT,Epithelial mesenchymal transition,ITGA2
+EMT,Epithelial mesenchymal transition,ITGA5
+EMT,Epithelial mesenchymal transition,ITGAV
+EMT,Epithelial mesenchymal transition,ITGB1
+EMT,Epithelial mesenchymal transition,ITGB3
+EMT,Epithelial mesenchymal transition,ITGB5
+EMT,Epithelial mesenchymal transition,JUN
+EMT,Epithelial mesenchymal transition,LAMA1
+EMT,Epithelial mesenchymal transition,LAMA2
+EMT,Epithelial mesenchymal transition,LAMA3
+EMT,Epithelial mesenchymal transition,LAMC1
+EMT,Epithelial mesenchymal transition,LAMC2
+EMT,Epithelial mesenchymal transition,LGALS1
+EMT,Epithelial mesenchymal transition,LOX
+EMT,Epithelial mesenchymal transition,LOXL1
+EMT,Epithelial mesenchymal transition,LOXL2
+EMT,Epithelial mesenchymal transition,LRP1
+EMT,Epithelial mesenchymal transition,LRRC15
+EMT,Epithelial mesenchymal transition,LUM
+EMT,Epithelial mesenchymal transition,MAGEE1
+EMT,Epithelial mesenchymal transition,MATN2
+EMT,Epithelial mesenchymal transition,MATN3
+EMT,Epithelial mesenchymal transition,MCM7
+EMT,Epithelial mesenchymal transition,MEST
+EMT,Epithelial mesenchymal transition,MFAP5
+EMT,Epithelial mesenchymal transition,MGP
+EMT,Epithelial mesenchymal transition,MMP1
+EMT,Epithelial mesenchymal transition,MMP14
+EMT,Epithelial mesenchymal transition,MMP2
+EMT,Epithelial mesenchymal transition,MMP3
+EMT,Epithelial mesenchymal transition,MSX1
+EMT,Epithelial mesenchymal transition,MXRA5
+EMT,Epithelial mesenchymal transition,MYL9
+EMT,Epithelial mesenchymal transition,MYLK
+EMT,Epithelial mesenchymal transition,NID2
+EMT,Epithelial mesenchymal transition,NNMT
+EMT,Epithelial mesenchymal transition,NOTCH2
+EMT,Epithelial mesenchymal transition,NT5E
+EMT,Epithelial mesenchymal transition,NTM
+EMT,Epithelial mesenchymal transition,OXTR
+EMT,Epithelial mesenchymal transition,P3H1
+EMT,Epithelial mesenchymal transition,PCOLCE
+EMT,Epithelial mesenchymal transition,PCOLCE2
+EMT,Epithelial mesenchymal transition,PDGFRB
+EMT,Epithelial mesenchymal transition,PDLIM4
+EMT,Epithelial mesenchymal transition,PFN2
+EMT,Epithelial mesenchymal transition,PLAUR
+EMT,Epithelial mesenchymal transition,PLOD1
+EMT,Epithelial mesenchymal transition,PLOD2
+EMT,Epithelial mesenchymal transition,PLOD3
+EMT,Epithelial mesenchymal transition,PMEPA1
+EMT,Epithelial mesenchymal transition,PMP22
+EMT,Epithelial mesenchymal transition,POSTN
+EMT,Epithelial mesenchymal transition,PPIB
+EMT,Epithelial mesenchymal transition,PRRX1
+EMT,Epithelial mesenchymal transition,PRSS2
+EMT,Epithelial mesenchymal transition,PTHLH
+EMT,Epithelial mesenchymal transition,PTX3
+EMT,Epithelial mesenchymal transition,PVR
+EMT,Epithelial mesenchymal transition,QSOX1
+EMT,Epithelial mesenchymal transition,RGS4
+EMT,Epithelial mesenchymal transition,RHOB
+EMT,Epithelial mesenchymal transition,SAT1
+EMT,Epithelial mesenchymal transition,SCG2
+EMT,Epithelial mesenchymal transition,SDC1
+EMT,Epithelial mesenchymal transition,SDC4
+EMT,Epithelial mesenchymal transition,SERPINE1
+EMT,Epithelial mesenchymal transition,SERPINE2
+EMT,Epithelial mesenchymal transition,SERPINH1
+EMT,Epithelial mesenchymal transition,SFRP1
+EMT,Epithelial mesenchymal transition,SFRP4
+EMT,Epithelial mesenchymal transition,SGCB
+EMT,Epithelial mesenchymal transition,SGCD
+EMT,Epithelial mesenchymal transition,SGCG
+EMT,Epithelial mesenchymal transition,SLC6A8
+EMT,Epithelial mesenchymal transition,SLIT2
+EMT,Epithelial mesenchymal transition,SLIT3
+EMT,Epithelial mesenchymal transition,SNAI2
+EMT,Epithelial mesenchymal transition,SNTB1
+EMT,Epithelial mesenchymal transition,SPARC
+EMT,Epithelial mesenchymal transition,SPOCK1
+EMT,Epithelial mesenchymal transition,SPP1
+EMT,Epithelial mesenchymal transition,TAGLN
+EMT,Epithelial mesenchymal transition,TFPI2
+EMT,Epithelial mesenchymal transition,TGFB1
+EMT,Epithelial mesenchymal transition,TGFBI
+EMT,Epithelial mesenchymal transition,TGFBR3
+EMT,Epithelial mesenchymal transition,TGM2
+EMT,Epithelial mesenchymal transition,THBS1
+EMT,Epithelial mesenchymal transition,THBS2
+EMT,Epithelial mesenchymal transition,THY1
+EMT,Epithelial mesenchymal transition,TIMP1
+EMT,Epithelial mesenchymal transition,TIMP3
+EMT,Epithelial mesenchymal transition,TNC
+EMT,Epithelial mesenchymal transition,TNFAIP3
+EMT,Epithelial mesenchymal transition,TNFRSF11B
+EMT,Epithelial mesenchymal transition,TNFRSF12A
+EMT,Epithelial mesenchymal transition,TPM1
+EMT,Epithelial mesenchymal transition,TPM2
+EMT,Epithelial mesenchymal transition,TPM4
+EMT,Epithelial mesenchymal transition,VCAM1
+EMT,Epithelial mesenchymal transition,VCAN
+EMT,Epithelial mesenchymal transition,VEGFA
+EMT,Epithelial mesenchymal transition,VEGFC
+EMT,Epithelial mesenchymal transition,VIM
+EMT,Epithelial mesenchymal transition,WIPF1
+EMT,Epithelial mesenchymal transition,WNT5A
+Glycolysis,Glycolysis,ABCB6
+Glycolysis,Glycolysis,ADORA2B
+Glycolysis,Glycolysis,AGL
+Glycolysis,Glycolysis,AGRN
+Glycolysis,Glycolysis,AK3
+Glycolysis,Glycolysis,AK4
+Glycolysis,Glycolysis,AKR1A1
+Glycolysis,Glycolysis,ALDH7A1
+Glycolysis,Glycolysis,ALDH9A1
+Glycolysis,Glycolysis,ALDOA
+Glycolysis,Glycolysis,ALDOB
+Glycolysis,Glycolysis,ALG1
+Glycolysis,Glycolysis,ANG
+Glycolysis,Glycolysis,ANGPTL4
+Glycolysis,Glycolysis,ANKZF1
+Glycolysis,Glycolysis,ARPP19
+Glycolysis,Glycolysis,ARTN
+Glycolysis,Glycolysis,AURKA
+Glycolysis,Glycolysis,B3GALT6
+Glycolysis,Glycolysis,B3GAT1
+Glycolysis,Glycolysis,B3GAT3
+Glycolysis,Glycolysis,B3GNT3
+Glycolysis,Glycolysis,B4GALT1
+Glycolysis,Glycolysis,B4GALT2
+Glycolysis,Glycolysis,B4GALT4
+Glycolysis,Glycolysis,B4GALT7
+Glycolysis,Glycolysis,BIK
+Glycolysis,Glycolysis,BPNT1
+Glycolysis,Glycolysis,CACNA1H
+Glycolysis,Glycolysis,CAPN5
+Glycolysis,Glycolysis,CASP6
+Glycolysis,Glycolysis,CD44
+Glycolysis,Glycolysis,CDK1
+Glycolysis,Glycolysis,CENPA
+Glycolysis,Glycolysis,CHPF
+Glycolysis,Glycolysis,CHPF2
+Glycolysis,Glycolysis,CHST1
+Glycolysis,Glycolysis,CHST12
+Glycolysis,Glycolysis,CHST2
+Glycolysis,Glycolysis,CHST4
+Glycolysis,Glycolysis,CHST6
+Glycolysis,Glycolysis,CITED2
+Glycolysis,Glycolysis,CLDN3
+Glycolysis,Glycolysis,CLDN9
+Glycolysis,Glycolysis,CLN6
+Glycolysis,Glycolysis,COG2
+Glycolysis,Glycolysis,COL5A1
+Glycolysis,Glycolysis,COPB2
+Glycolysis,Glycolysis,CTH
+Glycolysis,Glycolysis,CXCR4
+Glycolysis,Glycolysis,CYB5A
+Glycolysis,Glycolysis,DCN
+Glycolysis,Glycolysis,DDIT4
+Glycolysis,Glycolysis,DEPDC1
+Glycolysis,Glycolysis,DLD
+Glycolysis,Glycolysis,DPYSL4
+Glycolysis,Glycolysis,DSC2
+Glycolysis,Glycolysis,ECD
+Glycolysis,Glycolysis,EFNA3
+Glycolysis,Glycolysis,EGFR
+Glycolysis,Glycolysis,EGLN3
+Glycolysis,Glycolysis,ELF3
+Glycolysis,Glycolysis,ENO1
+Glycolysis,Glycolysis,ENO2
+Glycolysis,Glycolysis,ERO1A
+Glycolysis,Glycolysis,EXT1
+Glycolysis,Glycolysis,EXT2
+Glycolysis,Glycolysis,FAM162A
+Glycolysis,Glycolysis,FBP2
+Glycolysis,Glycolysis,FKBP4
+Glycolysis,Glycolysis,FUT8
+Glycolysis,Glycolysis,G6PD
+Glycolysis,Glycolysis,GAL3ST1
+Glycolysis,Glycolysis,GALE
+Glycolysis,Glycolysis,GALK1
+Glycolysis,Glycolysis,GALK2
+Glycolysis,Glycolysis,GAPDHS
+Glycolysis,Glycolysis,GCLC
+Glycolysis,Glycolysis,GFPT1
+Glycolysis,Glycolysis,GFUS
+Glycolysis,Glycolysis,GLCE
+Glycolysis,Glycolysis,GLRX
+Glycolysis,Glycolysis,GMPPA
+Glycolysis,Glycolysis,GMPPB
+Glycolysis,Glycolysis,GNE
+Glycolysis,Glycolysis,GNPDA1
+Glycolysis,Glycolysis,GOT1
+Glycolysis,Glycolysis,GOT2
+Glycolysis,Glycolysis,GPC1
+Glycolysis,Glycolysis,GPC3
+Glycolysis,Glycolysis,GPC4
+Glycolysis,Glycolysis,GPR87
+Glycolysis,Glycolysis,GUSB
+Glycolysis,Glycolysis,GYS1
+Glycolysis,Glycolysis,GYS2
+Glycolysis,Glycolysis,HAX1
+Glycolysis,Glycolysis,HDLBP
+Glycolysis,Glycolysis,HK2
+Glycolysis,Glycolysis,HMMR
+Glycolysis,Glycolysis,HOMER1
+Glycolysis,Glycolysis,HS2ST1
+Glycolysis,Glycolysis,HS6ST2
+Glycolysis,Glycolysis,HSPA5
+Glycolysis,Glycolysis,IDH1
+Glycolysis,Glycolysis,IDUA
+Glycolysis,Glycolysis,IER3
+Glycolysis,Glycolysis,IGFBP3
+Glycolysis,Glycolysis,IL13RA1
+Glycolysis,Glycolysis,IRS2
+Glycolysis,Glycolysis,ISG20
+Glycolysis,Glycolysis,KDELR3
+Glycolysis,Glycolysis,KIF20A
+Glycolysis,Glycolysis,KIF2A
+Glycolysis,Glycolysis,LCT
+Glycolysis,Glycolysis,LDHA
+Glycolysis,Glycolysis,LDHC
+Glycolysis,Glycolysis,LHPP
+Glycolysis,Glycolysis,LHX9
+Glycolysis,Glycolysis,MDH1
+Glycolysis,Glycolysis,MDH2
+Glycolysis,Glycolysis,ME1
+Glycolysis,Glycolysis,ME2
+Glycolysis,Glycolysis,MED24
+Glycolysis,Glycolysis,MERTK
+Glycolysis,Glycolysis,MET
+Glycolysis,Glycolysis,MIF
+Glycolysis,Glycolysis,MIOX
+Glycolysis,Glycolysis,MPI
+Glycolysis,Glycolysis,MXI1
+Glycolysis,Glycolysis,NANP
+Glycolysis,Glycolysis,NASP
+Glycolysis,Glycolysis,NDST3
+Glycolysis,Glycolysis,NDUFV3
+Glycolysis,Glycolysis,NOL3
+Glycolysis,Glycolysis,NSDHL
+Glycolysis,Glycolysis,NT5E
+Glycolysis,Glycolysis,P4HA1
+Glycolysis,Glycolysis,P4HA2
+Glycolysis,Glycolysis,PAM
+Glycolysis,Glycolysis,PAXIP1
+Glycolysis,Glycolysis,PC
+Glycolysis,Glycolysis,PDK3
+Glycolysis,Glycolysis,PFKFB1
+Glycolysis,Glycolysis,PFKP
+Glycolysis,Glycolysis,PGAM1
+Glycolysis,Glycolysis,PGAM2
+Glycolysis,Glycolysis,PGK1
+Glycolysis,Glycolysis,PGLS
+Glycolysis,Glycolysis,PGM2
+Glycolysis,Glycolysis,PHKA2
+Glycolysis,Glycolysis,PKM
+Glycolysis,Glycolysis,PKP2
+Glycolysis,Glycolysis,PLOD1
+Glycolysis,Glycolysis,PLOD2
+Glycolysis,Glycolysis,PMM2
+Glycolysis,Glycolysis,POLR3K
+Glycolysis,Glycolysis,PPFIA4
+Glycolysis,Glycolysis,PPIA
+Glycolysis,Glycolysis,PPP2CB
+Glycolysis,Glycolysis,PRPS1
+Glycolysis,Glycolysis,PSMC4
+Glycolysis,Glycolysis,PYGB
+Glycolysis,Glycolysis,PYGL
+Glycolysis,Glycolysis,QSOX1
+Glycolysis,Glycolysis,RARS1
+Glycolysis,Glycolysis,RBCK1
+Glycolysis,Glycolysis,RPE
+Glycolysis,Glycolysis,RRAGD
+Glycolysis,Glycolysis,SAP30
+Glycolysis,Glycolysis,SDC1
+Glycolysis,Glycolysis,SDC2
+Glycolysis,Glycolysis,SDC3
+Glycolysis,Glycolysis,SDHC
+Glycolysis,Glycolysis,SLC16A3
+Glycolysis,Glycolysis,SLC25A10
+Glycolysis,Glycolysis,SLC25A13
+Glycolysis,Glycolysis,SLC35A3
+Glycolysis,Glycolysis,SLC37A4
+Glycolysis,Glycolysis,SOD1
+Glycolysis,Glycolysis,SOX9
+Glycolysis,Glycolysis,SPAG4
+Glycolysis,Glycolysis,SRD5A3
+Glycolysis,Glycolysis,STC1
+Glycolysis,Glycolysis,STC2
+Glycolysis,Glycolysis,STMN1
+Glycolysis,Glycolysis,TALDO1
+Glycolysis,Glycolysis,TFF3
+Glycolysis,Glycolysis,TGFA
+Glycolysis,Glycolysis,TGFBI
+Glycolysis,Glycolysis,TKTL1
+Glycolysis,Glycolysis,TPBG
+Glycolysis,Glycolysis,TPI1
+Glycolysis,Glycolysis,TPST1
+Glycolysis,Glycolysis,TXN
+Glycolysis,Glycolysis,UGP2
+Glycolysis,Glycolysis,VCAN
+Glycolysis,Glycolysis,VEGFA
+Glycolysis,Glycolysis,VLDLR
+Glycolysis,Glycolysis,XYLT2
+Glycolysis,Glycolysis,ZNF292
+MYC_targets,MYC targets v1,ABCE1
+MYC_targets,MYC targets v1,ACP1
+MYC_targets,MYC targets v1,AIMP2
+MYC_targets,MYC targets v1,AP3S1
+MYC_targets,MYC targets v1,APEX1
+MYC_targets,MYC targets v1,BUB3
+MYC_targets,MYC targets v1,C1QBP
+MYC_targets,MYC targets v1,CAD
+MYC_targets,MYC targets v1,CANX
+MYC_targets,MYC targets v1,CBX3
+MYC_targets,MYC targets v1,CCNA2
+MYC_targets,MYC targets v1,CCT2
+MYC_targets,MYC targets v1,CCT3
+MYC_targets,MYC targets v1,CCT4
+MYC_targets,MYC targets v1,CCT5
+MYC_targets,MYC targets v1,CCT7
+MYC_targets,MYC targets v1,CDC20
+MYC_targets,MYC targets v1,CDC45
+MYC_targets,MYC targets v1,CDK2
+MYC_targets,MYC targets v1,CDK4
+MYC_targets,MYC targets v1,CLNS1A
+MYC_targets,MYC targets v1,CNBP
+MYC_targets,MYC targets v1,COPS5
+MYC_targets,MYC targets v1,COX5A
+MYC_targets,MYC targets v1,CSTF2
+MYC_targets,MYC targets v1,CTPS1
+MYC_targets,MYC targets v1,CUL1
+MYC_targets,MYC targets v1,CYC1
+MYC_targets,MYC targets v1,DDX18
+MYC_targets,MYC targets v1,DDX21
+MYC_targets,MYC targets v1,DEK
+MYC_targets,MYC targets v1,DHX15
+MYC_targets,MYC targets v1,DUT
+MYC_targets,MYC targets v1,EEF1B2
+MYC_targets,MYC targets v1,EIF1AX
+MYC_targets,MYC targets v1,EIF2S1
+MYC_targets,MYC targets v1,EIF2S2
+MYC_targets,MYC targets v1,EIF3B
+MYC_targets,MYC targets v1,EIF3D
+MYC_targets,MYC targets v1,EIF3J
+MYC_targets,MYC targets v1,EIF4A1
+MYC_targets,MYC targets v1,EIF4E
+MYC_targets,MYC targets v1,EIF4G2
+MYC_targets,MYC targets v1,EIF4H
+MYC_targets,MYC targets v1,EPRS1
+MYC_targets,MYC targets v1,ERH
+MYC_targets,MYC targets v1,ETF1
+MYC_targets,MYC targets v1,EXOSC7
+MYC_targets,MYC targets v1,FAM120A
+MYC_targets,MYC targets v1,FBL
+MYC_targets,MYC targets v1,G3BP1
+MYC_targets,MYC targets v1,GLO1
+MYC_targets,MYC targets v1,GNL3
+MYC_targets,MYC targets v1,GOT2
+MYC_targets,MYC targets v1,GSPT1
+MYC_targets,MYC targets v1,H2AZ1
+MYC_targets,MYC targets v1,HDAC2
+MYC_targets,MYC targets v1,HDDC2
+MYC_targets,MYC targets v1,HDGF
+MYC_targets,MYC targets v1,HNRNPA1
+MYC_targets,MYC targets v1,HNRNPA2B1
+MYC_targets,MYC targets v1,HNRNPA3
+MYC_targets,MYC targets v1,HNRNPC
+MYC_targets,MYC targets v1,HNRNPD
+MYC_targets,MYC targets v1,HNRNPR
+MYC_targets,MYC targets v1,HNRNPU
+MYC_targets,MYC targets v1,HPRT1
+MYC_targets,MYC targets v1,HSP90AB1
+MYC_targets,MYC targets v1,HSPD1
+MYC_targets,MYC targets v1,HSPE1
+MYC_targets,MYC targets v1,IARS1
+MYC_targets,MYC targets v1,IFRD1
+MYC_targets,MYC targets v1,ILF2
+MYC_targets,MYC targets v1,IMPDH2
+MYC_targets,MYC targets v1,KARS1
+MYC_targets,MYC targets v1,KPNA2
+MYC_targets,MYC targets v1,KPNB1
+MYC_targets,MYC targets v1,LDHA
+MYC_targets,MYC targets v1,LSM2
+MYC_targets,MYC targets v1,LSM7
+MYC_targets,MYC targets v1,MAD2L1
+MYC_targets,MYC targets v1,MCM2
+MYC_targets,MYC targets v1,MCM4
+MYC_targets,MYC targets v1,MCM5
+MYC_targets,MYC targets v1,MCM6
+MYC_targets,MYC targets v1,MCM7
+MYC_targets,MYC targets v1,MRPL23
+MYC_targets,MYC targets v1,MRPL9
+MYC_targets,MYC targets v1,MRPS18B
+MYC_targets,MYC targets v1,MYC
+MYC_targets,MYC targets v1,NAP1L1
+MYC_targets,MYC targets v1,NCBP1
+MYC_targets,MYC targets v1,NCBP2
+MYC_targets,MYC targets v1,NDUFAB1
+MYC_targets,MYC targets v1,NHP2
+MYC_targets,MYC targets v1,NME1
+MYC_targets,MYC targets v1,NOLC1
+MYC_targets,MYC targets v1,NOP16
+MYC_targets,MYC targets v1,NOP56
+MYC_targets,MYC targets v1,NPM1
+MYC_targets,MYC targets v1,ODC1
+MYC_targets,MYC targets v1,ORC2
+MYC_targets,MYC targets v1,PA2G4
+MYC_targets,MYC targets v1,PABPC1
+MYC_targets,MYC targets v1,PABPC4
+MYC_targets,MYC targets v1,PCBP1
+MYC_targets,MYC targets v1,PCNA
+MYC_targets,MYC targets v1,PGK1
+MYC_targets,MYC targets v1,PHB1
+MYC_targets,MYC targets v1,PHB2
+MYC_targets,MYC targets v1,POLD2
+MYC_targets,MYC targets v1,POLE3
+MYC_targets,MYC targets v1,PPIA
+MYC_targets,MYC targets v1,PPM1G
+MYC_targets,MYC targets v1,PRDX3
+MYC_targets,MYC targets v1,PRDX4
+MYC_targets,MYC targets v1,PRPF31
+MYC_targets,MYC targets v1,PRPS2
+MYC_targets,MYC targets v1,PSMA1
+MYC_targets,MYC targets v1,PSMA2
+MYC_targets,MYC targets v1,PSMA4
+MYC_targets,MYC targets v1,PSMA6
+MYC_targets,MYC targets v1,PSMA7
+MYC_targets,MYC targets v1,PSMB2
+MYC_targets,MYC targets v1,PSMB3
+MYC_targets,MYC targets v1,PSMC4
+MYC_targets,MYC targets v1,PSMC6
+MYC_targets,MYC targets v1,PSMD1
+MYC_targets,MYC targets v1,PSMD14
+MYC_targets,MYC targets v1,PSMD3
+MYC_targets,MYC targets v1,PSMD7
+MYC_targets,MYC targets v1,PSMD8
+MYC_targets,MYC targets v1,PTGES3
+MYC_targets,MYC targets v1,PWP1
+MYC_targets,MYC targets v1,RACK1
+MYC_targets,MYC targets v1,RAD23B
+MYC_targets,MYC targets v1,RAN
+MYC_targets,MYC targets v1,RANBP1
+MYC_targets,MYC targets v1,RFC4
+MYC_targets,MYC targets v1,RNPS1
+MYC_targets,MYC targets v1,RPL14
+MYC_targets,MYC targets v1,RPL18
+MYC_targets,MYC targets v1,RPL22
+MYC_targets,MYC targets v1,RPL34
+MYC_targets,MYC targets v1,RPL6
+MYC_targets,MYC targets v1,RPLP0
+MYC_targets,MYC targets v1,RPS10
+MYC_targets,MYC targets v1,RPS2
+MYC_targets,MYC targets v1,RPS3
+MYC_targets,MYC targets v1,RPS5
+MYC_targets,MYC targets v1,RPS6
+MYC_targets,MYC targets v1,RRM1
+MYC_targets,MYC targets v1,RRP9
+MYC_targets,MYC targets v1,RSL1D1
+MYC_targets,MYC targets v1,RUVBL2
+MYC_targets,MYC targets v1,SERBP1
+MYC_targets,MYC targets v1,SET
+MYC_targets,MYC targets v1,SF3A1
+MYC_targets,MYC targets v1,SF3B3
+MYC_targets,MYC targets v1,SLC25A3
+MYC_targets,MYC targets v1,SMARCC1
+MYC_targets,MYC targets v1,SNRPA
+MYC_targets,MYC targets v1,SNRPA1
+MYC_targets,MYC targets v1,SNRPB2
+MYC_targets,MYC targets v1,SNRPD1
+MYC_targets,MYC targets v1,SNRPD2
+MYC_targets,MYC targets v1,SNRPD3
+MYC_targets,MYC targets v1,SNRPG
+MYC_targets,MYC targets v1,SRM
+MYC_targets,MYC targets v1,SRPK1
+MYC_targets,MYC targets v1,SRSF1
+MYC_targets,MYC targets v1,SRSF2
+MYC_targets,MYC targets v1,SRSF3
+MYC_targets,MYC targets v1,SRSF7
+MYC_targets,MYC targets v1,SSB
+MYC_targets,MYC targets v1,SSBP1
+MYC_targets,MYC targets v1,STARD7
+MYC_targets,MYC targets v1,SYNCRIP
+MYC_targets,MYC targets v1,TARDBP
+MYC_targets,MYC targets v1,TCP1
+MYC_targets,MYC targets v1,TFDP1
+MYC_targets,MYC targets v1,TOMM70
+MYC_targets,MYC targets v1,TRA2B
+MYC_targets,MYC targets v1,TRIM28
+MYC_targets,MYC targets v1,TUFM
+MYC_targets,MYC targets v1,TXNL4A
+MYC_targets,MYC targets v1,TYMS
+MYC_targets,MYC targets v1,U2AF1
+MYC_targets,MYC targets v1,UBA2
+MYC_targets,MYC targets v1,UBE2E1
+MYC_targets,MYC targets v1,UBE2L3
+MYC_targets,MYC targets v1,USP1
+MYC_targets,MYC targets v1,VBP1
+MYC_targets,MYC targets v1,VDAC1
+MYC_targets,MYC targets v1,VDAC3
+MYC_targets,MYC targets v1,XPO1
+MYC_targets,MYC targets v1,XPOT
+MYC_targets,MYC targets v1,XRCC6
+MYC_targets,MYC targets v1,YWHAE
+MYC_targets,MYC targets v1,YWHAQ
+NRF2,NRF2 pathway,ABCC2
+NRF2,NRF2 pathway,ABCC3
+NRF2,NRF2 pathway,ABCC4
+NRF2,NRF2 pathway,ABCC5
+NRF2,NRF2 pathway,ADH7
+NRF2,NRF2 pathway,AGER
+NRF2,NRF2 pathway,ALDH3A1
+NRF2,NRF2 pathway,BLVRB
+NRF2,NRF2 pathway,CBR1
+NRF2,NRF2 pathway,CBR3
+NRF2,NRF2 pathway,CES1
+NRF2,NRF2 pathway,CES2
+NRF2,NRF2 pathway,CES3
+NRF2,NRF2 pathway,CES4A
+NRF2,NRF2 pathway,CES5A
+NRF2,NRF2 pathway,CYP2A6
+NRF2,NRF2 pathway,CYP4A11
+NRF2,NRF2 pathway,DNAJB1
+NRF2,NRF2 pathway,EGR1
+NRF2,NRF2 pathway,EPHA2
+NRF2,NRF2 pathway,EPHA3
+NRF2,NRF2 pathway,FGF13
+NRF2,NRF2 pathway,FTH1
+NRF2,NRF2 pathway,FTL
+NRF2,NRF2 pathway,G6PD
+NRF2,NRF2 pathway,GCLC
+NRF2,NRF2 pathway,GCLM
+NRF2,NRF2 pathway,GGT1
+NRF2,NRF2 pathway,GPX2
+NRF2,NRF2 pathway,GPX3
+NRF2,NRF2 pathway,GSR
+NRF2,NRF2 pathway,GSTA1
+NRF2,NRF2 pathway,GSTA2
+NRF2,NRF2 pathway,GSTA3
+NRF2,NRF2 pathway,GSTA4
+NRF2,NRF2 pathway,GSTA5
+NRF2,NRF2 pathway,GSTM1
+NRF2,NRF2 pathway,GSTM2
+NRF2,NRF2 pathway,GSTM3
+NRF2,NRF2 pathway,GSTM4
+NRF2,NRF2 pathway,GSTM5
+NRF2,NRF2 pathway,GSTP1
+NRF2,NRF2 pathway,GSTT2
+NRF2,NRF2 pathway,HBEGF
+NRF2,NRF2 pathway,HGF
+NRF2,NRF2 pathway,HMOX1
+NRF2,NRF2 pathway,HSP90AA1
+NRF2,NRF2 pathway,HSP90AB1
+NRF2,NRF2 pathway,HSPA1A
+NRF2,NRF2 pathway,KEAP1
+NRF2,NRF2 pathway,MAFF
+NRF2,NRF2 pathway,MAFG
+NRF2,NRF2 pathway,ME1
+NRF2,NRF2 pathway,MGST2
+NRF2,NRF2 pathway,MGST3
+NRF2,NRF2 pathway,NFE2L2
+NRF2,NRF2 pathway,NQO1
+NRF2,NRF2 pathway,NRG1
+NRF2,NRF2 pathway,PDGFB
+NRF2,NRF2 pathway,PGD
+NRF2,NRF2 pathway,PPARD
+NRF2,NRF2 pathway,PRDX1
+NRF2,NRF2 pathway,PRDX6
+NRF2,NRF2 pathway,PTGR1
+NRF2,NRF2 pathway,RXRA
+NRF2,NRF2 pathway,SERPINA1
+NRF2,NRF2 pathway,SLC2A1
+NRF2,NRF2 pathway,SLC2A10
+NRF2,NRF2 pathway,SLC2A11
+NRF2,NRF2 pathway,SLC2A12
+NRF2,NRF2 pathway,SLC2A13
+NRF2,NRF2 pathway,SLC2A14
+NRF2,NRF2 pathway,SLC2A2
+NRF2,NRF2 pathway,SLC2A3
+NRF2,NRF2 pathway,SLC2A4
+NRF2,NRF2 pathway,SLC2A5
+NRF2,NRF2 pathway,SLC2A6
+NRF2,NRF2 pathway,SLC2A7
+NRF2,NRF2 pathway,SLC2A8
+NRF2,NRF2 pathway,SLC2A9
+NRF2,NRF2 pathway,SLC39A1
+NRF2,NRF2 pathway,SLC39A10
+NRF2,NRF2 pathway,SLC39A11
+NRF2,NRF2 pathway,SLC39A12
+NRF2,NRF2 pathway,SLC39A13
+NRF2,NRF2 pathway,SLC39A14
+NRF2,NRF2 pathway,SLC39A2
+NRF2,NRF2 pathway,SLC39A3
+NRF2,NRF2 pathway,SLC39A4
+NRF2,NRF2 pathway,SLC39A5
+NRF2,NRF2 pathway,SLC39A6
+NRF2,NRF2 pathway,SLC39A7
+NRF2,NRF2 pathway,SLC39A8
+NRF2,NRF2 pathway,SLC39A9
+NRF2,NRF2 pathway,SLC5A1
+NRF2,NRF2 pathway,SLC5A10
+NRF2,NRF2 pathway,SLC5A11
+NRF2,NRF2 pathway,SLC5A12
+NRF2,NRF2 pathway,SLC5A2
+NRF2,NRF2 pathway,SLC5A3
+NRF2,NRF2 pathway,SLC5A4
+NRF2,NRF2 pathway,SLC5A5
+NRF2,NRF2 pathway,SLC5A6
+NRF2,NRF2 pathway,SLC5A7
+NRF2,NRF2 pathway,SLC5A8
+NRF2,NRF2 pathway,SLC5A9
+NRF2,NRF2 pathway,SLC6A1
+NRF2,NRF2 pathway,SLC6A11
+NRF2,NRF2 pathway,SLC6A13
+NRF2,NRF2 pathway,SLC6A14
+NRF2,NRF2 pathway,SLC6A15
+NRF2,NRF2 pathway,SLC6A16
+NRF2,NRF2 pathway,SLC6A17
+NRF2,NRF2 pathway,SLC6A18
+NRF2,NRF2 pathway,SLC6A19
+NRF2,NRF2 pathway,SLC6A2
+NRF2,NRF2 pathway,SLC6A20
+NRF2,NRF2 pathway,SLC6A3
+NRF2,NRF2 pathway,SLC6A4
+NRF2,NRF2 pathway,SLC6A5
+NRF2,NRF2 pathway,SLC6A6
+NRF2,NRF2 pathway,SLC6A7
+NRF2,NRF2 pathway,SLC6A8
+NRF2,NRF2 pathway,SLC6A9
+NRF2,NRF2 pathway,SLC7A11
+NRF2,NRF2 pathway,SOD3
+NRF2,NRF2 pathway,SQSTM1
+NRF2,NRF2 pathway,SRXN1
+NRF2,NRF2 pathway,TGFA
+NRF2,NRF2 pathway,TGFB1
+NRF2,NRF2 pathway,TGFB2
+NRF2,NRF2 pathway,TGFBR2
+NRF2,NRF2 pathway,TXN
+NRF2,NRF2 pathway,TXNRD1
+NRF2,NRF2 pathway,TXNRD3
+NRF2,NRF2 pathway,UGT1A1
+NRF2,NRF2 pathway,UGT1A4
+NRF2,NRF2 pathway,UGT1A6
+NRF2,NRF2 pathway,UGT1A7
+NRF2,NRF2 pathway,UGT1A9
+NRF2,NRF2 pathway,UGT2B7
+COD,Cellular oxidant detoxification,ALB
+COD,Cellular oxidant detoxification,ALOX5AP
+COD,Cellular oxidant detoxification,AMBP
+COD,Cellular oxidant detoxification,APOA4
+COD,Cellular oxidant detoxification,APOE
+COD,Cellular oxidant detoxification,APOM
+COD,Cellular oxidant detoxification,ATP7A
+COD,Cellular oxidant detoxification,BMP7
+COD,Cellular oxidant detoxification,CAT
+COD,Cellular oxidant detoxification,CCS
+COD,Cellular oxidant detoxification,CD36
+COD,Cellular oxidant detoxification,CLIC1
+COD,Cellular oxidant detoxification,CLIC2
+COD,Cellular oxidant detoxification,CP
+COD,Cellular oxidant detoxification,CYGB
+COD,Cellular oxidant detoxification,DHFR
+COD,Cellular oxidant detoxification,DHFRP1
+COD,Cellular oxidant detoxification,DUOX2
+COD,Cellular oxidant detoxification,EPX
+COD,Cellular oxidant detoxification,FABP1
+COD,Cellular oxidant detoxification,FBLN5
+COD,Cellular oxidant detoxification,GCH1
+COD,Cellular oxidant detoxification,GPX1
+COD,Cellular oxidant detoxification,GPX2
+COD,Cellular oxidant detoxification,GPX3
+COD,Cellular oxidant detoxification,GPX4
+COD,Cellular oxidant detoxification,GPX5
+COD,Cellular oxidant detoxification,GPX6
+COD,Cellular oxidant detoxification,GPX7
+COD,Cellular oxidant detoxification,GPX8
+COD,Cellular oxidant detoxification,GSR
+COD,Cellular oxidant detoxification,GSTA1
+COD,Cellular oxidant detoxification,GSTK1
+COD,Cellular oxidant detoxification,GSTM2
+COD,Cellular oxidant detoxification,GSTO1
+COD,Cellular oxidant detoxification,GSTO2
+COD,Cellular oxidant detoxification,GSTP1
+COD,Cellular oxidant detoxification,GSTT1
+COD,Cellular oxidant detoxification,GSTZ1
+COD,Cellular oxidant detoxification,HBA1
+COD,Cellular oxidant detoxification,HBA2
+COD,Cellular oxidant detoxification,HBB
+COD,Cellular oxidant detoxification,HP
+COD,Cellular oxidant detoxification,IPCEF1
+COD,Cellular oxidant detoxification,LPO
+COD,Cellular oxidant detoxification,LTC4S
+COD,Cellular oxidant detoxification,MB
+COD,Cellular oxidant detoxification,MGST1
+COD,Cellular oxidant detoxification,MGST2
+COD,Cellular oxidant detoxification,MGST3
+COD,Cellular oxidant detoxification,MPO
+COD,Cellular oxidant detoxification,MT3
+COD,Cellular oxidant detoxification,NFE2L2
+COD,Cellular oxidant detoxification,NOS3
+COD,Cellular oxidant detoxification,NQO1
+COD,Cellular oxidant detoxification,NXN
+COD,Cellular oxidant detoxification,PARK7
+COD,Cellular oxidant detoxification,PRDX1
+COD,Cellular oxidant detoxification,PRDX2
+COD,Cellular oxidant detoxification,PRDX3
+COD,Cellular oxidant detoxification,PRDX4
+COD,Cellular oxidant detoxification,PRDX5
+COD,Cellular oxidant detoxification,PRDX6
+COD,Cellular oxidant detoxification,PRXL2A
+COD,Cellular oxidant detoxification,PTGES
+COD,Cellular oxidant detoxification,PTGS1
+COD,Cellular oxidant detoxification,PTGS2
+COD,Cellular oxidant detoxification,PXDN
+COD,Cellular oxidant detoxification,PXDNL
+COD,Cellular oxidant detoxification,S100A9
+COD,Cellular oxidant detoxification,SELENOF
+COD,Cellular oxidant detoxification,SELENOS
+COD,Cellular oxidant detoxification,SELENOT
+COD,Cellular oxidant detoxification,SELENOW
+COD,Cellular oxidant detoxification,SESN1
+COD,Cellular oxidant detoxification,SESN2
+COD,Cellular oxidant detoxification,SOD1
+COD,Cellular oxidant detoxification,SOD2
+COD,Cellular oxidant detoxification,SOD3
+COD,Cellular oxidant detoxification,SRXN1
+COD,Cellular oxidant detoxification,TP53INP1
+COD,Cellular oxidant detoxification,TPO
+COD,Cellular oxidant detoxification,TXN
+COD,Cellular oxidant detoxification,TXNDC17
+COD,Cellular oxidant detoxification,TXNDC2
+COD,Cellular oxidant detoxification,TXNRD1
+COD,Cellular oxidant detoxification,TXNRD2
+COD,Cellular oxidant detoxification,TXNRD3
+COD,Cellular oxidant detoxification,UBIAD1
+JNK,JNK cascade,AGER
+JNK,JNK cascade,AIDA
+JNK,JNK cascade,AMBP
+JNK,JNK cascade,APP
+JNK,JNK cascade,ARHGEF6
+JNK,JNK cascade,ATF2
+JNK,JNK cascade,AXIN1
+JNK,JNK cascade,BECN1
+JNK,JNK cascade,BIRC7
+JNK,JNK cascade,BIRC8
+JNK,JNK cascade,CARD9
+JNK,JNK cascade,CASR
+JNK,JNK cascade,CBS
+JNK,JNK cascade,CCDC88C
+JNK,JNK cascade,CCL19
+JNK,JNK cascade,CCL21
+JNK,JNK cascade,CCN2
+JNK,JNK cascade,CCR7
+JNK,JNK cascade,CD27
+JNK,JNK cascade,CDC42EP5
+JNK,JNK cascade,COPS5
+JNK,JNK cascade,CRACR2A
+JNK,JNK cascade,CRK
+JNK,JNK cascade,CRKL
+JNK,JNK cascade,CYLD
+JNK,JNK cascade,DAB2IP
+JNK,JNK cascade,DACT1
+JNK,JNK cascade,DAXX
+JNK,JNK cascade,DKK1
+JNK,JNK cascade,DNAJA1
+JNK,JNK cascade,DUSP10
+JNK,JNK cascade,DUSP19
+JNK,JNK cascade,DUSP22
+JNK,JNK cascade,DUSP3
+JNK,JNK cascade,DUSP9
+JNK,JNK cascade,DVL2
+JNK,JNK cascade,DVL3
+JNK,JNK cascade,EDA2R
+JNK,JNK cascade,EDAR
+JNK,JNK cascade,EDN1
+JNK,JNK cascade,ENSG00000274276
+JNK,JNK cascade,EPHA4
+JNK,JNK cascade,EPHB1
+JNK,JNK cascade,ERBB2
+JNK,JNK cascade,ERBB3
+JNK,JNK cascade,ERCC6
+JNK,JNK cascade,ERN1
+JNK,JNK cascade,ERN2
+JNK,JNK cascade,F2RL1
+JNK,JNK cascade,FCGR2B
+JNK,JNK cascade,FGF12
+JNK,JNK cascade,FGF14
+JNK,JNK cascade,FGF19
+JNK,JNK cascade,FKTN
+JNK,JNK cascade,FLT4
+JNK,JNK cascade,FZD10
+JNK,JNK cascade,FZD7
+JNK,JNK cascade,GADD45A
+JNK,JNK cascade,GADD45B
+JNK,JNK cascade,GADD45G
+JNK,JNK cascade,GPS1
+JNK,JNK cascade,GPS2
+JNK,JNK cascade,GRIK2
+JNK,JNK cascade,GSTP1
+JNK,JNK cascade,HACD3
+JNK,JNK cascade,HDAC3
+JNK,JNK cascade,HIPK2
+JNK,JNK cascade,HIPK3
+JNK,JNK cascade,HMGB1
+JNK,JNK cascade,HRAS
+JNK,JNK cascade,IGF1R
+JNK,JNK cascade,IL1B
+JNK,JNK cascade,IRAK1
+JNK,JNK cascade,IRAK4
+JNK,JNK cascade,ITCH
+JNK,JNK cascade,JUN
+JNK,JNK cascade,KLHL31
+JNK,JNK cascade,LRRK2
+JNK,JNK cascade,LTBR
+JNK,JNK cascade,MAP1LC3A
+JNK,JNK cascade,MAP2K4
+JNK,JNK cascade,MAP2K7
+JNK,JNK cascade,MAP3K10
+JNK,JNK cascade,MAP3K11
+JNK,JNK cascade,MAP3K12
+JNK,JNK cascade,MAP3K13
+JNK,JNK cascade,MAP3K15
+JNK,JNK cascade,MAP3K20
+JNK,JNK cascade,MAP3K5
+JNK,JNK cascade,MAP3K6
+JNK,JNK cascade,MAP3K7
+JNK,JNK cascade,MAP4K1
+JNK,JNK cascade,MAP4K2
+JNK,JNK cascade,MAP4K3
+JNK,JNK cascade,MAP4K4
+JNK,JNK cascade,MAPK10
+JNK,JNK cascade,MAPK8
+JNK,JNK cascade,MAPK8IP1
+JNK,JNK cascade,MAPK8IP2
+JNK,JNK cascade,MAPK8IP3
+JNK,JNK cascade,MAPK9
+JNK,JNK cascade,MAPKBP1
+JNK,JNK cascade,MARVELD3
+JNK,JNK cascade,MBIP
+JNK,JNK cascade,MDFI
+JNK,JNK cascade,MDFIC
+JNK,JNK cascade,MDFIC2
+JNK,JNK cascade,MECOM
+JNK,JNK cascade,MEN1
+JNK,JNK cascade,MFHAS1
+JNK,JNK cascade,MINK1
+JNK,JNK cascade,MIR92A1
+JNK,JNK cascade,MTURN
+JNK,JNK cascade,MYD88
+JNK,JNK cascade,MYOC
+JNK,JNK cascade,NAIP
+JNK,JNK cascade,NCOR1
+JNK,JNK cascade,NFKB1
+JNK,JNK cascade,NOD1
+JNK,JNK cascade,NOD2
+JNK,JNK cascade,NOX1
+JNK,JNK cascade,NPHS1
+JNK,JNK cascade,NPPA
+JNK,JNK cascade,NR2C2
+JNK,JNK cascade,NRK
+JNK,JNK cascade,PAFAH1B1
+JNK,JNK cascade,PDCD4
+JNK,JNK cascade,PER1
+JNK,JNK cascade,PHLPP1
+JNK,JNK cascade,PINK1
+JNK,JNK cascade,PJA2
+JNK,JNK cascade,PLCB1
+JNK,JNK cascade,PRKN
+JNK,JNK cascade,PRMT1
+JNK,JNK cascade,PTGER4
+JNK,JNK cascade,PTK2B
+JNK,JNK cascade,PTPN1
+JNK,JNK cascade,PTPN22
+JNK,JNK cascade,PYCARD
+JNK,JNK cascade,RAP2A
+JNK,JNK cascade,RASSF2
+JNK,JNK cascade,RB1CC1
+JNK,JNK cascade,RGS2
+JNK,JNK cascade,RIPK1
+JNK,JNK cascade,RIPK2
+JNK,JNK cascade,RNF13
+JNK,JNK cascade,SDCBP
+JNK,JNK cascade,SEMA3A
+JNK,JNK cascade,SERPINF2
+JNK,JNK cascade,SH2D3A
+JNK,JNK cascade,SH2D3C
+JNK,JNK cascade,SH3RF1
+JNK,JNK cascade,SH3RF2
+JNK,JNK cascade,SH3RF3
+JNK,JNK cascade,SIRPA
+JNK,JNK cascade,SLAMF1
+JNK,JNK cascade,SMAD3
+JNK,JNK cascade,STK3
+JNK,JNK cascade,STRADB
+JNK,JNK cascade,TAOK1
+JNK,JNK cascade,TAOK2
+JNK,JNK cascade,TAOK3
+JNK,JNK cascade,TGFBR3
+JNK,JNK cascade,TIRAP
+JNK,JNK cascade,TLR3
+JNK,JNK cascade,TLR4
+JNK,JNK cascade,TLR7
+JNK,JNK cascade,TLR9
+JNK,JNK cascade,TNF
+JNK,JNK cascade,TNFRSF11A
+JNK,JNK cascade,TNFRSF19
+JNK,JNK cascade,TNFSF11
+JNK,JNK cascade,TNIK
+JNK,JNK cascade,TNXB
+JNK,JNK cascade,TPD52L1
+JNK,JNK cascade,TRAF2
+JNK,JNK cascade,TRAF4
+JNK,JNK cascade,TRAF6
+JNK,JNK cascade,TRIB1
+JNK,JNK cascade,TRPV4
+JNK,JNK cascade,ULK4
+JNK,JNK cascade,UNC5CL
+JNK,JNK cascade,WNT16
+JNK,JNK cascade,WNT5A
+JNK,JNK cascade,WNT7A
+JNK,JNK cascade,WNT7B
+JNK,JNK cascade,XIAP
+JNK,JNK cascade,ZMYND11
+JNK,JNK cascade,ZNF622
+JNK,JNK cascade,ZNF675
+Ferroptosis,Ferroptosis,ACLY
+Ferroptosis,Ferroptosis,ACSL4
+Ferroptosis,Ferroptosis,ADGRG1
+Ferroptosis,Ferroptosis,AIFM2
+Ferroptosis,Ferroptosis,ALDH7A1
+Ferroptosis,Ferroptosis,CAMK2A
+Ferroptosis,Ferroptosis,DHCR7
+Ferroptosis,Ferroptosis,EGLN3
+Ferroptosis,Ferroptosis,FTH1
+Ferroptosis,Ferroptosis,GPX4
+Ferroptosis,Ferroptosis,GSTP1
+Ferroptosis,Ferroptosis,HDAC3
+Ferroptosis,Ferroptosis,HMOX1
+Ferroptosis,Ferroptosis,HSPA8
+Ferroptosis,Ferroptosis,KAT2B
+Ferroptosis,Ferroptosis,LAMP2
+Ferroptosis,Ferroptosis,LGALS13
+Ferroptosis,Ferroptosis,NFE2L2
+Ferroptosis,Ferroptosis,NINJ1
+Ferroptosis,Ferroptosis,NQO1
+Ferroptosis,Ferroptosis,PCK2
+Ferroptosis,Ferroptosis,PRKAA1
+Ferroptosis,Ferroptosis,PRKCB
+Ferroptosis,Ferroptosis,PSAT1
+Ferroptosis,Ferroptosis,SC5D
+Ferroptosis,Ferroptosis,SLC25A1
+Ferroptosis,Ferroptosis,SLC39A7
+Ferroptosis,Ferroptosis,SLC7A11
+Ferroptosis,Ferroptosis,SMURF2
+Ferroptosis,Ferroptosis,SQSTM1
+Ferroptosis,Ferroptosis,TMEM164
+PI3K,PI3K/AKT signaling pathway,AKT1
+PI3K,PI3K/AKT signaling pathway,AKT2
+PI3K,PI3K/AKT signaling pathway,AKT3
+PI3K,PI3K/AKT signaling pathway,BAD
+PI3K,PI3K/AKT signaling pathway,BCL2L1
+PI3K,PI3K/AKT signaling pathway,CASP9
+PI3K,PI3K/AKT signaling pathway,CDKN1A
+PI3K,PI3K/AKT signaling pathway,CDKN1B
+PI3K,PI3K/AKT signaling pathway,CHUK
+PI3K,PI3K/AKT signaling pathway,FOXO1
+PI3K,PI3K/AKT signaling pathway,FOXO3
+PI3K,PI3K/AKT signaling pathway,FOXO4
+PI3K,PI3K/AKT signaling pathway,GSK3A
+PI3K,PI3K/AKT signaling pathway,GSK3B
+PI3K,PI3K/AKT signaling pathway,HSP90AA1
+PI3K,PI3K/AKT signaling pathway,KPNA1
+PI3K,PI3K/AKT signaling pathway,MAP3K5
+PI3K,PI3K/AKT signaling pathway,MAPKAP1
+PI3K,PI3K/AKT signaling pathway,MLST8
+PI3K,PI3K/AKT signaling pathway,MTOR
+PI3K,PI3K/AKT signaling pathway,PDPK1
+PI3K,PI3K/AKT signaling pathway,PRKACA
+PI3K,PI3K/AKT signaling pathway,PRKDC
+PI3K,PI3K/AKT signaling pathway,RAF1
+PI3K,PI3K/AKT signaling pathway,RICTOR
+PI3K,PI3K/AKT signaling pathway,SFN
+PI3K,PI3K/AKT signaling pathway,SLC2A4
+PI3K,PI3K/AKT signaling pathway,SRC
+PI3K,PI3K/AKT signaling pathway,TBC1D4
+PI3K,PI3K/AKT signaling pathway,YWHAB
+PI3K,PI3K/AKT signaling pathway,YWHAE
+PI3K,PI3K/AKT signaling pathway,YWHAG
+PI3K,PI3K/AKT signaling pathway,YWHAH
+PI3K,PI3K/AKT signaling pathway,YWHAQ
+PI3K,PI3K/AKT signaling pathway,YWHAZ
+Autophagy,Autophagy,AMBRA1
+Autophagy,Autophagy,ARL13B
+Autophagy,Autophagy,ATG10
+Autophagy,Autophagy,ATG101
+Autophagy,Autophagy,ATG12
+Autophagy,Autophagy,ATG13
+Autophagy,Autophagy,ATG14
+Autophagy,Autophagy,ATG16L1
+Autophagy,Autophagy,ATG16L2
+Autophagy,Autophagy,ATG3
+Autophagy,Autophagy,ATG4A
+Autophagy,Autophagy,ATG4B
+Autophagy,Autophagy,ATG4C
+Autophagy,Autophagy,ATG4D
+Autophagy,Autophagy,ATG5
+Autophagy,Autophagy,ATG7
+Autophagy,Autophagy,ATG9A
+Autophagy,Autophagy,ATG9B
+Autophagy,Autophagy,ATM
+Autophagy,Autophagy,BECN1
+Autophagy,Autophagy,CETN1
+Autophagy,Autophagy,CFTR
+Autophagy,Autophagy,CHMP2A
+Autophagy,Autophagy,CHMP2B
+Autophagy,Autophagy,CHMP3
+Autophagy,Autophagy,CHMP4A
+Autophagy,Autophagy,CHMP4B
+Autophagy,Autophagy,CHMP4C
+Autophagy,Autophagy,CHMP6
+Autophagy,Autophagy,CHMP7
+Autophagy,Autophagy,CSNK2A1
+Autophagy,Autophagy,CSNK2A2
+Autophagy,Autophagy,CSNK2B
+Autophagy,Autophagy,DYNC1H1
+Autophagy,Autophagy,DYNC1I1
+Autophagy,Autophagy,DYNC1I2
+Autophagy,Autophagy,DYNC1LI1
+Autophagy,Autophagy,DYNC1LI2
+Autophagy,Autophagy,DYNLL1
+Autophagy,Autophagy,DYNLL2
+Autophagy,Autophagy,EEF1A1
+Autophagy,Autophagy,EPAS1
+Autophagy,Autophagy,FUNDC1
+Autophagy,Autophagy,GABARAP
+Autophagy,Autophagy,GABARAPL1
+Autophagy,Autophagy,GABARAPL2
+Autophagy,Autophagy,GFAP
+Autophagy,Autophagy,HBB
+Autophagy,Autophagy,HDAC6
+Autophagy,Autophagy,HSF1
+Autophagy,Autophagy,HSP90AA1
+Autophagy,Autophagy,HSP90AB1
+Autophagy,Autophagy,HSPA8
+Autophagy,Autophagy,IFT88
+Autophagy,Autophagy,LAMP2
+Autophagy,Autophagy,LAMTOR1
+Autophagy,Autophagy,LAMTOR2
+Autophagy,Autophagy,LAMTOR3
+Autophagy,Autophagy,LAMTOR4
+Autophagy,Autophagy,LAMTOR5
+Autophagy,Autophagy,MAP1LC3A
+Autophagy,Autophagy,MAP1LC3B
+Autophagy,Autophagy,MAP1LC3C
+Autophagy,Autophagy,MFN1
+Autophagy,Autophagy,MFN2
+Autophagy,Autophagy,MLST8
+Autophagy,Autophagy,MTERF3
+Autophagy,Autophagy,MTMR14
+Autophagy,Autophagy,MTMR3
+Autophagy,Autophagy,MTOR
+Autophagy,Autophagy,MVB12A
+Autophagy,Autophagy,MVB12B
+Autophagy,Autophagy,NBR1
+Autophagy,Autophagy,OPTN
+Autophagy,Autophagy,PARK7
+Autophagy,Autophagy,PCNT
+Autophagy,Autophagy,PEX5
+Autophagy,Autophagy,PGAM5
+Autophagy,Autophagy,PIK3C3
+Autophagy,Autophagy,PIK3R4
+Autophagy,Autophagy,PINK1
+Autophagy,Autophagy,PLIN2
+Autophagy,Autophagy,PLIN3
+Autophagy,Autophagy,PRKAA1
+Autophagy,Autophagy,PRKAA2
+Autophagy,Autophagy,PRKAB1
+Autophagy,Autophagy,PRKAB2
+Autophagy,Autophagy,PRKAG1
+Autophagy,Autophagy,PRKAG2
+Autophagy,Autophagy,PRKAG3
+Autophagy,Autophagy,PRKN
+Autophagy,Autophagy,RB1CC1
+Autophagy,Autophagy,RHEB
+Autophagy,Autophagy,RNASE1
+Autophagy,Autophagy,RPS27A
+Autophagy,Autophagy,RPTOR
+Autophagy,Autophagy,RRAGA
+Autophagy,Autophagy,RRAGB
+Autophagy,Autophagy,RRAGC
+Autophagy,Autophagy,RRAGD
+Autophagy,Autophagy,SLC38A9
+Autophagy,Autophagy,SQSTM1
+Autophagy,Autophagy,SRC
+Autophagy,Autophagy,TBK1
+Autophagy,Autophagy,TOMM20
+Autophagy,Autophagy,TOMM22
+Autophagy,Autophagy,TOMM40
+Autophagy,Autophagy,TOMM5
+Autophagy,Autophagy,TOMM6
+Autophagy,Autophagy,TOMM7
+Autophagy,Autophagy,TOMM70
+Autophagy,Autophagy,TSC1
+Autophagy,Autophagy,TSC2
+Autophagy,Autophagy,TSG101
+Autophagy,Autophagy,TUBA1A
+Autophagy,Autophagy,TUBA1B
+Autophagy,Autophagy,TUBA1C
+Autophagy,Autophagy,TUBA3C
+Autophagy,Autophagy,TUBA3D
+Autophagy,Autophagy,TUBA3E
+Autophagy,Autophagy,TUBA4A
+Autophagy,Autophagy,TUBA4B
+Autophagy,Autophagy,TUBA8
+Autophagy,Autophagy,TUBAL3
+Autophagy,Autophagy,TUBB1
+Autophagy,Autophagy,TUBB2A
+Autophagy,Autophagy,TUBB2B
+Autophagy,Autophagy,TUBB3
+Autophagy,Autophagy,TUBB4A
+Autophagy,Autophagy,TUBB4B
+Autophagy,Autophagy,TUBB6
+Autophagy,Autophagy,TUBB8
+Autophagy,Autophagy,TUBB8B
+Autophagy,Autophagy,UBA52
+Autophagy,Autophagy,UBAP1
+Autophagy,Autophagy,UBB
+Autophagy,Autophagy,UBC
+Autophagy,Autophagy,UBE2D2
+Autophagy,Autophagy,UBE2D3
+Autophagy,Autophagy,UBE2L3
+Autophagy,Autophagy,UBE2N
+Autophagy,Autophagy,UBE2V1
+Autophagy,Autophagy,ULK1
+Autophagy,Autophagy,USP30
+Autophagy,Autophagy,UVRAG
+Autophagy,Autophagy,VCP
+Autophagy,Autophagy,VDAC1
+Autophagy,Autophagy,VDAC2
+Autophagy,Autophagy,VDAC3
+Autophagy,Autophagy,VIM
+Autophagy,Autophagy,VPS28
+Autophagy,Autophagy,VPS37A
+Autophagy,Autophagy,VPS37B
+Autophagy,Autophagy,VPS37C
+Autophagy,Autophagy,VPS37D
+Autophagy,Autophagy,WDR45
+Autophagy,Autophagy,WDR45B
+Autophagy,Autophagy,WIPI1
+Autophagy,Autophagy,WIPI2
+Keratinization,Keratinization,CAPN1
+Keratinization,Keratinization,CAPNS1
+Keratinization,Keratinization,CASP14
+Keratinization,Keratinization,CDSN
+Keratinization,Keratinization,CELA2A
+Keratinization,Keratinization,CSTA
+Keratinization,Keratinization,DSC1
+Keratinization,Keratinization,DSC2
+Keratinization,Keratinization,DSC3
+Keratinization,Keratinization,DSG1
+Keratinization,Keratinization,DSG2
+Keratinization,Keratinization,DSG3
+Keratinization,Keratinization,DSG4
+Keratinization,Keratinization,DSP
+Keratinization,Keratinization,EVPL
+Keratinization,Keratinization,FLG
+Keratinization,Keratinization,FURIN
+Keratinization,Keratinization,IVL
+Keratinization,Keratinization,JUP
+Keratinization,Keratinization,KAZN
+Keratinization,Keratinization,KLK12
+Keratinization,Keratinization,KLK13
+Keratinization,Keratinization,KLK14
+Keratinization,Keratinization,KLK5
+Keratinization,Keratinization,KLK8
+Keratinization,Keratinization,KRT1
+Keratinization,Keratinization,KRT10
+Keratinization,Keratinization,KRT12
+Keratinization,Keratinization,KRT13
+Keratinization,Keratinization,KRT14
+Keratinization,Keratinization,KRT15
+Keratinization,Keratinization,KRT16
+Keratinization,Keratinization,KRT17
+Keratinization,Keratinization,KRT18
+Keratinization,Keratinization,KRT19
+Keratinization,Keratinization,KRT2
+Keratinization,Keratinization,KRT20
+Keratinization,Keratinization,KRT23
+Keratinization,Keratinization,KRT24
+Keratinization,Keratinization,KRT25
+Keratinization,Keratinization,KRT26
+Keratinization,Keratinization,KRT27
+Keratinization,Keratinization,KRT28
+Keratinization,Keratinization,KRT3
+Keratinization,Keratinization,KRT31
+Keratinization,Keratinization,KRT32
+Keratinization,Keratinization,KRT33A
+Keratinization,Keratinization,KRT33B
+Keratinization,Keratinization,KRT34
+Keratinization,Keratinization,KRT35
+Keratinization,Keratinization,KRT36
+Keratinization,Keratinization,KRT37
+Keratinization,Keratinization,KRT38
+Keratinization,Keratinization,KRT39
+Keratinization,Keratinization,KRT4
+Keratinization,Keratinization,KRT40
+Keratinization,Keratinization,KRT5
+Keratinization,Keratinization,KRT6A
+Keratinization,Keratinization,KRT6B
+Keratinization,Keratinization,KRT6C
+Keratinization,Keratinization,KRT7
+Keratinization,Keratinization,KRT71
+Keratinization,Keratinization,KRT72
+Keratinization,Keratinization,KRT73
+Keratinization,Keratinization,KRT74
+Keratinization,Keratinization,KRT75
+Keratinization,Keratinization,KRT76
+Keratinization,Keratinization,KRT77
+Keratinization,Keratinization,KRT78
+Keratinization,Keratinization,KRT79
+Keratinization,Keratinization,KRT8
+Keratinization,Keratinization,KRT80
+Keratinization,Keratinization,KRT81
+Keratinization,Keratinization,KRT82
+Keratinization,Keratinization,KRT83
+Keratinization,Keratinization,KRT84
+Keratinization,Keratinization,KRT85
+Keratinization,Keratinization,KRT86
+Keratinization,Keratinization,KRT9
+Keratinization,Keratinization,KRTAP1-1
+Keratinization,Keratinization,KRTAP1-3
+Keratinization,Keratinization,KRTAP1-4
+Keratinization,Keratinization,KRTAP1-5
+Keratinization,Keratinization,KRTAP10-1
+Keratinization,Keratinization,KRTAP10-10
+Keratinization,Keratinization,KRTAP10-11
+Keratinization,Keratinization,KRTAP10-12
+Keratinization,Keratinization,KRTAP10-2
+Keratinization,Keratinization,KRTAP10-3
+Keratinization,Keratinization,KRTAP10-4
+Keratinization,Keratinization,KRTAP10-5
+Keratinization,Keratinization,KRTAP10-6
+Keratinization,Keratinization,KRTAP10-7
+Keratinization,Keratinization,KRTAP10-8
+Keratinization,Keratinization,KRTAP10-9
+Keratinization,Keratinization,KRTAP11-1
+Keratinization,Keratinization,KRTAP12-1
+Keratinization,Keratinization,KRTAP12-2
+Keratinization,Keratinization,KRTAP12-3
+Keratinization,Keratinization,KRTAP12-4
+Keratinization,Keratinization,KRTAP13-1
+Keratinization,Keratinization,KRTAP13-2
+Keratinization,Keratinization,KRTAP13-3
+Keratinization,Keratinization,KRTAP13-4
+Keratinization,Keratinization,KRTAP15-1
+Keratinization,Keratinization,KRTAP16-1
+Keratinization,Keratinization,KRTAP17-1
+Keratinization,Keratinization,KRTAP19-1
+Keratinization,Keratinization,KRTAP19-2
+Keratinization,Keratinization,KRTAP19-3
+Keratinization,Keratinization,KRTAP19-4
+Keratinization,Keratinization,KRTAP19-5
+Keratinization,Keratinization,KRTAP19-6
+Keratinization,Keratinization,KRTAP19-7
+Keratinization,Keratinization,KRTAP19-8
+Keratinization,Keratinization,KRTAP2-1
+Keratinization,Keratinization,KRTAP2-2
+Keratinization,Keratinization,KRTAP2-3
+Keratinization,Keratinization,KRTAP2-4
+Keratinization,Keratinization,KRTAP20-1
+Keratinization,Keratinization,KRTAP20-2
+Keratinization,Keratinization,KRTAP21-1
+Keratinization,Keratinization,KRTAP21-2
+Keratinization,Keratinization,KRTAP21-3
+Keratinization,Keratinization,KRTAP22-1
+Keratinization,Keratinization,KRTAP23-1
+Keratinization,Keratinization,KRTAP24-1
+Keratinization,Keratinization,KRTAP25-1
+Keratinization,Keratinization,KRTAP26-1
+Keratinization,Keratinization,KRTAP27-1
+Keratinization,Keratinization,KRTAP29-1
+Keratinization,Keratinization,KRTAP3-1
+Keratinization,Keratinization,KRTAP3-2
+Keratinization,Keratinization,KRTAP3-3
+Keratinization,Keratinization,KRTAP4-1
+Keratinization,Keratinization,KRTAP4-11
+Keratinization,Keratinization,KRTAP4-2
+Keratinization,Keratinization,KRTAP4-3
+Keratinization,Keratinization,KRTAP4-4
+Keratinization,Keratinization,KRTAP4-5
+Keratinization,Keratinization,KRTAP4-6
+Keratinization,Keratinization,KRTAP4-7
+Keratinization,Keratinization,KRTAP4-8
+Keratinization,Keratinization,KRTAP4-9
+Keratinization,Keratinization,KRTAP5-1
+Keratinization,Keratinization,KRTAP5-10
+Keratinization,Keratinization,KRTAP5-11
+Keratinization,Keratinization,KRTAP5-2
+Keratinization,Keratinization,KRTAP5-3
+Keratinization,Keratinization,KRTAP5-4
+Keratinization,Keratinization,KRTAP5-5
+Keratinization,Keratinization,KRTAP5-6
+Keratinization,Keratinization,KRTAP5-7
+Keratinization,Keratinization,KRTAP5-8
+Keratinization,Keratinization,KRTAP5-9
+Keratinization,Keratinization,KRTAP6-1
+Keratinization,Keratinization,KRTAP6-2
+Keratinization,Keratinization,KRTAP6-3
+Keratinization,Keratinization,KRTAP8-1
+Keratinization,Keratinization,KRTAP9-1
+Keratinization,Keratinization,KRTAP9-2
+Keratinization,Keratinization,KRTAP9-3
+Keratinization,Keratinization,KRTAP9-4
+Keratinization,Keratinization,KRTAP9-6
+Keratinization,Keratinization,KRTAP9-7
+Keratinization,Keratinization,KRTAP9-8
+Keratinization,Keratinization,KRTAP9-9
+Keratinization,Keratinization,LCE1A
+Keratinization,Keratinization,LCE1B
+Keratinization,Keratinization,LCE1C
+Keratinization,Keratinization,LCE1D
+Keratinization,Keratinization,LCE1E
+Keratinization,Keratinization,LCE1F
+Keratinization,Keratinization,LCE2A
+Keratinization,Keratinization,LCE2B
+Keratinization,Keratinization,LCE2C
+Keratinization,Keratinization,LCE2D
+Keratinization,Keratinization,LCE3A
+Keratinization,Keratinization,LCE3B
+Keratinization,Keratinization,LCE3C
+Keratinization,Keratinization,LCE3D
+Keratinization,Keratinization,LCE3E
+Keratinization,Keratinization,LCE4A
+Keratinization,Keratinization,LCE5A
+Keratinization,Keratinization,LCE6A
+Keratinization,Keratinization,LELP1
+Keratinization,Keratinization,LIPJ
+Keratinization,Keratinization,LIPK
+Keratinization,Keratinization,LIPM
+Keratinization,Keratinization,LIPN
+Keratinization,Keratinization,LORICRIN
+Keratinization,Keratinization,PCSK6
+Keratinization,Keratinization,PERP
+Keratinization,Keratinization,PI3
+Keratinization,Keratinization,PKP1
+Keratinization,Keratinization,PKP2
+Keratinization,Keratinization,PKP3
+Keratinization,Keratinization,PKP4
+Keratinization,Keratinization,PPL
+Keratinization,Keratinization,PRSS8
+Keratinization,Keratinization,RPTN
+Keratinization,Keratinization,SPINK5
+Keratinization,Keratinization,SPINK6
+Keratinization,Keratinization,SPINK9
+Keratinization,Keratinization,SPRR1A
+Keratinization,Keratinization,SPRR1B
+Keratinization,Keratinization,SPRR2A
+Keratinization,Keratinization,SPRR2B
+Keratinization,Keratinization,SPRR2D
+Keratinization,Keratinization,SPRR2E
+Keratinization,Keratinization,SPRR2F
+Keratinization,Keratinization,SPRR2G
+Keratinization,Keratinization,SPRR3
+Keratinization,Keratinization,ST14
+Keratinization,Keratinization,TCHH
+Keratinization,Keratinization,TGM1
+Keratinization,Keratinization,TGM5
+MT,Mitochondrial translation,AURKAIP1
+MT,Mitochondrial translation,CHCHD1
+MT,Mitochondrial translation,DAP3
+MT,Mitochondrial translation,ERAL1
+MT,Mitochondrial translation,GADD45GIP1
+MT,Mitochondrial translation,GFM1
+MT,Mitochondrial translation,GFM2
+MT,Mitochondrial translation,KGD4
+MT,Mitochondrial translation,MALSU1
+MT,Mitochondrial translation,MIEF1
+MT,Mitochondrial translation,MRPL1
+MT,Mitochondrial translation,MRPL10
+MT,Mitochondrial translation,MRPL11
+MT,Mitochondrial translation,MRPL12
+MT,Mitochondrial translation,MRPL13
+MT,Mitochondrial translation,MRPL14
+MT,Mitochondrial translation,MRPL15
+MT,Mitochondrial translation,MRPL16
+MT,Mitochondrial translation,MRPL17
+MT,Mitochondrial translation,MRPL18
+MT,Mitochondrial translation,MRPL19
+MT,Mitochondrial translation,MRPL2
+MT,Mitochondrial translation,MRPL20
+MT,Mitochondrial translation,MRPL21
+MT,Mitochondrial translation,MRPL22
+MT,Mitochondrial translation,MRPL23
+MT,Mitochondrial translation,MRPL24
+MT,Mitochondrial translation,MRPL27
+MT,Mitochondrial translation,MRPL28
+MT,Mitochondrial translation,MRPL3
+MT,Mitochondrial translation,MRPL30
+MT,Mitochondrial translation,MRPL32
+MT,Mitochondrial translation,MRPL33
+MT,Mitochondrial translation,MRPL34
+MT,Mitochondrial translation,MRPL35
+MT,Mitochondrial translation,MRPL36
+MT,Mitochondrial translation,MRPL37
+MT,Mitochondrial translation,MRPL38
+MT,Mitochondrial translation,MRPL39
+MT,Mitochondrial translation,MRPL4
+MT,Mitochondrial translation,MRPL40
+MT,Mitochondrial translation,MRPL41
+MT,Mitochondrial translation,MRPL42
+MT,Mitochondrial translation,MRPL43
+MT,Mitochondrial translation,MRPL44
+MT,Mitochondrial translation,MRPL45
+MT,Mitochondrial translation,MRPL46
+MT,Mitochondrial translation,MRPL47
+MT,Mitochondrial translation,MRPL48
+MT,Mitochondrial translation,MRPL49
+MT,Mitochondrial translation,MRPL50
+MT,Mitochondrial translation,MRPL51
+MT,Mitochondrial translation,MRPL52
+MT,Mitochondrial translation,MRPL53
+MT,Mitochondrial translation,MRPL54
+MT,Mitochondrial translation,MRPL55
+MT,Mitochondrial translation,MRPL57
+MT,Mitochondrial translation,MRPL58
+MT,Mitochondrial translation,MRPL9
+MT,Mitochondrial translation,MRPS10
+MT,Mitochondrial translation,MRPS11
+MT,Mitochondrial translation,MRPS12
+MT,Mitochondrial translation,MRPS14
+MT,Mitochondrial translation,MRPS15
+MT,Mitochondrial translation,MRPS16
+MT,Mitochondrial translation,MRPS17
+MT,Mitochondrial translation,MRPS18A
+MT,Mitochondrial translation,MRPS18B
+MT,Mitochondrial translation,MRPS18C
+MT,Mitochondrial translation,MRPS2
+MT,Mitochondrial translation,MRPS21
+MT,Mitochondrial translation,MRPS22
+MT,Mitochondrial translation,MRPS23
+MT,Mitochondrial translation,MRPS24
+MT,Mitochondrial translation,MRPS25
+MT,Mitochondrial translation,MRPS26
+MT,Mitochondrial translation,MRPS27
+MT,Mitochondrial translation,MRPS28
+MT,Mitochondrial translation,MRPS30
+MT,Mitochondrial translation,MRPS31
+MT,Mitochondrial translation,MRPS33
+MT,Mitochondrial translation,MRPS34
+MT,Mitochondrial translation,MRPS35
+MT,Mitochondrial translation,MRPS5
+MT,Mitochondrial translation,MRPS6
+MT,Mitochondrial translation,MRPS7
+MT,Mitochondrial translation,MRPS9
+MT,Mitochondrial translation,MRRF
+MT,Mitochondrial translation,MT-ATP6
+MT,Mitochondrial translation,MT-ATP8
+MT,Mitochondrial translation,MT-CO1
+MT,Mitochondrial translation,MT-CO2
+MT,Mitochondrial translation,MT-CO3
+MT,Mitochondrial translation,MT-CYB
+MT,Mitochondrial translation,MT-ND1
+MT,Mitochondrial translation,MT-ND2
+MT,Mitochondrial translation,MT-ND3
+MT,Mitochondrial translation,MT-ND4
+MT,Mitochondrial translation,MT-ND4L
+MT,Mitochondrial translation,MT-ND5
+MT,Mitochondrial translation,MT-ND6
+MT,Mitochondrial translation,MT-RNR1
+MT,Mitochondrial translation,MT-RNR2
+MT,Mitochondrial translation,MTFMT
+MT,Mitochondrial translation,MTIF2
+MT,Mitochondrial translation,MTIF3
+MT,Mitochondrial translation,MTRES1
+MT,Mitochondrial translation,MTRF1
+MT,Mitochondrial translation,MTRF1L
+MT,Mitochondrial translation,MTRFR
+MT,Mitochondrial translation,NDUFAB1
+MT,Mitochondrial translation,OXA1L
+MT,Mitochondrial translation,PTCD3
+MT,Mitochondrial translation,TSFM
+MT,Mitochondrial translation,TUFM
+MG,Mitochondrial gene expression,AARS2
+MG,Mitochondrial gene expression,ALKBH1
+MG,Mitochondrial gene expression,ANGEL2
+MG,Mitochondrial gene expression,AURKAIP1
+MG,Mitochondrial gene expression,C1QBP
+MG,Mitochondrial gene expression,CDK5RAP1
+MG,Mitochondrial gene expression,CHCHD1
+MG,Mitochondrial gene expression,COA3
+MG,Mitochondrial gene expression,DAP3
+MG,Mitochondrial gene expression,DARS2
+MG,Mitochondrial gene expression,DDX3X
+MG,Mitochondrial gene expression,EARS2
+MG,Mitochondrial gene expression,ELAC2
+MG,Mitochondrial gene expression,FASTK
+MG,Mitochondrial gene expression,FASTKD1
+MG,Mitochondrial gene expression,FASTKD2
+MG,Mitochondrial gene expression,FASTKD3
+MG,Mitochondrial gene expression,FASTKD5
+MG,Mitochondrial gene expression,FOXO3
+MG,Mitochondrial gene expression,GADD45GIP1
+MG,Mitochondrial gene expression,GARS1
+MG,Mitochondrial gene expression,GATB
+MG,Mitochondrial gene expression,GATC
+MG,Mitochondrial gene expression,GFM1
+MG,Mitochondrial gene expression,GFM2
+MG,Mitochondrial gene expression,GTPBP3
+MG,Mitochondrial gene expression,HARS2
+MG,Mitochondrial gene expression,HSD17B10
+MG,Mitochondrial gene expression,IARS2
+MG,Mitochondrial gene expression,KANSL1
+MG,Mitochondrial gene expression,KANSL3
+MG,Mitochondrial gene expression,KAT8
+MG,Mitochondrial gene expression,LARS2
+MG,Mitochondrial gene expression,LRPPRC
+MG,Mitochondrial gene expression,MALSU1
+MG,Mitochondrial gene expression,METTL4
+MG,Mitochondrial gene expression,METTL8
+MG,Mitochondrial gene expression,MIURF
+MG,Mitochondrial gene expression,MPV17L2
+MG,Mitochondrial gene expression,MRPL1
+MG,Mitochondrial gene expression,MRPL10
+MG,Mitochondrial gene expression,MRPL11
+MG,Mitochondrial gene expression,MRPL12
+MG,Mitochondrial gene expression,MRPL13
+MG,Mitochondrial gene expression,MRPL14
+MG,Mitochondrial gene expression,MRPL15
+MG,Mitochondrial gene expression,MRPL16
+MG,Mitochondrial gene expression,MRPL17
+MG,Mitochondrial gene expression,MRPL18
+MG,Mitochondrial gene expression,MRPL19
+MG,Mitochondrial gene expression,MRPL2
+MG,Mitochondrial gene expression,MRPL20
+MG,Mitochondrial gene expression,MRPL21
+MG,Mitochondrial gene expression,MRPL22
+MG,Mitochondrial gene expression,MRPL23
+MG,Mitochondrial gene expression,MRPL24
+MG,Mitochondrial gene expression,MRPL27
+MG,Mitochondrial gene expression,MRPL28
+MG,Mitochondrial gene expression,MRPL3
+MG,Mitochondrial gene expression,MRPL30
+MG,Mitochondrial gene expression,MRPL32
+MG,Mitochondrial gene expression,MRPL33
+MG,Mitochondrial gene expression,MRPL34
+MG,Mitochondrial gene expression,MRPL35
+MG,Mitochondrial gene expression,MRPL36
+MG,Mitochondrial gene expression,MRPL37
+MG,Mitochondrial gene expression,MRPL38
+MG,Mitochondrial gene expression,MRPL39
+MG,Mitochondrial gene expression,MRPL4
+MG,Mitochondrial gene expression,MRPL40
+MG,Mitochondrial gene expression,MRPL41
+MG,Mitochondrial gene expression,MRPL42
+MG,Mitochondrial gene expression,MRPL43
+MG,Mitochondrial gene expression,MRPL44
+MG,Mitochondrial gene expression,MRPL45
+MG,Mitochondrial gene expression,MRPL46
+MG,Mitochondrial gene expression,MRPL47
+MG,Mitochondrial gene expression,MRPL48
+MG,Mitochondrial gene expression,MRPL49
+MG,Mitochondrial gene expression,MRPL50
+MG,Mitochondrial gene expression,MRPL51
+MG,Mitochondrial gene expression,MRPL52
+MG,Mitochondrial gene expression,MRPL53
+MG,Mitochondrial gene expression,MRPL54
+MG,Mitochondrial gene expression,MRPL55
+MG,Mitochondrial gene expression,MRPL57
+MG,Mitochondrial gene expression,MRPL58
+MG,Mitochondrial gene expression,MRPL9
+MG,Mitochondrial gene expression,MRPS10
+MG,Mitochondrial gene expression,MRPS11
+MG,Mitochondrial gene expression,MRPS12
+MG,Mitochondrial gene expression,MRPS14
+MG,Mitochondrial gene expression,MRPS15
+MG,Mitochondrial gene expression,MRPS16
+MG,Mitochondrial gene expression,MRPS17
+MG,Mitochondrial gene expression,MRPS18A
+MG,Mitochondrial gene expression,MRPS18B
+MG,Mitochondrial gene expression,MRPS18C
+MG,Mitochondrial gene expression,MRPS2
+MG,Mitochondrial gene expression,MRPS21
+MG,Mitochondrial gene expression,MRPS22
+MG,Mitochondrial gene expression,MRPS23
+MG,Mitochondrial gene expression,MRPS24
+MG,Mitochondrial gene expression,MRPS25
+MG,Mitochondrial gene expression,MRPS26
+MG,Mitochondrial gene expression,MRPS27
+MG,Mitochondrial gene expression,MRPS28
+MG,Mitochondrial gene expression,MRPS30
+MG,Mitochondrial gene expression,MRPS31
+MG,Mitochondrial gene expression,MRPS33
+MG,Mitochondrial gene expression,MRPS34
+MG,Mitochondrial gene expression,MRPS35
+MG,Mitochondrial gene expression,MRPS5
+MG,Mitochondrial gene expression,MRPS6
+MG,Mitochondrial gene expression,MRPS7
+MG,Mitochondrial gene expression,MRPS9
+MG,Mitochondrial gene expression,MTERF1
+MG,Mitochondrial gene expression,MTERF2
+MG,Mitochondrial gene expression,MTERF3
+MG,Mitochondrial gene expression,MTG1
+MG,Mitochondrial gene expression,MTG2
+MG,Mitochondrial gene expression,MTIF2
+MG,Mitochondrial gene expression,MTIF3
+MG,Mitochondrial gene expression,MTO1
+MG,Mitochondrial gene expression,MTPAP
+MG,Mitochondrial gene expression,MTRES1
+MG,Mitochondrial gene expression,MTRF1
+MG,Mitochondrial gene expression,MTRF1L
+MG,Mitochondrial gene expression,MTRFR
+MG,Mitochondrial gene expression,NGRN
+MG,Mitochondrial gene expression,NSUN3
+MG,Mitochondrial gene expression,OSGEPL1
+MG,Mitochondrial gene expression,OXA1L
+MG,Mitochondrial gene expression,PNPT1
+MG,Mitochondrial gene expression,POLRMT
+MG,Mitochondrial gene expression,PRKAA1
+MG,Mitochondrial gene expression,PRORP
+MG,Mitochondrial gene expression,PTCD3
+MG,Mitochondrial gene expression,PUS1
+MG,Mitochondrial gene expression,QRSL1
+MG,Mitochondrial gene expression,RARS2
+MG,Mitochondrial gene expression,RMND1
+MG,Mitochondrial gene expression,RPUSD3
+MG,Mitochondrial gene expression,RPUSD4
+MG,Mitochondrial gene expression,SARS2
+MG,Mitochondrial gene expression,SHMT2
+MG,Mitochondrial gene expression,SLC25A33
+MG,Mitochondrial gene expression,SLIRP
+MG,Mitochondrial gene expression,SUPV3L1
+MG,Mitochondrial gene expression,TACO1
+MG,Mitochondrial gene expression,TARS2
+MG,Mitochondrial gene expression,TBRG4
+MG,Mitochondrial gene expression,TEFM
+MG,Mitochondrial gene expression,TFAM
+MG,Mitochondrial gene expression,TFB1M
+MG,Mitochondrial gene expression,TFB2M
+MG,Mitochondrial gene expression,THAP11
+MG,Mitochondrial gene expression,TRIT1
+MG,Mitochondrial gene expression,TRMT10C
+MG,Mitochondrial gene expression,TRMT5
+MG,Mitochondrial gene expression,TRMT61B
+MG,Mitochondrial gene expression,TRNT1
+MG,Mitochondrial gene expression,TRUB2
+MG,Mitochondrial gene expression,TSFM
+MG,Mitochondrial gene expression,TUFM
+MG,Mitochondrial gene expression,TWNK
+MG,Mitochondrial gene expression,UQCC2
+MG,Mitochondrial gene expression,WARS2
+MG,Mitochondrial gene expression,YARS2
+MG,Mitochondrial gene expression,YRDC
+TM,Tyrosine metabolism,ADH1A
+TM,Tyrosine metabolism,ADH1B
+TM,Tyrosine metabolism,ADH1C
+TM,Tyrosine metabolism,ADH4
+TM,Tyrosine metabolism,ADH5
+TM,Tyrosine metabolism,ADH6
+TM,Tyrosine metabolism,ADH7
+TM,Tyrosine metabolism,ALDH1A3
+TM,Tyrosine metabolism,ALDH3A1
+TM,Tyrosine metabolism,ALDH3B1
+TM,Tyrosine metabolism,ALDH3B2
+TM,Tyrosine metabolism,AOC2
+TM,Tyrosine metabolism,AOC3
+TM,Tyrosine metabolism,AOX1
+TM,Tyrosine metabolism,BUD23
+TM,Tyrosine metabolism,COMT
+TM,Tyrosine metabolism,DBH
+TM,Tyrosine metabolism,DCT
+TM,Tyrosine metabolism,DDC
+TM,Tyrosine metabolism,FAH
+TM,Tyrosine metabolism,GOT1
+TM,Tyrosine metabolism,GOT2
+TM,Tyrosine metabolism,GSTZ1
+TM,Tyrosine metabolism,HEMK1
+TM,Tyrosine metabolism,HGD
+TM,Tyrosine metabolism,HPD
+TM,Tyrosine metabolism,IL4I1
+TM,Tyrosine metabolism,LCMT1
+TM,Tyrosine metabolism,LCMT2
+TM,Tyrosine metabolism,MAOA
+TM,Tyrosine metabolism,MAOB
+TM,Tyrosine metabolism,METTL2B
+TM,Tyrosine metabolism,METTL6
+TM,Tyrosine metabolism,MIF
+TM,Tyrosine metabolism,NAA80
+TM,Tyrosine metabolism,PNMT
+TM,Tyrosine metabolism,TAT
+TM,Tyrosine metabolism,TH
+TM,Tyrosine metabolism,TPO
+TM,Tyrosine metabolism,TRMT11
+TM,Tyrosine metabolism,TYR
+TM,Tyrosine metabolism,TYRP1
