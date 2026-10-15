@@ -1,5 +1,5 @@
 ### Single-follicle multi-omics reveals convergent and divergent mechanisms of human hair graying
-
+### Code awaiting update
 Single-follicle RNA-seq (sfRNA-seq) and ATAC-seq (sfATAC-seq) of 181 human hair follicles reveals that hair graying is driven by multiple independent mechanisms, with melanin pathways downregulated across all gray follicles and distinct pathways (oxidative stress, p53) altered in specific gray subgroups. GSTP1 is identified as a key regulator of melanogenesis.
 
 ### Repository Structure
@@ -55,7 +55,7 @@ Single-follicle RNA-seq (sfRNA-seq) and ATAC-seq (sfATAC-seq) of 181 human hair 
 
 ### Usage
 # 1. Clone and setup
-git clone https://github.com/Lycorisradiata777/hair-graying.git
+get clone https://github.com/Lycorisradiata777/hair_multiomics.git
 cd hair-graying
 conda env create -f environment.yml
 conda activate hair_omics
